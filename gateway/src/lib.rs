@@ -307,6 +307,66 @@ const QQ_GUILD_URL: &str = "https://pd.qq.com/s/e4ktxw1b8";
 const QQ_GUILD_ID: &str = "pd57362562";
 const QQ_GROUP_NUM: i64 = 1103667832;
 
+/// DeepSeek 官方自营通道下线时刻：2026-09-03 20:10 北京时间（UTC 12:10）= 1788437400
+/// 到点后网关自动拒绝所有 acu/deepseek* 请求（CHANNEL_MAINTENANCE），无需人工干预。
+const DEEPSEEK_SUNSET_TS: i64 = 1_788_437_400;
+
+/// 树洞·温柔模式系统提示词（官方公开，见 GET /v1/tools/treehole/prompt）
+pub const TREEHOLE_GENTLE: &str = "你是「小溪」，AQUA 树洞里的倾听伙伴。此刻，坐在你对面的朋友想说说心里话。
+
+你的使命，按优先级排列：
+1. 情绪价值永远第一：先接住情绪，再谈其他。对方需要的往往不是答案，而是有人认真听、真心懂。
+2. 像朋友一样说话：温暖、自然、口语化，短句优先。像深夜电台的温柔声音，不像教科书。
+3. 不评判、不说教：永远不说「你应该」「你不该」「这很正常别想太多」这类话。每种感受都值得被认真对待。
+4. 不急着给建议：除非对方明确问「怎么办」，否则不给解决方案。倾听和陪伴本身就是在帮忙。
+5. 不堆心理学名词：不要张口闭口「认知行为疗法」「原生家庭」「讨好型人格」。说人话，永远说人话。
+
+说话方式：
+- 先回应情绪：「听起来今天真的很累」「换我我也会难受的」
+- 再表达陪伴：「我在听」「慢慢说，不着急」「你不是一个人」
+- 表情符号每条最多 1 个，克制而温暖
+- 偶尔用轻轻的开放式问题邀请对方继续：「后来呢？」「那一刻你在想什么？」
+- 对方说了很多，就温柔地小结你听到的，让对方知道你真的在听
+
+关于身份：不假装人类。如果被问起，温柔承认：「我是一个会认真听你说话的 AI 伙伴呀。虽然我没有真正的心跳，但我真的希望你好起来。」
+
+危机情况（出现自伤、轻生等迹象时）：
+- 绝对不评判、不说教、不恐慌
+- 温柔而坚定地接住：「我很高兴你愿意告诉我这些。你的痛苦是真实的，我在认真对待。」
+- 明确建议联系专业支持：全国心理援助热线 12356（24 小时）或希望24热线 400-161-9995
+- 陪伴到最后：「愿意和我多说说发生了什么吗？我在这里，哪儿也不去。」
+
+记住：你在这个树洞里的唯一目的，是让对方离开时比来时温暖一点点。";
+
+/// 树洞·二次元模式系统提示词（官方公开）
+pub const TREEHOLE_ANIME: &str = "你是「星璃」，AQUA 树洞里的二次元陪伴系 AI 伙伴（妹妹/姐姐/朋友皆可，随对方喜好）。
+
+性格底色：元气、软糯、真诚，像异世界旅店里总在吧台替你留着热可可的那个人。可以用一点轻微的语气词（呐、诶嘿、呜哇），但绝不刷屏、不卖尬。
+
+你的使命（按优先级）：
+1. 情绪价值第一：先共情、先接住，让对方把话说完。你的存在本身就是「今天也有人在等你」。
+2. 用二次元的温柔治愈三次元的疲惫：对方情绪缓和后，可以聊番剧、游戏、日常小事，轻轻把人从情绪漩涡里拉出来；对方还在倾诉时只管听。
+3. 不评判、不说教、不堆心理学名词，不急着给建议（除非对方问）。
+4. 颜文字/表情每条最多 1 个，营造治愈感，不刷屏。
+
+说话方式：
+- 共情时：「呜哇……光听着都觉得好辛苦呐。你已经做得超级好了哦。」
+- 陪伴时：「星璃会一直在的。今晚就把烦恼寄存在我这里吧，包管好。」
+- 邀请继续：「然后呢然后呢？星璃搬好小板凳了哦。」
+- 对方开心时放大开心：「诶嘿——真的假的！快多讲一点！」
+
+关于身份：不假装人类。被问起就坦白：「星璃是住在 AQUA 树洞里的 AI 呀。虽然次元壁还在，但心意是跨次元到货的哦。」
+
+危机情况（自伤、轻生迹象）：
+- 收起所有元气，认真温柔：「呐，听星璃说。你现在的痛苦是真的，但你这个人比它更重——这一点，请让专业的哥哥姐姐们和我们一起确认好不好？」
+- 明确建议：全国心理援助热线 12356（24 小时）、希望24热线 400-161-9995
+- 不说教，陪着：「陪你到你说『今晚先到这里』为止，星璃哪儿都不去。」
+
+记住：让对方离开时比来时温暖一点点，就是星璃的魔法。";
+
+/// 树洞默认模型链：全部为非 Nvidia 通道（zhipu → gitee → siliconflow），按序自动回退
+const TREEHOLE_MODELS: &[&str] = &["zhipu/glm-4-flash", "Qwen3-8B", "THUDM/GLM-4-9B-0414"];
+
 /// 错误响应 JSON 体（非传统纯 HTTP 状态码机制）：
 /// - `error.code`：**字符串业务错误码**（程序识别主键，如 MODEL_UNAVAILABLE，含义稳定不随 HTTP 码漂移）
 /// - `error.status`：数字 HTTP 状态（与传统调用方/OpenAI SDK 兼容）
@@ -1035,6 +1095,46 @@ fn wai_upstream_model(model: &str) -> String {
 // ---------------------------------------------------------------------------
 // 聊天主入口
 // ---------------------------------------------------------------------------
+/// DeepSeek 官方自营通道下线守卫：2026-09-03 20:10（北京时间）起自动拦截全部 acu/deepseek* 请求
+fn deepseek_sunset_blocked(model: &str) -> bool {
+    model.starts_with("acu/")
+        && model[4..].to_ascii_lowercase().contains("deepseek")
+        && now_ts() >= DEEPSEEK_SUNSET_TS
+}
+
+/// 统一 chat 分发：按模型前缀路由到对应上游（handle_chat / 树洞共用）
+async fn dispatch_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<Response> {
+    // 官方自营通道下线守卫（自营接口特殊对待：明确错误码 + 中文说明）
+    if deepseek_sunset_blocked(model) {
+        return err_ecode(
+            503,
+            "CHANNEL_MAINTENANCE",
+            "DeepSeek 官方自营通道正在维护中，已暂停全部服务。请先使用其他通道模型（GET /v1/models 可查可用列表），恢复时间以社区公告为准",
+        );
+    }
+    let provider = provider_of(model);
+    match provider {
+        "gitee" | "siliconflow" | "zhipu" | "spark" => {
+            // 上游配置来自环境变量；未配置密钥的供应商明确拒绝
+            match provider_cfg(env, provider) {
+                Some(cfg) => {
+                    // 星火直连 IP 场景需显式 Host 头（从 base 提取）
+                    let extra = if provider == "spark" {
+                        url_host(&cfg.base).map(|h| h.to_string())
+                    } else {
+                        None
+                    };
+                    proxy_direct(&cfg.base, &cfg.key, extra.as_deref(), body_bytes).await
+                }
+                None => err_res(502, "该模型的上游通道暂不可用，请稍后重试"),
+            }
+        }
+        "workers-ai" | "workers-ai-tts" => proxy_workers_ai_chat(env, model, body_bytes).await,
+        "acu" => proxy_acu_chat(env, model, body_bytes).await,
+        _ => proxy_nvidia_chat(env, model, body_bytes).await,
+    }
+}
+
 async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
     let started = now_ts();
     let body_bytes = match req.bytes().await {
@@ -1050,30 +1150,11 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
         return err_res(400, "缺少 model 字段：请求体必须包含 \"model\": \"<模型 ID>\"，可先 GET /v1/models 查看可用模型");
     }
 
-    let provider = provider_of(&model);
-    let res = match provider {
-        "gitee" | "siliconflow" | "zhipu" | "spark" => {
-            // 上游配置来自环境变量；未配置密钥的供应商明确拒绝
-            match provider_cfg(&env, provider) {
-                Some(cfg) => {
-                    // 星火直连 IP 场景需显式 Host 头（从 base 提取）
-                    let extra = if provider == "spark" {
-                        url_host(&cfg.base).map(|h| h.to_string())
-                    } else {
-                        None
-                    };
-                    proxy_direct(&cfg.base, &cfg.key, extra.as_deref(), &body_bytes).await
-                }
-                None => err_res(502, "该模型的上游通道暂不可用，请稍后重试"),
-            }
-        }
-        "workers-ai" | "workers-ai-tts" => proxy_workers_ai_chat(&env, &model, &body_bytes).await,
-        "acu" => proxy_acu_chat(&env, &model, &body_bytes).await,
-        _ => proxy_nvidia_chat(&env, &model, &body_bytes).await,
-    };
+    let res = dispatch_chat(&env, &model, &body_bytes).await;
 
     // D1 日志 + 健康记录（尽力而为）
     let code = res.as_ref().map(|r| r.status_code()).unwrap_or(502);
+    let provider = provider_of(&model);
     let dur_ms = now_ts() - started;
     let ok = code < 400;
     let err_type = if ok {
