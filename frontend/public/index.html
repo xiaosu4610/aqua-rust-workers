@@ -1070,9 +1070,9 @@
     <nav class="home-subnav" aria-label="首页板块导航">
       <button class="subnav-chip" data-target="h-quick">直达入口</button>
       <button class="subnav-chip" data-target="h-eco">生态合作</button>
+      <button class="subnav-chip" data-target="h-community">社区支持</button>
       <button class="subnav-chip" data-target="h-status">实时状态</button>
       <button class="subnav-chip" data-target="h-start">快速接入</button>
-      <button class="subnav-chip" data-target="h-community">社区支持</button>
     </nav>
 
     <!-- ===== 板块一：直达入口（页面入口矩阵化，首屏即点即达） ===== -->
@@ -1146,7 +1146,86 @@
     </div>
     </section>
 
-    <!-- ===== 板块三：实时状态（JS 从网关拉真实数据填充） ===== -->
+    <!-- ===== 板块三：社区与支持（QQ 频道为主阵地，前移增加曝光） ===== -->
+    <section id="h-community" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>社区与支持</h2>
+      <div class="home-community">
+    <!-- ===== QQ 频道入口（主推：官方通知 / 密钥分发） ===== -->
+    <div class="qq-block">
+      <div class="qq-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </div>
+      <div class="qq-info">
+        <b>AQUA 开源社区 · QQ 频道（官方主阵地）</b>
+        <p>大版本更新、密钥更换、重要公告均在此通知，<b>获取密钥请优先加频道</b></p>
+        <p>频道号：<span class="qq-num">pd57362562</span></p>
+      </div>
+      <div class="qq-actions">
+        <a class="qq-join" href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          加入频道
+        </a>
+        <button class="btn" data-copy-text="pd57362562">复制频道号</button>
+      </div>
+    </div>
+    <!-- ===== QQ 群入口（次推：闲聊 / 吹水 / 技术交流） ===== -->
+    <div class="qq-block">
+      <div class="qq-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/><path d="M9 12l-2 3M15 12l2 3"/></svg>
+      </div>
+      <div class="qq-info">
+        <b>AQUA 休闲交流群（QQ 群）</b>
+        <p>日常闲聊、吹水、技术交流欢迎加入；更新与密钥通知以频道为准，群内通知较少</p>
+        <p>群号：<span class="qq-num">1103667832</span></p>
+      </div>
+      <div class="qq-actions">
+        <a class="qq-join" href="https://qm.qq.com/q/qoe6XbsVge" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          加入群聊
+        </a>
+        <button class="btn" data-copy-text="1103667832">复制群号</button>
+      </div>
+    </div>
+    <!-- ===== Gitee 仓库入口（与 QQ 频道/群卡片同构） ===== -->
+    <div class="qq-block">
+      <div class="qq-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
+      </div>
+      <div class="qq-info">
+        <b>AQUA 完全开源 · Gitee 仓库</b>
+        <p>网关 + 前台全量源码，基于 <b>AGPL-3.0</b>：可自由自部署，二开对外提供服务需同协议开源</p>
+        <p>地址：<span class="qq-num">gitee.com/xiaosu4610/aqua-rust-workers</span></p>
+      </div>
+      <div class="qq-actions">
+        <a class="qq-join" href="https://gitee.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" title="Gitee · 国内访问推荐">
+          <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
+          访问仓库 / Star
+        </a>
+        <button class="btn" data-copy-text="https://gitee.com/xiaosu4610/aqua-rust-workers">复制仓库地址</button>
+      </div>
+    </div>
+    <!-- ===== GitHub 仓库入口（与 Gitee 同构、地位平等） ===== -->
+    <div class="qq-block">
+      <div class="qq-icon">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </div>
+      <div class="qq-info">
+        <b>AQUA 完全开源 · GitHub 仓库</b>
+        <p>独立仓库，与 Gitee 内容完全同步；国际访问推荐，欢迎 Follow 与 Star</p>
+        <p>地址：<span class="qq-num">github.com/xiaosu4610/aqua-rust-workers</span></p>
+      </div>
+      <div class="qq-actions">
+        <a class="qq-join" href="https://github.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" title="GitHub · 国际访问">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          访问仓库 / Star
+        </a>
+        <button class="btn" data-copy-text="https://github.com/xiaosu4610/aqua-rust-workers">复制仓库地址</button>
+      </div>
+    </div>
+      </div>
+    </section>
+
+    <!-- ===== 板块四：实时状态（JS 从网关拉真实数据填充） ===== -->
     <section id="h-status" class="block">
       <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>实时状态</h2>
       <div class="live-strip">
@@ -1157,7 +1236,7 @@
       </div>
     </section>
 
-    <!-- ===== 板块三：三步接入（步骤卡 + 代码示例 Tab 化，纵向更短） ===== -->
+    <!-- ===== 板块五：三步接入（步骤卡 + 代码示例 Tab 化，纵向更短） ===== -->
     <section id="h-start" class="block">
       <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>三步接入</h2>
       <div class="cards">
@@ -1237,85 +1316,6 @@ resp = client.chat.completions.create(
           <div class="label">可用模型</div>
           <p class="hint">点击顶部「模型中心」查看全部模型名称并一键复制模型 ID；模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM 与讯飞星火实时提供。</p>
         </div>
-      </div>
-    </section>
-
-    <!-- ===== 板块四：社区与支持（三条全宽横幅改三卡并排，纵向更紧凑） ===== -->
-    <section id="h-community" class="block">
-      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>社区与支持</h2>
-      <div class="home-community">
-    <!-- ===== QQ 频道入口（主推：官方通知 / 密钥分发） ===== -->
-    <div class="qq-block">
-      <div class="qq-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      </div>
-      <div class="qq-info">
-        <b>AQUA 开源社区 · QQ 频道（官方主阵地）</b>
-        <p>大版本更新、密钥更换、重要公告均在此通知，<b>获取密钥请优先加频道</b></p>
-        <p>频道号：<span class="qq-num">pd57362562</span></p>
-      </div>
-      <div class="qq-actions">
-        <a class="qq-join" href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
-          加入频道
-        </a>
-        <button class="btn" data-copy-text="pd57362562">复制频道号</button>
-      </div>
-    </div>
-    <!-- ===== QQ 群入口（次推：闲聊 / 吹水 / 技术交流） ===== -->
-    <div class="qq-block">
-      <div class="qq-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/><path d="M9 12l-2 3M15 12l2 3"/></svg>
-      </div>
-      <div class="qq-info">
-        <b>AQUA 休闲交流群（QQ 群）</b>
-        <p>日常闲聊、吹水、技术交流欢迎加入；更新与密钥通知以频道为准，群内通知较少</p>
-        <p>群号：<span class="qq-num">1103667832</span></p>
-      </div>
-      <div class="qq-actions">
-        <a class="qq-join" href="https://qm.qq.com/q/qoe6XbsVge" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
-          加入群聊
-        </a>
-        <button class="btn" data-copy-text="1103667832">复制群号</button>
-      </div>
-    </div>
-    <!-- ===== Gitee 仓库入口（与 QQ 频道/群卡片同构） ===== -->
-    <div class="qq-block">
-      <div class="qq-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
-      </div>
-      <div class="qq-info">
-        <b>AQUA 完全开源 · Gitee 仓库</b>
-        <p>网关 + 前台全量源码，基于 <b>AGPL-3.0</b>：可自由自部署，二开对外提供服务需同协议开源</p>
-        <p>地址：<span class="qq-num">gitee.com/xiaosu4610/aqua-rust-workers</span></p>
-      </div>
-      <div class="qq-actions">
-        <a class="qq-join" href="https://gitee.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" title="Gitee · 国内访问推荐">
-          <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
-          访问仓库 / Star
-        </a>
-        <button class="btn" data-copy-text="https://gitee.com/xiaosu4610/aqua-rust-workers">复制仓库地址</button>
-      </div>
-    </div>
-    <!-- ===== GitHub 仓库入口（与 Gitee 同构、地位平等） ===== -->
-    <div class="qq-block">
-      <div class="qq-icon">
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-      </div>
-      <div class="qq-info">
-        <b>AQUA 完全开源 · GitHub 仓库</b>
-        <p>独立仓库，与 Gitee 内容完全同步；国际访问推荐，欢迎 Follow 与 Star</p>
-        <p>地址：<span class="qq-num">github.com/xiaosu4610/aqua-rust-workers</span></p>
-      </div>
-      <div class="qq-actions">
-        <a class="qq-join" href="https://github.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" title="GitHub · 国际访问">
-          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          访问仓库 / Star
-        </a>
-        <button class="btn" data-copy-text="https://github.com/xiaosu4610/aqua-rust-workers">复制仓库地址</button>
-      </div>
-    </div>
       </div>
     </section>
 

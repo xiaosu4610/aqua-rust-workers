@@ -1780,6 +1780,67 @@ fn auth_mode(env: &Env) -> &'static str {
 pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     console_error_panic_hook::set_once();
 
+    // ===== 防扫保底（zone 级 WAF 之外的第二道防线，Workers 层零成本拦截） =====
+    // 1) 常见扫描/利用路径：返回 404（不暴露网关存在感），避免打满 Workers 请求数与 CPU
+    let path = req.path().to_string();
+    const SCAN_SUFFIXES: &[&str] = &[
+        ".php", ".asp", ".aspx", ".jsp", ".cgi", ".env", ".git", ".bak", ".sql",
+        ".yaml", ".yml", ".conf", ".ini", ".json.bak", ".zip", ".tar", ".gz",
+    ];
+    const SCAN_PARTS: &[&str] = &[
+        "wp-admin", "wp-login", "wordpress", "phpmyadmin", "phpMyAdmin", "xmlrpc.php",
+        ".well-known/probing", "actuator", "console/", "manager/html", "jmx-console",
+        "/admin", "/administrator", "/config", "/backup", "/shell", "/eval",
+        "/cgi-bin", "/vendor", "/debug", "/telemetry", "/owa/", "/autodiscover",
+        "/.env", "/.git", "/.aws", "/.docker", "/.svn", "/.hg", "/.DS_Store",
+        "/vendor/phpunit", "/.idea", "/.vscode", "/web.config", "/crossdomain.xml",
+    ];
+    let p = if path.len() > 1 { path.trim_end_matches('/') } else { &path };
+    let lower = p.to_ascii_lowercase();
+    let scan_hit = SCAN_SUFFIXES.iter().any(|s| lower.ends_with(s))
+        || SCAN_PARTS.iter().any(|s| lower.contains(&s.to_ascii_lowercase()));
+    if scan_hit {
+        let mut r = Response::from_html("404 Not Found")?.with_status(404);
+        r.headers().set("X-Robots-Tag", "noindex, nofollow").ok();
+        return Ok(r);
+    }
+
+    // 2) 明显的脚本扫描器 UA（对 API 网关无业务意义）：直接 404
+    //    白名单：浏览器、curl、wget、OpenAI/主流 SDK、CF Health
+    let ua = req
+        .headers()
+        .get("user-agent")?
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    let ua_allowed = ua.is_empty()
+        || ua.contains("mozilla")
+        || ua.contains("curl")
+        || ua.contains("wget")
+        || ua.contains("python")
+        || ua.contains("java/") && ua.contains("okhttp")   // 部分 SDK 用 okhttp
+        || ua.contains("openai")
+        || ua.contains("node")
+        || ua.contains("go-http-client")
+        || ua.contains("cloudflare")
+        || ua.starts_with("apifox")
+        || ua.starts_with("postman")
+        || ua.starts_with("insomnia")
+        || ua.contains("httpx")
+        || ua.contains("aiohttp")
+        || ua.contains("reqwest")
+        || ua.contains("libcurl");
+    let ua_blocked = !ua_allowed
+        && (ua.contains("masscan") || ua.contains("nmap") || ua.contains("nikto")
+            || ua.contains("sqlmap") || ua.contains("dirbuster") || ua.contains("dirb")
+            || ua.contains("gobuster") || ua.contains("wfuzz") || ua.contains("ffuf")
+            || ua.contains("nuclei") || ua.contains("zgrab") || ua.contains("acunetix")
+            || ua.contains("netsparker") || ua.contains("whatweb") || ua.contains("wpscan"));
+    if ua_blocked {
+        let mut r = Response::from_html("404 Not Found")?.with_status(404);
+        r.headers().set("X-Robots-Tag", "noindex, nofollow").ok();
+        return Ok(r);
+    }
+
     if req.method() == Method::Options {
         let mut res = Response::empty()?;
         cors_headers(&mut res)?;
@@ -1790,7 +1851,6 @@ pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     // 其余端点鉴权模式由 AUTH_MODE 决定：
     //   open（默认）→ 任意非空密钥放行（开放传统）
     //   key  → 仅 GATEWAY_KEYS 中的密钥放行（防滥用，可选）
-    let path = req.path().to_string();
     let is_public = path == "/" || path == "/v1/models";
     if !is_public {
         match extract_key(&req).await {
