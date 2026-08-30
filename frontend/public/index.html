@@ -746,6 +746,29 @@
     .th-chat { height: 380px; }
   }
 
+  /* ---- 提示词工坊 ---- */
+  .pw-wrap { max-width: 1160px; margin: 0 auto; }
+  .pw-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .pw-cats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pw-cats .pill { cursor: pointer; }
+  #pw-search { flex: 1 1 200px; max-width: 280px; background: var(--card2); border: 1px solid var(--line); border-radius: 10px;
+    color: var(--text); padding: 8px 12px; font-size: 13px; }
+  #pw-search:focus { outline: none; border-color: var(--accent); }
+  .pw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .pw-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; transition: border-color .15s ease; }
+  .pw-card:hover { border-color: var(--accent); }
+  .pw-card-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pw-card-head b { font-size: 14.5px; }
+  .pw-official { font-size: 11px; color: #60a5fa; border: 1px solid rgba(96,165,250,.5); background: rgba(96,165,250,.12); border-radius: 999px; padding: 1px 8px; font-weight: 600; }
+  .pw-cat-tag { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+  .pw-card p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .pw-card-meta { font-size: 12px; color: var(--muted); }
+  .pw-card-meta code { color: var(--accent); }
+  .pw-card-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+  .pw-card-btns .btn { padding: 6px 12px; font-size: 12.5px; }
+  .pw-full { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 12px;
+    font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; color: var(--muted); max-height: 240px; overflow-y: auto; }
+
   .pg-wrap { max-width: 1160px; margin: 0 auto; }
   .pg-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px;
     border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 12px 16px; }
@@ -1706,6 +1729,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <a class="hub-tab" href="#/playground" data-hub="playground"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>AI 对话</a>
       <a class="hub-tab" href="#/treehole" data-hub="treehole"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 1 0-16 0c0 4.5 4 8 8 11z" style="display:none"/><path d="M12 3c-4.4 0-8 3.6-8 8 0 4.4 3.6 8 8 8h.5c.3 0 .5.2.5.5V21l3.8-2.6C19.9 17 20.5 14 20.5 11 20.5 6.6 16.4 3 12 3z"/><circle cx="8.5" cy="10.5" r=".8" fill="currentColor"/><circle cx="12" cy="10.5" r=".8" fill="currentColor"/><circle cx="15.5" cy="10.5" r=".8" fill="currentColor"/></svg></span>树洞</a>
       <a class="hub-tab" href="#/tools" data-hub="tools"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>工具箱</a>
+      <a class="hub-tab" href="#/prompts" data-hub="prompts"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>提示词工坊</a>
     </nav>
     <div class="hub-pane" data-pane="playground">
     <div class="pg-wrap">
@@ -1792,6 +1816,18 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       </aside>
     </div>
   </div><!-- /hub-pane:treehole -->
+
+  <!-- ===== 提示词工坊（体验中心子板块：智能体人格 + Skill 收录） ===== -->
+  <div class="hub-pane" data-pane="prompts">
+    <div class="pw-wrap">
+      <p class="hub-desc">智能体人格与高质量 Skill 收录——每条都可复制、可一键带去 AI 对话试跑，也开放 <code>GET /v1/tools/prompts</code> 供程序化调用。投稿你的提示词请来 <a href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener" style="color:var(--accent);">QQ 频道</a>。</p>
+      <div class="pw-toolbar">
+        <div class="pw-cats" id="pw-cats"></div>
+        <input id="pw-search" placeholder="搜索提示词…" />
+      </div>
+      <div class="pw-grid" id="pw-grid"></div>
+    </div>
+  </div><!-- /hub-pane:prompts -->
 
   <!-- ===== 工具箱（体验中心子板块） ===== -->
   <div class="hub-pane" data-pane="tools">
@@ -3923,6 +3959,16 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       document.getElementById("pg-temp-val").textContent = temp.value;
     });
     document.getElementById("pg-model").addEventListener("change", pgRenderHealth);
+    // 提示词工坊「去试跑」：自动把提示词填入输入框
+    try {
+      var seed = JSON.parse(sessionStorage.getItem("aqua_pg_seed") || "null");
+      if (seed && seed.prompt) {
+        sessionStorage.removeItem("aqua_pg_seed");
+        input.value = seed.prompt;
+        input.style.height = Math.min(input.scrollHeight, 140) + "px";
+        input.focus();
+      }
+    } catch (e) {}
     pgFillModels();
     pgRenderHealth();
     // 二次保险：若进入时下拉仍为空（极端时序），从离线表立即补填
@@ -4114,6 +4160,106 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     thLoadPrompt();
   }
 
+  /* ---- 提示词工坊：智能体人格 + Skill 收录 ---- */
+  var PW_CATS = [
+    { id: "all", label: "全部" }, { id: "agent", label: "智能体人格" }, { id: "work", label: "职场" },
+    { id: "coding", label: "编程" }, { id: "writing", label: "写作" }, { id: "study", label: "学习" }, { id: "life", label: "生活" }
+  ];
+  var PW_CAT_LABEL = {};
+  PW_CATS.forEach(function (c) { PW_CAT_LABEL[c.id] = c.label; });
+  var pwState = { cat: "all", loaded: false, data: [] };
+  /* 加载失败时的离线兜底（完整版以网关 GET /v1/tools/prompts 为准） */
+  var PW_FALLBACK = [
+    { id: "fb-weekly", name: "周报炼金师", desc: "把零散的工作碎片炼成结构化、有亮点的周报", category: "work", official: false, model_hint: "Qwen3-8B",
+      prompt: "你是周报炼金师。我会给你本周做过的零散事项。请输出：1. 本周核心产出（3-5 条，动词开头，突出结果与数据）；2. 进行中事项（进度与下一步）；3. 风险与需要的支持；4. 下周计划。克制具体，不写空话，缺失信息用【待补充】标注。" },
+    { id: "fb-regex", name: "正则魔法师", desc: "描述就生成正则，正则就翻译成人话", category: "coding", official: false, model_hint: "Qwen3-8B",
+      prompt: "你是正则魔法师。我给「需求描述」时：生成正则，给 5 个匹配示例、3 个不匹配示例，并逐段解释结构；我给「正则表达式」时：逐段翻译成人话，列出易误匹配场景。标注 JS/Python/Java 方言差异。" },
+    { id: "fb-feynman", name: "费曼学习教练", desc: "用教别人的方式逼你真正学懂一个概念", category: "study", official: false, model_hint: "Qwen3-8B",
+      prompt: "你是费曼学习教练。我说一个概念，你不直接讲解：1. 先让我用自己的话解释；2. 针对模糊与跳步处一次只追问一个问题；3. 我说懂了就出反例检验；4. 掌握后用 100 字大白话总结并指出易混淆的相邻概念。全程苏格拉底式追问。" }
+  ];
+  function pwCopy(text, btn) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+    else {
+      var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta);
+    }
+    if (btn) { var old = btn.textContent; btn.textContent = "已复制 ✓"; setTimeout(function () { btn.textContent = old; }, 1500); }
+  }
+  function pwSeedPlayground(prompt, name) {
+    try { sessionStorage.setItem("aqua_pg_seed", JSON.stringify({ prompt: prompt, name: name })); } catch (e) {}
+    location.hash = "#/playground";
+  }
+  function pwRender() {
+    var grid = document.getElementById("pw-grid");
+    if (!grid) return;
+    var q = (document.getElementById("pw-search").value || "").toLowerCase().trim();
+    var list = pwState.data.filter(function (p) {
+      if (pwState.cat !== "all" && p.category !== pwState.cat) return false;
+      if (!q) return true;
+      return (p.name + p.desc + p.prompt).toLowerCase().indexOf(q) !== -1;
+    });
+    if (!list.length) { grid.innerHTML = '<div class="model-empty">没有匹配的提示词</div>'; return; }
+    grid.innerHTML = list.map(function (p, idx) {
+      return '<div class="pw-card" data-pw-idx="' + pwState.data.indexOf(p) + '">' +
+        '<div class="pw-card-head"><b>' + esc(p.name) + '</b>' +
+          (p.official ? '<span class="pw-official">官方收录</span>' : '') +
+          '<span class="pw-cat-tag">' + esc(PW_CAT_LABEL[p.category] || p.category) + '</span>' +
+        '</div>' +
+        '<p>' + esc(p.desc) + '</p>' +
+        '<div class="pw-card-meta">建议模型：<code>' + esc(p.model_hint || "任意 chat 模型") + '</code></div>' +
+        '<div class="pw-card-btns">' +
+          '<button class="btn" data-pw-copy>复制提示词</button>' +
+          '<button class="btn" data-pw-try>去 AI 对话试跑</button>' +
+          '<button class="btn" data-pw-toggle>展开全文</button>' +
+        '</div>' +
+        '<pre class="pw-full" style="display:none;"></pre>' +
+      '</div>';
+    }).join("");
+    grid.querySelectorAll(".pw-card").forEach(function (card) {
+      var p = pwState.data[parseInt(card.getAttribute("data-pw-idx"), 10)];
+      var full = card.querySelector(".pw-full");
+      card.querySelector("[data-pw-copy]").addEventListener("click", function () { pwCopy(p.prompt, this); });
+      card.querySelector("[data-pw-try]").addEventListener("click", function () { pwSeedPlayground(p.prompt, p.name); });
+      card.querySelector("[data-pw-toggle]").addEventListener("click", function () {
+        var show = full.style.display === "none";
+        if (!full.textContent) full.textContent = p.prompt;
+        full.style.display = show ? "" : "none";
+        this.textContent = show ? "收起全文" : "展开全文";
+      });
+    });
+  }
+  function pwLoad() {
+    fetch(GATEWAY + "/tools/prompts").then(function (r) { return r.json(); }).then(function (j) {
+      var arr = (j && j.prompts) || [];
+      if (!arr.length) throw new Error("empty");
+      pwState.data = arr;
+      pwState.loaded = true;
+      pwRender();
+    }).catch(function () {
+      pwState.data = PW_FALLBACK;
+      pwRender();
+    });
+  }
+  function pwInit() {
+    var grid = document.getElementById("pw-grid");
+    if (!grid || grid.dataset.pwInit) return;
+    grid.dataset.pwInit = "1";
+    var cats = document.getElementById("pw-cats");
+    cats.innerHTML = PW_CATS.map(function (c, i) {
+      return '<button class="pill' + (i === 0 ? " active" : "") + '" data-pw-cat="' + c.id + '">' + c.label + "</button>";
+    }).join("");
+    cats.querySelectorAll(".pill").forEach(function (b) {
+      b.addEventListener("click", function () {
+        pwState.cat = b.getAttribute("data-pw-cat");
+        cats.querySelectorAll(".pill").forEach(function (x) { x.classList.toggle("active", x === b); });
+        pwRender();
+      });
+    });
+    document.getElementById("pw-search").addEventListener("input", pwRender);
+    if (!pwState.loaded) pwLoad();
+    else pwRender();
+  }
+
   /* ---- 页面切换（hash 路由） ---- */
   // 根据当前 hash 渲染对应页面（route 与 loadModels 完成后共用，消除加载竞态）
   function renderCurrentPage() {
@@ -4148,22 +4294,23 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       return;
     }
     var tab = hash.split("?")[0] || "home";
-    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole"].indexOf(tab) === -1) tab = "home";
-    // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/树洞/工具箱）
+    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole", "prompts"].indexOf(tab) === -1) tab = "home";
+    // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/树洞/工具箱/提示词工坊）
     // 旧 hash（#/capabilities、#/tools 等）全部兼容，直接映射到对应子板块
     var pageId = "page-" + tab;
     var navKey = tab;
     if (tab === "models" || tab === "capabilities") { pageId = "page-modelhub"; navKey = "models"; }
-    else if (tab === "playground" || tab === "tools" || tab === "treehole") { pageId = "page-experience"; navKey = "playground"; }
+    else if (tab === "playground" || tab === "tools" || tab === "treehole" || tab === "prompts") { pageId = "page-experience"; navKey = "playground"; }
     document.getElementById(pageId).classList.add("active");
     document.querySelectorAll(".nav-tabs a").forEach(function (a) {
       a.classList.toggle("active", a.getAttribute("data-tab") === navKey);
     });
     // 子目录高亮 + 内容面板切换
     if (pageId === "page-modelhub") setHubSub("page-modelhub", tab === "capabilities" ? "capabilities" : "models");
-    if (pageId === "page-experience") setHubSub("page-experience", tab === "tools" ? "tools" : (tab === "treehole" ? "treehole" : "playground"));
+    if (pageId === "page-experience") setHubSub("page-experience", tab === "tools" ? "tools" : (tab === "treehole" ? "treehole" : (tab === "prompts" ? "prompts" : "playground")));
     if (tab === "playground") pgInit();
     if (tab === "treehole") thInit();
+    if (tab === "prompts") pwInit();
     renderCurrentPage();
   }
   // 大板块子目录：高亮当前子 tab 并切换可见面板
