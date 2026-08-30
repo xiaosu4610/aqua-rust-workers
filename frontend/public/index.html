@@ -265,7 +265,7 @@
   .hint { font-size: 13px; color: var(--muted); margin-top: 8px; }
 
   /* ===== Section ===== */
-  section.block { margin: 44px 0; }
+  section.block { margin: 44px 0; scroll-margin-top: 72px; } /* 锚点滚动避开 sticky 导航遮挡 */
   .sec-title { font-size: 22px; font-weight: 700; margin-bottom: 20px;
                display: flex; align-items: center; gap: 9px; position: relative; }
   .sec-title::before { content: ""; width: 4px; height: 22px; border-radius: 2px; flex: none;
@@ -279,6 +279,15 @@
     background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px;
     transition: all .15s; }
   .subnav-chip:hover { background: var(--btn-hover); transform: translateY(-1px); }
+  /* ===== 大板块子目录（模型中心 / 体验中心）：hash 驱动的二级导航 ===== */
+  .hub-subnav { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 20px; }
+  .hub-tab { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--card); color: var(--muted); font-size: 13.5px; font-weight: 600;
+    text-decoration: none; transition: all .15s; }
+  .hub-tab .ic svg { width: 16px; height: 16px; }
+  .hub-tab:hover { background: var(--btn-hover); color: var(--accent); transform: translateY(-1px); }
+  .hub-tab.active { background: linear-gradient(90deg, var(--grad-1), var(--grad-2)); border-color: transparent; color: #04121f; }
+  .hub-desc { color: var(--muted); font-size: 13.5px; line-height: 1.7; margin: 0 0 14px; }
   /* 直达磁贴：页面入口矩阵化，首屏即点即达 */
   .quick-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .qtile { display: flex; flex-direction: column; gap: 6px; text-decoration: none; padding: 18px;
@@ -414,8 +423,6 @@
 
   /* ===== 模型能力总览页 ===== */
   .cap-page { max-width: 1080px; margin: 0 auto; }
-  .cap-head h1 { display: flex; align-items: center; gap: 10px; font-size: 22px; }
-  .cap-head p { font-size: 13px; color: var(--muted); margin-top: 8px; }
   .cap-stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 6px; }
   .cap-stat-card { flex: none; min-width: 90px; background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--aqua) 6%, var(--card)));
     border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; text-align: center; }
@@ -527,7 +534,7 @@
     letter-spacing: .5px; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; }
   .sponsors-title::before, .sponsors-title::after { content: ""; flex: 1; height: 1px;
     background: var(--border); }
-  .sponsors-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .sponsors-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 12px; }
   .sponsor-card { position: relative; display: flex; flex-direction: column; gap: 10px;
     background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px;
     transition: all .18s; }
@@ -694,9 +701,9 @@
   .pg-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px;
     border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 12px 16px; }
   .pg-toolbar label { font-size: 12px; color: var(--muted); margin-right: 6px; }
-  .pg-model-pick { display: flex; align-items: center; }
+  .pg-model-pick { display: flex; align-items: center; min-width: 0; flex: 1 1 auto; }
   .pg-model-pick select { background: var(--card2); color: var(--text); border: 1px solid var(--border);
-    border-radius: 8px; padding: 7px 10px; font-size: 13px; max-width: 320px; }
+    border-radius: 8px; padding: 7px 10px; font-size: 13px; min-width: 0; max-width: 100%; flex: 1; }
   .pg-temp { display: flex; align-items: center; gap: 8px; }
   .pg-temp input[type=range] { width: 120px; accent-color: var(--accent); }
   .pg-temp span { color: var(--accent); font-weight: 600; min-width: 24px; }
@@ -731,9 +738,6 @@
 
   /* ===== 工具箱 ===== */
   .tools-page { max-width: 1160px; margin: 0 auto; padding-top: 28px; }
-  .tools-head h1 { display: flex; align-items: center; gap: 10px; font-size: 26px; margin-bottom: 8px; }
-  .tools-head h1 .ic svg { width: 24px; height: 24px; color: var(--accent); }
-  .tools-head p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
   .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
   .tool-card { border: 1px solid var(--border); border-radius: 16px; background: linear-gradient(160deg, var(--card), var(--card2));
     padding: 20px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: var(--text);
@@ -754,7 +758,6 @@
   .tools-sec-t::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--accent); }
   .tools-sec-t::after { content: ""; flex: 1; height: 1px; background: var(--border); }
   .tools-sec-n { font-size: 12px; color: var(--muted); }
-  .tools-head { padding-top: 8px; }
   .tools-api-note { border: 1px solid var(--border); border-radius: 14px; background: linear-gradient(160deg, var(--card), var(--card2));
     padding: 18px 22px; margin-top: 36px; }
   .tools-api-note p { color: var(--muted); font-size: 13.5px; line-height: 2; }
@@ -824,10 +827,13 @@
   .tt-cell:hover { background: var(--card2); }
   .tt-cell.taken { cursor: default; }
   .tt-cell.taken:hover { background: var(--card); }
+  /* AI 思考中锁定棋盘：禁止落子 */
+  .tt-board.busy .tt-cell:not(.taken), .gk-board.busy .gk-cell:not(.taken) { cursor: not-allowed; opacity: .75; }
+  .tt-board.busy .tt-cell:not(.taken):hover, .gk-board.busy .gk-cell:not(.taken):hover { background: var(--card); }
 
   /* ===== 五子棋 ===== */
   .gk-board { display: grid; grid-template-columns: repeat(9, 34px); grid-auto-rows: 34px; gap: 2px;
-    max-width: 326px; margin: 4px 0 14px; background: var(--card2); padding: 6px; border-radius: 10px; border: 1px solid var(--border); }
+    max-width: 340px; margin: 4px 0 14px; background: var(--card2); padding: 6px; border-radius: 10px; border: 1px solid var(--border); }
   .gk-cell { border: 1px solid var(--border); border-radius: 4px; background: var(--card);
     display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .gk-cell:hover { background: rgba(103,232,249,.1); }
@@ -921,7 +927,7 @@
     .models-bar { flex-direction: column; gap: 8px; }
     .search { min-width: 0; width: 100%; padding: 10px 12px; font-size: 14px; }
     .count { font-size: 12px; }
-    .model-grid { grid-template-columns: 1fr; gap: 8px; }
+    .model-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; } /* minmax(0,1fr)：防止超长模型名的 min-content 撑破轨道 */
     .model-item { padding: 10px; gap: 6px; }
     .model-item code { font-size: 12px; }
     .model-item .btn { padding: 5px 10px; font-size: 11px; }
@@ -962,6 +968,12 @@
     .tt-cell { font-size: 28px; }
     .gk-board { grid-template-columns: repeat(9, 30px); grid-auto-rows: 30px; }
     .gk-black, .gk-white { width: 18px; height: 18px; }
+    /* 体验中心：对话区 + 侧栏改单列，避免 280px 固定侧栏挤压聊天区 */
+    .pg-main { grid-template-columns: 1fr; }
+    .pg-chat { min-height: 320px; max-height: 480px; }
+    /* 大板块子目录窄屏紧凑化 */
+    .hub-subnav { gap: 6px; margin-bottom: 14px; }
+    .hub-tab { padding: 6px 12px; font-size: 12.5px; }
   }
 
   /* ===== 超小屏 (≤380px) ===== */
@@ -973,6 +985,12 @@
     .copy-row code { font-size: 11px; }
     .model-item { flex-direction: column; align-items: stretch; }
     .model-item .btn { align-self: flex-end; }
+    /* 五子棋 9 列固定宽：26px 格总宽 264px，320px 视口不再横向溢出 */
+    .gk-board { grid-template-columns: repeat(9, 26px); grid-auto-rows: 26px; padding: 5px; }
+    .gk-black, .gk-white { width: 15px; height: 15px; }
+    .tt-board { grid-template-columns: repeat(3, 64px); grid-auto-rows: 64px; }
+    /* 单列卡片布局下超长模型名允许换行（原 nowrap 的 min-content 会撑破 grid 轨道） */
+    .model-link { white-space: normal; word-break: break-all; }
   }
 </style>
 </head>
@@ -997,27 +1015,19 @@
       <div class="nav-tabs">
         <a href="#/home" data-tab="home">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>
-          首页
+          <span class="nt">首页</span>
         </a>
         <a href="#/models" data-tab="models">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-          模型列表
-        </a>
-        <a href="#/capabilities" data-tab="capabilities">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 7v10l-8 5-8-5V7l8-5z"/><path d="M12 12v8"/><path d="m4 7 8 5 8-5"/><path d="M12 2v8"/></svg></span>
-          模型能力
+          <span class="nt">模型中心</span>
         </a>
         <a href="#/playground" data-tab="playground">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
-          在线体验
-        </a>
-        <a href="#/tools" data-tab="tools">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
-          工具箱
+          <span class="nt">体验中心</span>
         </a>
         <a href="#/api" data-tab="api">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
-          API 文档
+          <span class="nt">API 文档</span>
         </a>
       </div>
       <div class="theme-switch" id="theme-switch">
@@ -1077,9 +1087,9 @@
         </a>
         <a class="qtile" href="#/models">
           <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>
-          <b>模型列表</b>
-          <span class="qt-desc">全线模型实时健康分，一键复制模型 ID</span>
-          <span class="qt-go">查看全部 →</span>
+          <b>模型中心</b>
+          <span class="qt-desc">模型列表 + 能力总览，实时健康分、一键复制模型 ID</span>
+          <span class="qt-go">进入中心 →</span>
         </a>
         <a class="qtile" href="#/tools">
           <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
@@ -1185,7 +1195,7 @@ resp = client.chat.completions.create(
         </div>
         <div class="doc-block">
           <div class="label">可用模型</div>
-          <p class="hint">点击顶部「模型列表」查看全部模型名称并一键复制模型 ID；模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM 与讯飞星火实时提供。</p>
+          <p class="hint">点击顶部「模型中心」查看全部模型名称并一键复制模型 ID；模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM 与讯飞星火实时提供。</p>
         </div>
       </div>
     </section>
@@ -1303,12 +1313,18 @@ resp = client.chat.completions.create(
     </section>
   </section>
 
-  <!-- ===== 页面二：模型列表 ===== -->
-  <section id="page-models" class="page">
+  <!-- ===== 页面二：模型中心（模型列表 + 模型能力，子目录切换） ===== -->
+  <section id="page-modelhub" class="page">
     <div class="models-page-head">
-      <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>模型列表</h1>
-      <p>以下模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火与官方自营平台提供，点击「复制」即可获取模型 ID，填入客户端使用。</p>
+      <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>模型中心</h1>
+      <p>全线模型一览与能力总览的统一入口：由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火与官方自营平台实时提供。</p>
     </div>
+    <nav class="hub-subnav" aria-label="模型中心子导航">
+      <a class="hub-tab" href="#/models" data-hub="models"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>模型列表</a>
+      <a class="hub-tab" href="#/models/capabilities" data-hub="capabilities"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 7v10l-8 5-8-5V7l8-5z"/><path d="M12 12v8"/><path d="m4 7 8 5 8-5"/><path d="M12 2v8"/></svg></span>模型能力</a>
+    </nav>
+    <div class="hub-pane" data-pane="models">
+    <p class="hub-desc">以下模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火与官方自营平台提供，点击「复制」即可获取模型 ID，填入客户端使用。</p>
     <div class="acu-models-banner" data-copy-text="acu/deepseek-v4-flash" title="点击复制模型 ID">
       <div class="mb-top">
         <div class="mb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26 6.86.63-5.2 4.55 1.56 6.71L12 16.9 5.88 20.15l1.56-6.71-5.2-4.55 6.86-.63z"/></svg></div>
@@ -1373,22 +1389,12 @@ resp = client.chat.completions.create(
       <div class="model-empty">模型加载中…</div>
     </div>
     <p class="hint" style="margin-top:10px;">点击任意模型 ID 可查看该模型的详细能力说明与支持参数。</p>
-  </section>
+    </div><!-- /hub-pane:models -->
 
-  <!-- ===== 页面三：模型详情 ===== -->
-  <section id="page-model" class="page">
-    <div class="model-detail" id="model-detail">
-      <div class="model-empty">模型加载中…</div>
-    </div>
-  </section>
-
-  <!-- ===== 页面四：模型能力总览 ===== -->
-  <section id="page-capabilities" class="page">
+  <!-- ===== 模型能力总览（模型中心子板块） ===== -->
+  <div class="hub-pane" data-pane="capabilities">
     <div class="cap-page">
-      <div class="cap-head">
-        <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 7v10l-8 5-8-5V7l8-5z"/><path d="M12 12v8"/><path d="m4 7 8 5 8-5"/><path d="M12 2v8"/></svg></span>模型能力总览</h1>
-        <p>浏览所有模型的「能力卡片」——上下文 / 参数量 / 平台 / 类型一目了然。点击任意卡片可进入该模型专属详情页（含上下文知识库、支持与不支持参数、使用示例等）。</p>
-      </div>
+      <p class="hub-desc">浏览所有模型的「能力卡片」——上下文 / 参数量 / 平台 / 类型一目了然。点击任意卡片可进入该模型专属详情页（含上下文知识库、支持与不支持参数、使用示例等）。</p>
       <div class="repo-banner">
         <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
         <span><b>AQUA 完全开源</b>——可自部署、可二开，觉得有用就点个 Star 支持一下</span>
@@ -1420,13 +1426,21 @@ resp = client.chat.completions.create(
         <div class="model-empty">模型加载中…</div>
       </div>
     </div>
+  </div><!-- /hub-pane:capabilities -->
+  </section>
+
+  <!-- ===== 页面三：模型详情 ===== -->
+  <section id="page-model" class="page">
+    <div class="model-detail" id="model-detail">
+      <div class="model-empty">模型加载中…</div>
+    </div>
   </section>
 
   <!-- ===== 页面五：API 文档 ===== -->
   <section id="page-api" class="page">
     <div class="api-page">
       <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>API 文档</h1>
-      <p class="intro">AQUA 网关完整兼容 OpenAI 协议，所有端点均可直接用 OpenAI SDK 调用。统一入口见「首页」，以下为各端点的详细说明、调用示例与错误码。API Key 加 QQ 频道（频道号 pd57362562）获取，模型列表请以「模型列表」页为准（实时同步）。</p>
+      <p class="intro">AQUA 网关完整兼容 OpenAI 协议，所有端点均可直接用 OpenAI SDK 调用。统一入口见「首页」，以下为各端点的详细说明、调用示例与错误码。API Key 加 QQ 频道（频道号 pd57362562）获取，模型列表请以「模型中心 · 模型列表」为准（实时同步）。</p>
       <div class="repo-banner">
         <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
         <span><b>AQUA 完全开源</b>——你正在看的这份页面源码全部开放，欢迎自部署与二开</span>
@@ -1608,8 +1622,17 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     </div>
   </section>
 
-  <!-- ===== 页面六：在线体验（Playground） ===== -->
-  <section id="page-playground" class="page">
+  <!-- ===== 页面六：体验中心（AI 对话 + 工具箱，子目录切换） ===== -->
+  <section id="page-experience" class="page">
+    <div class="models-page-head">
+      <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>体验中心</h1>
+      <p>免登录直接对话、玩 AI 对弈游戏、用免费实用工具——所有体验与真实 API 行为完全一致。</p>
+    </div>
+    <nav class="hub-subnav" aria-label="体验中心子导航">
+      <a class="hub-tab" href="#/playground" data-hub="playground"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>AI 对话</a>
+      <a class="hub-tab" href="#/tools" data-hub="tools"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>工具箱</a>
+    </nav>
+    <div class="hub-pane" data-pane="playground">
     <div class="pg-wrap">
       <div class="pg-toolbar">
         <div class="pg-model-pick">
@@ -1646,15 +1669,12 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         <button class="btn pg-stop" id="pg-stop" style="display:none;">停止</button>
       </div>
     </div>
-  </section>
+    </div><!-- /hub-pane:playground -->
 
-  <!-- ===== 页面七：工具箱（AI 赋能） ===== -->
-  <section id="page-tools" class="page">
+  <!-- ===== 工具箱（体验中心子板块） ===== -->
+  <div class="hub-pane" data-pane="tools">
     <div class="tools-page">
-      <div class="tools-head">
-        <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>AI 赋能工具箱</h1>
-        <p>基于 AQUA 网关构建的对弈游戏与实用工具——每个工具既是网页应用，也是网关 API，兼容性拉满。</p>
-      </div>
+      <p class="hub-desc">基于 AQUA 网关构建的对弈游戏与实用工具——每个工具既是网页应用，也是网关 API，兼容性拉满。</p>
       <div class="tools-sec"><span class="tools-sec-t">AI 对弈游戏</span><span class="tools-sec-n">4 款 · 支持自选模型对手</span></div>
       <div class="tools-grid" id="tools-grid">
         <a class="tool-card" href="#/tools/tictactoe">
@@ -1726,6 +1746,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         <p>上述所有工具的能力同时以 REST API 形式开放在网关上——例如 <code>POST /v1/tools/text-stats</code>、<code>GET /v1/tools/uuid</code>、<code>POST /v1/tools/base64</code>。鉴权方式与主 API 相同，详见 <a href="#/api" style="color:var(--accent);">API 文档</a>。我们不只提供 AI API，也提供工具 API。</p>
       </div>
     </div>
+  </div><!-- /hub-pane:tools -->
   </section>
 
   <!-- ===== 页面八：工具子页（IP/审核等，JS 动态渲染） ===== -->
@@ -2784,6 +2805,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       '<div id="id-result" class="tool-result"></div>');
     var chain = [];
     var needChar = "";
+    var busy = false; // AI 思考锁：AI 回合中禁止玩家提交
+    var gen = 0;      // 对局代际：重开后旧 AI 回调作废
     function isIdiom(s) { return /^[\u4e00-\u9fa5]{4}$/.test(s); }
     function setStatus(t) { document.getElementById("id-status").textContent = t; }
     function addLog(who, word) {
@@ -2797,38 +2820,46 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       document.getElementById("id-result").innerHTML = '<div class="tool-ai-box"><b>对局结束</b><div class="tool-ai-text">' + msg + "</div></div>";
     }
     function userGo() {
+      if (busy) { setStatus("AI 思考中，请稍候…"); return; }
       var inp = document.getElementById("id-input");
       var w = (inp.value || "").trim();
       inp.value = "";
       if (!isIdiom(w)) { setStatus("请输入四字成语"); return; }
       if (needChar && w[0] !== needChar) { setStatus('接龙失败：需要以「' + needChar + "」开头"); return; }
       if (chain.some(function (c) { return c[1] === w; })) { setStatus("这个成语已经用过了"); return; }
+      busy = true;
       addLog("user", w);
       needChar = w[3];
       setStatus("AI 思考中…（需以「" + needChar + "」开头）");
-      aiGo(w, needChar);
+      aiGo(w, needChar, gen);
     }
-    function aiGo(prevWord, startChar) {
+    function aiGo(prevWord, startChar, myGen) {
       var model = document.getElementById("id-model").value;
       var used = chain.map(function (c) { return c[1]; }).join("、");
       apiChat([
         { role: "system", content: "你在玩成语接龙。只输出一个四字成语本身，不要标点不要解释。成语必须以指定汉字开头，且不能与已用过的成语重复。" },
         { role: "user", content: "上一个成语是「" + prevWord + "」。你必须输出一个以「" + startChar + "」开头的四字成语。已用过的成语（禁止重复）：" + (used || "无") }
       ], { model: model, temperature: 0.6, max_tokens: 30 }).then(function (out) {
+        if (myGen !== gen) return; // 思考期间重开了对局，丢弃过期回调
         var w = out ? String(out).replace(/[^一-鿿]/g, "").slice(0, 4) : "";
         if (!isIdiom(w) || w[0] !== startChar || chain.some(function (c) { return c[1] === w; })) {
+          busy = false;
           return win("🎉 AI 接不上「" + startChar + "」开头的成语，你赢了！共 " + chain.length + " 手");
         }
         addLog("ai", w);
         needChar = w[3];
+        busy = false;
         setStatus('轮到你了（需以「' + needChar + '」开头）');
       }).catch(function (err) {
+        if (myGen !== gen) return;
+        busy = false;
         win("AI 调用失败（" + err.message + "），本轮不计胜负，请重新开始");
       });
     }
     document.getElementById("id-go").addEventListener("click", userGo);
     document.getElementById("id-input").addEventListener("keydown", function (e) { if (e.key === "Enter") userGo(); });
     document.getElementById("id-restart").addEventListener("click", function () {
+      gen++; busy = false; // 作废思考中的旧回调
       chain = []; needChar = "";
       document.getElementById("id-log").innerHTML = "";
       document.getElementById("id-result").innerHTML = "";
@@ -2966,6 +2997,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var N = 9;
     var board = [];
     var over = false;
+    var busy = false; // AI 回合锁：思考中禁止落子
+    var gen = 0;      // 对局代际：重开后旧 AI 回调作废
     function reset() { board = []; for (var i = 0; i < N * N; i++) board.push(0); over = false; }
     function idx(r, c) { return r * N + c; }
     function checkWin(p) {
@@ -3029,6 +3062,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }
     function draw() {
       var el = document.getElementById("gk-board");
+      el.classList.toggle("busy", busy && !over);
       var html = "";
       for (var i = 0; i < N * N; i++) {
         var v = board[i];
@@ -3042,20 +3076,24 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }
     function setStatus(t) { document.getElementById("gk-status").textContent = t; }
     function finish(msg) {
-      over = true;
+      over = true; busy = false;
+      document.getElementById("gk-board").classList.remove("busy");
       setStatus(msg);
       document.getElementById("gk-result").innerHTML = '<div class="tool-ai-box"><b>对局结束</b><div class="tool-ai-text">' + msg + "</div></div>";
     }
     function afterAiMove() {
       if (checkWin(2)) return finish("💥 对手获胜");
+      if (board.indexOf(0) === -1) return finish("🤝 平局"); // 棋盘下满无人获胜，防止死局挂起
       setStatus("轮到你了（黑棋）");
     }
     function aiMoveAlgo() {
       var mv = bestMoveAlgo();
-      board[idx(mv[0], mv[1])] = 2; draw();
+      board[idx(mv[0], mv[1])] = 2;
+      busy = false; // 先释放锁再重绘，确保 .busy 视觉状态同步清除
+      draw();
       afterAiMove();
     }
-    function aiMoveLlm() {
+    function aiMoveLlm(myGen) {
       var model = document.getElementById("gk-llm-model").value;
       var rows = [];
       for (var r = 0; r < N; r++) {
@@ -3068,34 +3106,43 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         { role: "system", content: "你在下五子棋（9×9），执白棋 O，人类执黑棋 X。坐标格式为「行,列」（0-8）。只输出一个坐标如 4,4，不要输出其他内容。优先连五取胜，其次阻挡黑棋四连/活三。" },
         { role: "user", content: "当前棋盘（. 为空）：\n" + rows.join("\n") + "\n轮到你（O）落子，输出坐标。" }
       ], { model: model, temperature: 0.2, max_tokens: 30 }).then(function (out) {
+        if (myGen !== gen) return; // 思考期间重开了对局，丢弃过期回调
         var mv = null;
         if (out) {
           var m = String(out).match(/(\d)\D+(\d)/);
           if (m) { var rr = +m[1], cc = +m[2]; if (rr < N && cc < N && !board[idx(rr,cc)]) mv = [rr, cc]; }
         }
         if (!mv) mv = bestMoveAlgo();
-        board[idx(mv[0], mv[1])] = 2; draw();
+        board[idx(mv[0], mv[1])] = 2;
+        busy = false; // 先释放锁再重绘，确保 .busy 视觉状态同步清除
+        draw();
         afterAiMove();
       }).catch(function () {
+        if (myGen !== gen) return;
         // LLM 异常自动回退算法对手，对局不中断
         setStatus("LLM 调用失败，回退算法对手");
         aiMoveAlgo();
       });
     }
     function onCell(i) {
-      if (over || board[i]) return;
+      if (over || busy || board[i]) return; // 思考中/已结束/已占用一律禁止
+      busy = true;
       board[i] = 1; draw();
       if (checkWin(1)) return finish("🎉 你赢了！");
+      if (board.indexOf(0) === -1) return finish("🤝 平局"); // 棋盘下满无人获胜，防止死局挂起
       setStatus("对手思考中…");
+      var myGen = gen;
       setTimeout(function () {
+        if (myGen !== gen) return; // 重开后作废
         var mode = document.getElementById("gk-mode").value;
-        if (mode === "llm") aiMoveLlm(); else aiMoveAlgo();
+        if (mode === "llm") aiMoveLlm(myGen); else aiMoveAlgo();
       }, 300);
     }
     document.getElementById("gk-mode").addEventListener("change", function () {
       document.getElementById("gk-llm-model").style.display = this.value === "llm" ? "" : "none";
     });
     document.getElementById("gk-restart").addEventListener("click", function () {
+      gen++; busy = false; // 作废思考中的旧回调
       reset();
       document.getElementById("gk-result").innerHTML = "";
       draw(); setStatus("轮到你了（黑棋）");
@@ -3119,6 +3166,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       '<div class="tt-side" id="tt-result"></div></div>');
     var board = Array(9).fill("");
     var over = false;
+    var busy = false; // AI 回合锁：思考中禁止落子
+    var gen = 0;      // 对局代际：重开后旧 AI 回调作废
     var WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     function winner(b) {
       for (var i = 0; i < WINS.length; i++) {
@@ -3157,6 +3206,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }
     function draw() {
       var el = document.getElementById("tt-board");
+      el.classList.toggle("busy", busy && !over);
       el.innerHTML = board.map(function (c, i) {
         return '<div class="tt-cell' + (c ? " taken" : "") + '" data-i="' + i + '">' + (c === "X" ? "✕" : c === "O" ? "◯" : "") + "</div>";
       }).join("");
@@ -3166,19 +3216,22 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }
     function setStatus(t) { document.getElementById("tt-status").textContent = t; }
     function finish(w) {
-      over = true;
+      over = true; busy = false;
+      document.getElementById("tt-board").classList.remove("busy");
       var msg = w.who === "X" ? "🎉 你赢了！" : w.who === "O" ? "💥 对手获胜" : "🤝 平局";
       setStatus(msg);
       document.getElementById("tt-result").innerHTML = '<div class="tool-ai-box"><b>对局结束</b><div class="tool-ai-text">' + msg + "</div></div>";
     }
     function aiMoveAlgo() {
       var i = bestMove();
-      board[i] = "O"; draw();
+      board[i] = "O";
+      busy = false; // 先释放锁再重绘，确保 .busy 视觉状态同步清除
+      draw();
       var w = winner(board);
       if (w) return finish(w);
       setStatus("轮到你了（✕）");
     }
-    function aiMoveLlm() {
+    function aiMoveLlm(myGen) {
       var model = document.getElementById("tt-llm-model").value;
       var grid = "";
       for (var r = 0; r < 3; r++) {
@@ -3189,36 +3242,46 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         { role: "system", content: "你在玩井字棋，执 O 对抗人类的 X。棋盘用 - 表示空格。只输出一个 0-8 的数字表示你的落子位置（0 左上，8 右下），不要输出任何其他内容。必须选择空格，优先取胜、其次阻挡人类连三。" },
         { role: "user", content: "当前棋盘：\n" + grid + "轮到你（O）落子，输出空格编号。" }
       ], { model: model, temperature: 0.2, max_tokens: 20 }).then(function (out) {
+        if (myGen !== gen) return; // 思考期间重开了对局，丢弃过期回调
         var idx = -1;
         if (out) { var mnum = String(out).match(/[0-8]/); if (mnum) idx = +mnum[0]; }
         // LLM 输出无效时兜底选第一个空格
         if (idx < 0 || board[idx]) { idx = -1; for (var i = 0; i < 9; i++) if (!board[i]) { idx = i; break; } }
-        board[idx] = "O"; draw();
+        board[idx] = "O";
+        busy = false; // 先释放锁再重绘，确保 .busy 视觉状态同步清除
+        draw();
         var w = winner(board);
         if (w) return finish(w);
         setStatus("轮到你了（✕）");
       }).catch(function () {
+        if (myGen !== gen) return;
         // LLM 异常自动回退算法对手，对局不中断
         setStatus("LLM 调用失败，回退算法对手");
         aiMoveAlgo();
       });
     }
-    function aiMove() {
+    function aiMove(myGen) {
       var mode = document.getElementById("tt-mode").value;
-      if (mode === "llm") aiMoveLlm(); else aiMoveAlgo();
+      if (mode === "llm") aiMoveLlm(myGen); else aiMoveAlgo();
     }
     function onCell(i) {
-      if (over || board[i]) return;
+      if (over || busy || board[i]) return; // 思考中/已结束/已占用一律禁止
+      busy = true;
       board[i] = "X"; draw();
       var w = winner(board);
       if (w) return finish(w);
       setStatus("对手思考中…");
-      setTimeout(aiMove, 300);
+      var myGen = gen;
+      setTimeout(function () {
+        if (myGen !== gen) return; // 重开后作废
+        aiMove(myGen);
+      }, 300);
     }
     document.getElementById("tt-mode").addEventListener("change", function () {
       document.getElementById("tt-llm-model").style.display = this.value === "llm" ? "" : "none";
     });
     document.getElementById("tt-restart").addEventListener("click", function () {
+      gen++; busy = false; // 作废思考中的旧回调
       board = Array(9).fill(""); over = false;
       document.getElementById("tt-result").innerHTML = "";
       draw(); setStatus("轮到你了（✕）");
@@ -3454,7 +3517,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       '</div>';
     }
     el.innerHTML =
-      '<a href="#/capabilities" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>返回模型能力</a>' +
+      '<a href="#/models/capabilities" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>返回模型能力</a>' +
       '<div class="md-head">' +
         '<h1><code>' + esc(id) + '</code></h1>' +
         '<div class="md-tags">' +
@@ -3851,12 +3914,32 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }
     var tab = hash.split("?")[0] || "home";
     if (["home", "models", "capabilities", "api", "playground", "tools"].indexOf(tab) === -1) tab = "home";
-    document.getElementById("page-" + tab).classList.add("active");
+    // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/工具箱）
+    // 旧 hash（#/capabilities、#/tools 等）全部兼容，直接映射到对应子板块
+    var pageId = "page-" + tab;
+    var navKey = tab;
+    if (tab === "models" || tab === "capabilities") { pageId = "page-modelhub"; navKey = "models"; }
+    else if (tab === "playground" || tab === "tools") { pageId = "page-experience"; navKey = "playground"; }
+    document.getElementById(pageId).classList.add("active");
     document.querySelectorAll(".nav-tabs a").forEach(function (a) {
-      a.classList.toggle("active", a.getAttribute("data-tab") === tab);
+      a.classList.toggle("active", a.getAttribute("data-tab") === navKey);
     });
+    // 子目录高亮 + 内容面板切换
+    if (pageId === "page-modelhub") setHubSub("page-modelhub", tab === "capabilities" ? "capabilities" : "models");
+    if (pageId === "page-experience") setHubSub("page-experience", tab === "tools" ? "tools" : "playground");
     if (tab === "playground") pgInit();
     renderCurrentPage();
+  }
+  // 大板块子目录：高亮当前子 tab 并切换可见面板
+  function setHubSub(pageId, sub) {
+    var hub = document.getElementById(pageId);
+    if (!hub) return;
+    hub.querySelectorAll(".hub-tab").forEach(function (t) {
+      t.classList.toggle("active", t.getAttribute("data-hub") === sub);
+    });
+    hub.querySelectorAll(".hub-pane").forEach(function (p) {
+      p.style.display = p.getAttribute("data-pane") === sub ? "" : "none";
+    });
   }
   window.addEventListener("hashchange", route);
 
