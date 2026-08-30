@@ -4162,6 +4162,13 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     thWelcome();
     thRenderPrompt();
   }
+  /* 剥离推理模型的 <think> 思维链，只保留正式回复（流式中未闭合时先不显示） */
+  function thStripThink(s) {
+    var i = s.indexOf("</think>");
+    if (i !== -1) return s.slice(i + 8).replace(/^\s+/, "");
+    if (s.indexOf("<think") !== -1) return "";
+    return s;
+  }
   function thSend() {
     if (thState.busy) return;
     var input = document.getElementById("th-input");
@@ -4205,7 +4212,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
             } catch (e) {}
           });
           aiDiv.classList.remove("streaming");
-          if (full) { aiDiv.textContent = full; thState.history.push({ role: "assistant", content: full }); }
+          var shown = thStripThink(full);
+          if (shown) { aiDiv.textContent = shown; thState.history.push({ role: "assistant", content: shown }); }
           else aiDiv.innerHTML = '<span class="th-err">树洞小伙伴走神了，再试一次好吗？</span>';
           thState.busy = false;
         });
@@ -4217,8 +4225,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         return reader.read().then(function (chunk) {
           if (chunk.done) {
             aiDiv.classList.remove("streaming");
-            if (!full) aiDiv.innerHTML = '<span class="th-err">树洞小伙伴走神了，再试一次好吗？</span>';
-            else thState.history.push({ role: "assistant", content: full });
+            var shownDone = thStripThink(full);
+            if (!shownDone) aiDiv.innerHTML = '<span class="th-err">树洞小伙伴走神了，再试一次好吗？</span>';
+            else { aiDiv.textContent = shownDone; thState.history.push({ role: "assistant", content: shownDone }); }
             thState.busy = false;
             return;
           }
@@ -4234,7 +4243,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
               var j = JSON.parse(payload);
               var delta = j.choices && j.choices[0] && j.choices[0].delta;
               var piece = delta && (delta.content || "") || "";
-              if (piece) { full += piece; aiDiv.textContent = full;
+              if (piece) { full += piece; aiDiv.textContent = thStripThink(full);
                 var chat = document.getElementById("th-chat"); chat.scrollTop = chat.scrollHeight; }
             } catch (e) {}
           }
