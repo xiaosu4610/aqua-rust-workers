@@ -697,6 +697,55 @@
   .repo-banner a.repo-link:hover { text-decoration: underline; }
 
   /* ===== Playground（在线体验） ===== */
+  /* ---- 树洞（情绪陪伴）---- */
+  .th-wrap { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; }
+  .th-toolbar { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .th-modes { display: flex; gap: 10px; flex-wrap: wrap; }
+  .th-mode { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 14px; border: 1px solid var(--line);
+    background: var(--card2); color: var(--text); cursor: pointer; transition: all .15s ease; text-align: left; }
+  .th-mode:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .th-mode.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card2)); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .th-avatar { font-size: 26px; line-height: 1; }
+  .th-mode-info { display: flex; flex-direction: column; gap: 2px; }
+  .th-mode-info b { font-size: 14px; }
+  .th-mode-info i { font-style: normal; font-size: 12px; color: var(--muted); }
+  .th-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .th-chat { height: 460px; overflow-y: auto; border: 1px solid var(--line); border-radius: 16px; padding: 16px;
+    background:
+      radial-gradient(1200px 400px at 80% -10%, rgba(129,140,248,.10), transparent 60%),
+      radial-gradient(900px 380px at 10% 110%, rgba(165,180,252,.08), transparent 60%),
+      var(--card); }
+  .th-welcome { text-align: center; padding: 56px 20px; color: var(--muted); }
+  .th-welcome b { display: block; font-size: 18px; color: var(--text); margin-bottom: 10px; }
+  .th-welcome p { font-size: 13px; line-height: 1.9; max-width: 460px; margin: 0 auto; }
+  .th-msg { max-width: 82%; padding: 11px 14px; border-radius: 14px; font-size: 14px; line-height: 1.85; white-space: pre-wrap; word-break: break-word; margin-bottom: 12px; }
+  .th-msg.user { margin-left: auto; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .th-msg.assistant { background: var(--card2); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .th-msg.streaming::after { content: "▍"; opacity: .6; animation: thblink 1s steps(2) infinite; }
+  @keyframes thblink { 50% { opacity: 0; } }
+  .th-msg .th-err { color: #f87171; font-size: 13px; }
+  .th-inputbar { display: flex; gap: 10px; align-items: flex-end; }
+  .th-inputbar textarea { flex: 1; resize: none; background: var(--card2); border: 1px solid var(--line); border-radius: 12px;
+    color: var(--text); padding: 11px 14px; font-size: 14px; line-height: 1.6; font-family: inherit; max-height: 140px; }
+  .th-inputbar textarea:focus { outline: none; border-color: var(--accent); }
+  .th-send { white-space: nowrap; border-radius: 12px; }
+  .th-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .th-side-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; font-size: 13px; }
+  .th-side-card b { display: block; margin-bottom: 8px; font-size: 13.5px; }
+  .th-side-card p { color: var(--muted); line-height: 1.8; margin: 0 0 10px; }
+  .th-hotline { border-color: rgba(251,113,133,.4); background: rgba(251,113,133,.06); }
+  .th-tel { padding: 6px 0; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .th-tel a { color: #fb7185; font-weight: 700; text-decoration: none; font-family: var(--mono); }
+  .th-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .th-prompt-box pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; line-height: 1.8; color: var(--muted);
+    background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: 260px; overflow-y: auto; }
+  .th-prompt-box summary { cursor: pointer; color: var(--accent); font-size: 12.5px; margin-bottom: 8px; }
+  .th-disclaimer { color: var(--muted); }
+  @media (max-width: 900px) {
+    .th-wrap { grid-template-columns: minmax(0, 1fr); }
+    .th-chat { height: 380px; }
+  }
+
   .pg-wrap { max-width: 1160px; margin: 0 auto; }
   .pg-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px;
     border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 12px 16px; }
@@ -1655,6 +1704,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     </div>
     <nav class="hub-subnav" aria-label="体验中心子导航">
       <a class="hub-tab" href="#/playground" data-hub="playground"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>AI 对话</a>
+      <a class="hub-tab" href="#/treehole" data-hub="treehole"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 1 0-16 0c0 4.5 4 8 8 11z" style="display:none"/><path d="M12 3c-4.4 0-8 3.6-8 8 0 4.4 3.6 8 8 8h.5c.3 0 .5.2.5.5V21l3.8-2.6C19.9 17 20.5 14 20.5 11 20.5 6.6 16.4 3 12 3z"/><circle cx="8.5" cy="10.5" r=".8" fill="currentColor"/><circle cx="12" cy="10.5" r=".8" fill="currentColor"/><circle cx="15.5" cy="10.5" r=".8" fill="currentColor"/></svg></span>树洞</a>
       <a class="hub-tab" href="#/tools" data-hub="tools"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>工具箱</a>
     </nav>
     <div class="hub-pane" data-pane="playground">
@@ -1695,6 +1745,53 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       </div>
     </div>
     </div><!-- /hub-pane:playground -->
+
+  <!-- ===== 树洞（体验中心子板块：情绪陪伴 · 官方提示词公开） ===== -->
+  <div class="hub-pane" data-pane="treehole">
+    <div class="th-wrap">
+      <div class="th-toolbar">
+        <div class="th-modes">
+          <button class="th-mode active" data-th-mode="gentle" type="button">
+            <span class="th-avatar">🌊</span>
+            <span class="th-mode-info"><b>小溪</b><i>温柔树洞 · 深夜电台的倾听伙伴</i></span>
+          </button>
+          <button class="th-mode" data-th-mode="anime" type="button">
+            <span class="th-avatar">✨</span>
+            <span class="th-mode-info"><b>星璃</b><i>二次元陪伴 · 跨次元的元气伙伴</i></span>
+          </button>
+        </div>
+        <button class="btn" id="th-clear">清空倾诉</button>
+      </div>
+      <div class="th-main">
+        <div class="th-chat" id="th-chat"></div>
+        <div class="th-inputbar">
+          <textarea id="th-input" rows="1" placeholder="把心里的话说给树洞听…（Enter 发送，Shift+Enter 换行）"></textarea>
+          <button class="btn th-send" id="th-send">说给树洞</button>
+        </div>
+      </div>
+      <aside class="th-side">
+        <div class="th-side-card th-hotline">
+          <b>如果你或身边的人正处于危机</b>
+          <p>请立即联系专业支持（24 小时），他们和你一样认真：</p>
+          <div class="th-tel">全国心理援助热线 <a href="tel:12356">12356</a></div>
+          <div class="th-tel">希望24热线 <a href="tel:400-161-9995">400-161-9995</a></div>
+        </div>
+        <div class="th-side-card">
+          <b>树洞伙伴如何思考（完全公开）</b>
+          <p>树洞的温柔来自一套精心打磨的提示词——我们把它完整公开，欢迎复制到你的项目里：</p>
+          <div class="th-actions">
+            <button class="btn" id="th-copy-prompt">复制当前模式提示词</button>
+            <a class="btn" href="#/prompts">提示词工坊</a>
+          </div>
+          <details class="th-prompt-box"><summary>展开完整提示词</summary><pre id="th-prompt-text"></pre></details>
+        </div>
+        <div class="th-side-card th-disclaimer">
+          <b>温柔的边界</b>
+          <p>树洞伙伴是 AI：能陪伴、能倾听，但不能替代专业心理援助。对话内容不会被保存。</p>
+        </div>
+      </aside>
+    </div>
+  </div><!-- /hub-pane:treehole -->
 
   <!-- ===== 工具箱（体验中心子板块） ===== -->
   <div class="hub-pane" data-pane="tools">
@@ -3838,6 +3935,185 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }
   }
 
+  /* ---- 树洞：情绪陪伴（服务端官方提示词 + 非 Nvidia 模型链，流式） ---- */
+  var thState = { mode: "gentle", busy: false, history: [], abort: null, promptReady: false };
+  var TH_MODES = {
+    gentle: { name: "小溪", welcome: "我是小溪 🌊 这里没有评判，没有说教，只有认真听你说话的人。\n今天过得怎么样？慢慢说，我在。" },
+    anime:  { name: "星璃", welcome: "呐——是星璃哦 ✨ 今天也辛苦了呢。\n烦恼也好，开心也好，都寄存在我这里吧。想从哪里说起？" }
+  };
+  function thGetPromptCache() { try { return JSON.parse(sessionStorage.getItem("aqua_th_prompts") || "null"); } catch (e) { return null; } }
+  function thPromptOf(mode) {
+    var cache = thGetPromptCache();
+    if (cache && cache.modes) {
+      for (var i = 0; i < cache.modes.length; i++) if (cache.modes[i].id === mode) return cache.modes[i].prompt;
+    }
+    return "";
+  }
+  function thLoadPrompt() {
+    thState.promptReady = false;
+    fetch(GATEWAY + "/tools/treehole/prompt").then(function (r) { return r.json(); }).then(function (j) {
+      try { sessionStorage.setItem("aqua_th_prompts", JSON.stringify(j)); } catch (e) {}
+      thState.promptReady = true;
+      thRenderPrompt();
+    }).catch(function () { thRenderPrompt(); });
+  }
+  function thRenderPrompt() {
+    var el = document.getElementById("th-prompt-text");
+    if (!el) return;
+    var p = thPromptOf(thState.mode);
+    el.textContent = p || "提示词加载失败，请稍后刷新重试（服务端会强制注入官方提示词，即使此处未展示也不影响对话质量）。";
+  }
+  function thWelcome() {
+    var chat = document.getElementById("th-chat");
+    if (!chat) return;
+    chat.innerHTML = '<div class="th-welcome"><b>' + esc(TH_MODES[thState.mode].name) + ' 在听</b><p style="white-space:pre-wrap;">' + esc(TH_MODES[thState.mode].welcome) + '</p></div>';
+  }
+  function thAddMsg(role, text, streaming) {
+    var chat = document.getElementById("th-chat");
+    var div = document.createElement("div");
+    div.className = "th-msg " + role + (streaming ? " streaming" : "");
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+  function thSwitchMode(mode) {
+    if (thState.mode === mode || thState.busy) return;
+    thState.mode = mode;
+    document.querySelectorAll(".th-mode").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-th-mode") === mode);
+    });
+    thState.history = [];
+    thWelcome();
+    thRenderPrompt();
+  }
+  function thSend() {
+    if (thState.busy) return;
+    var input = document.getElementById("th-input");
+    var text = (input.value || "").trim();
+    if (!text) return;
+    input.value = ""; input.style.height = "auto";
+    var w = document.querySelector("#th-chat .th-welcome");
+    if (w) w.remove();
+    thState.history.push({ role: "user", content: text });
+    thAddMsg("user", text);
+    var aiDiv = thAddMsg("assistant", "", true);
+    thState.busy = true;
+    thState.abort = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    fetch(GATEWAY + "/tools/treehole", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer sk-playground-demo" },
+      body: JSON.stringify({ mode: thState.mode, stream: true, messages: thState.history.slice(-20) }),
+      signal: thState.abort ? thState.abort.signal : undefined,
+    }).then(function (res) {
+      if (!res.ok) {
+        return res.json().catch(function () { return {}; }).then(function (j) {
+          var e = (j && j.error) || {};
+          var err = new Error(formatAquaErr(e, res.status));
+          err.aqua = e;
+          throw err;
+        });
+      }
+      // 兼容降级：无 ReadableStream 时整段读取
+      if (!res.body || typeof res.body.getReader !== "function") {
+        return res.text().then(function (raw) {
+          var full = "";
+          raw.split("\n").forEach(function (line) {
+            line = line.trim();
+            if (line.indexOf("data:") !== 0) return;
+            var payload = line.slice(5).trim();
+            if (payload === "[DONE]") return;
+            try {
+              var j = JSON.parse(payload);
+              var c = j.choices && j.choices[0] && (j.choices[0].delta || j.choices[0].message);
+              if (c && c.content) full += c.content;
+            } catch (e) {}
+          });
+          aiDiv.classList.remove("streaming");
+          if (full) { aiDiv.textContent = full; thState.history.push({ role: "assistant", content: full }); }
+          else aiDiv.innerHTML = '<span class="th-err">树洞小伙伴走神了，再试一次好吗？</span>';
+          thState.busy = false;
+        });
+      }
+      var reader = res.body.getReader();
+      var dec = (typeof TextDecoder !== "undefined") ? new TextDecoder() : null;
+      var buf = "", full = "";
+      function pump() {
+        return reader.read().then(function (chunk) {
+          if (chunk.done) {
+            aiDiv.classList.remove("streaming");
+            if (!full) aiDiv.innerHTML = '<span class="th-err">树洞小伙伴走神了，再试一次好吗？</span>';
+            else thState.history.push({ role: "assistant", content: full });
+            thState.busy = false;
+            return;
+          }
+          buf += dec ? dec.decode(chunk, { stream: true }) : String.fromCharCode.apply(null, new Uint8Array(chunk.value));
+          var lines = buf.split("\n");
+          buf = lines.pop();
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line || line.indexOf("data:") !== 0) continue;
+            var payload = line.slice(5).trim();
+            if (payload === "[DONE]") continue;
+            try {
+              var j = JSON.parse(payload);
+              var delta = j.choices && j.choices[0] && j.choices[0].delta;
+              var piece = delta && (delta.content || "") || "";
+              if (piece) { full += piece; aiDiv.textContent = full;
+                var chat = document.getElementById("th-chat"); chat.scrollTop = chat.scrollHeight; }
+            } catch (e) {}
+          }
+          return pump();
+        });
+      }
+      return pump();
+    }).catch(function (err) {
+      aiDiv.classList.remove("streaming");
+      var msg = (err && err.name === "AbortError") ? "" : ((err && err.message) || "网络异常，稍后再试");
+      if (msg) {
+        if (err && err.aqua && err.aqua.hint) msg += "\n" + err.aqua.hint;
+        if (!aiDiv.textContent) aiDiv.innerHTML = '<span class="th-err">' + esc(msg).replace(/\n/g, "<br>") + "</span>";
+        else aiDiv.textContent += "\n\n[" + msg + "]";
+      } else aiDiv.classList.remove("streaming");
+      thState.busy = false;
+    });
+  }
+  function thInit() {
+    var input = document.getElementById("th-input");
+    if (!input || input.dataset.thInit) return;
+    input.dataset.thInit = "1";
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); thSend(); }
+    });
+    input.addEventListener("input", function () {
+      input.style.height = "auto";
+      input.style.height = Math.min(input.scrollHeight, 140) + "px";
+    });
+    document.getElementById("th-send").addEventListener("click", thSend);
+    document.getElementById("th-clear").addEventListener("click", function () {
+      if (thState.busy && thState.abort) { try { thState.abort.abort(); } catch (e) {} }
+      thState.history = [];
+      thWelcome();
+    });
+    document.querySelectorAll(".th-mode").forEach(function (b) {
+      b.addEventListener("click", function () { thSwitchMode(b.getAttribute("data-th-mode")); });
+    });
+    document.getElementById("th-copy-prompt").addEventListener("click", function () {
+      var p = thPromptOf(thState.mode);
+      if (!p) { thLoadPrompt(); return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(p);
+      else {
+        var ta = document.createElement("textarea"); ta.value = p; document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta);
+      }
+      this.textContent = "已复制 ✓";
+      var btn = this;
+      setTimeout(function () { btn.textContent = "复制当前模式提示词"; }, 1600);
+    });
+    thWelcome();
+    thLoadPrompt();
+  }
+
   /* ---- 页面切换（hash 路由） ---- */
   // 根据当前 hash 渲染对应页面（route 与 loadModels 完成后共用，消除加载竞态）
   function renderCurrentPage() {
@@ -3872,21 +4148,22 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       return;
     }
     var tab = hash.split("?")[0] || "home";
-    if (["home", "models", "capabilities", "api", "playground", "tools"].indexOf(tab) === -1) tab = "home";
-    // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/工具箱）
+    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole"].indexOf(tab) === -1) tab = "home";
+    // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/树洞/工具箱）
     // 旧 hash（#/capabilities、#/tools 等）全部兼容，直接映射到对应子板块
     var pageId = "page-" + tab;
     var navKey = tab;
     if (tab === "models" || tab === "capabilities") { pageId = "page-modelhub"; navKey = "models"; }
-    else if (tab === "playground" || tab === "tools") { pageId = "page-experience"; navKey = "playground"; }
+    else if (tab === "playground" || tab === "tools" || tab === "treehole") { pageId = "page-experience"; navKey = "playground"; }
     document.getElementById(pageId).classList.add("active");
     document.querySelectorAll(".nav-tabs a").forEach(function (a) {
       a.classList.toggle("active", a.getAttribute("data-tab") === navKey);
     });
     // 子目录高亮 + 内容面板切换
     if (pageId === "page-modelhub") setHubSub("page-modelhub", tab === "capabilities" ? "capabilities" : "models");
-    if (pageId === "page-experience") setHubSub("page-experience", tab === "tools" ? "tools" : "playground");
+    if (pageId === "page-experience") setHubSub("page-experience", tab === "tools" ? "tools" : (tab === "treehole" ? "treehole" : "playground"));
     if (tab === "playground") pgInit();
+    if (tab === "treehole") thInit();
     renderCurrentPage();
   }
   // 大板块子目录：高亮当前子 tab 并切换可见面板
