@@ -9,8 +9,10 @@ Rust → WebAssembly · Cloudflare Workers 边缘运行 · 多上游聚合 · �
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://rustup.rs/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020.svg)](https://workers.cloudflare.com/)
+[![Gitee Stars](https://img.shields.io/gitee/stars/xiaosu4610/aqua-rust-workers?color=red&logo=gitee)](https://gitee.com/xiaosu4610/aqua-rust-workers)
+[![GitHub Stars](https://img.shields.io/github/stars/xiaosu4610/aqua-rust-workers?color=yellow&logo=github)](https://github.com/xiaosu4610/aqua-rust-workers)
 
-**开源仓库：[gitee.com/xiaosu4610/aqua-rust-workers](https://gitee.com/xiaosu4610/aqua-rust-workers) · 觉得不错请点个 Star ⭐**
+**开源仓库：[Gitee · 主仓库](https://gitee.com/xiaosu4610/aqua-rust-workers) | [GitHub · 同步镜像](https://github.com/xiaosu4610/aqua-rust-workers) —— 觉得不错请各点一个 Star ⭐**
 
 </div>
 
@@ -22,7 +24,7 @@ AQUA 把 **Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、Clo
 
 网关本体用 **Rust 编译为 WebAssembly**，跑在 Cloudflare 边缘节点上：全球就近接入、无冷启动、免费套餐即可运行。
 
-**任意密钥即可调用**——不需要注册、不需要申请，填任意非空 Key（`sk-****`、甚至中文）就能用。
+**任意密钥即可调用**——不需要注册、不需要申请，填任意非空 Key（`sk-****`、甚至中文）就能用。项目**完全开源（AGPL-3.0）**，源码同步托管于 Gitee 与 GitHub 双仓库，可自由自部署。
 
 ## 模型通道
 
