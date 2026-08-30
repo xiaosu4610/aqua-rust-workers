@@ -4,6 +4,8 @@
 
 **免费 · 极速 · 免注册的 OpenAI 兼容 AI 网关**
 
+**AQUA 是 ACU 工程系列的开源旗舰项目** —— 系列内更多生态链项目（工具、网关、应用）持续开发中。
+
 Rust → WebAssembly · Cloudflare Workers 边缘运行 · 多上游聚合 · 任意密钥即用
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
@@ -20,7 +22,7 @@ Rust → WebAssembly · Cloudflare Workers 边缘运行 · 多上游聚合 · �
 
 ## 这是什么
 
-AQUA 把 **Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、Cloudflare Workers AI** 等多家 AI 上游，聚合成一套 **OpenAI 兼容 API**。用任何支持 OpenAI SDK 的客户端（ChatGPT 客户端、LobeChat、NextChat、Dify、沉浸式翻译等），填一个 Base URL 就能用上全线模型。
+AQUA 是 **ACU 工程系列**的开源旗舰项目。它把 **Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、Cloudflare Workers AI** 等多家 AI 上游，聚合成一套 **OpenAI 兼容 API**。用任何支持 OpenAI SDK 的客户端（ChatGPT 客户端、LobeChat、NextChat、Dify、沉浸式翻译等），填一个 Base URL 就能用上全线模型。
 
 网关本体用 **Rust 编译为 WebAssembly**，跑在 Cloudflare 边缘节点上：全球就近接入、无冷启动、免费套餐即可运行。
 
