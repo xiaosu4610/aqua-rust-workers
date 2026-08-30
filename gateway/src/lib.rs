@@ -10,8 +10,9 @@
 //! - POST /v1/moderations              内容安全
 //! - POST /v1/images/generations       文生图（zhipu cogview）
 //! - POST /v1/videos/generations       文生视频（zhipu cogvideox）
-//! - POST /v1/ip_location              IP 定位（上游实为 GET 接口，网关代转查询串）
+//! - POST /v1/ip_location              IP 定位（双通道：Gitee AI 主 + ip-api.com 备，主通道故障自动兜底）
 //! - POST /v1/tools/text-stats|dice|base64    纯算法工具（零上游消耗）
+//! - POST /v1/tools/subnet                    IPv4 子网计算器（纯算法）
 //! - GET  /v1/tools/uuid|timestamp            纯算法工具
 //! - POST /v1/tools/timestamp                 时间戳互转
 //! - GET  /assets/*                    R2 图片缓存
@@ -1218,11 +1219,10 @@ async fn handle_ip_location(mut req: Request, env: Env) -> Result<Response> {
         Ok(b) => b.to_vec(),
         Err(_) => return err_res(400, "请求体读取失败，请检查网络后重试"),
     };
-    // 上游 Gitee AI 的 ip_location 是 GET 接口（?ip=xxx），这里解析请求体后转为查询串转发
+    // 解析请求体，取要查询的 IP
     let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap_or(serde_json::json!({}));
     let mut ip = parsed.get("ip").and_then(|v| v.as_str()).unwrap_or("").trim().to_string();
-    // 留空 = 查询调用方出口 IP：上游不支持空 ip 查询（返回不可读 400），
-    // 这里改用 Cloudflare 边缘自带的请求来源头拿到调用方真实 IP 再转发
+    // 留空 = 查询调用方出口 IP：用 Cloudflare 边缘自带的请求来源头拿到调用方真实 IP
     if ip.is_empty() {
         ip = req
             .headers()
@@ -1241,17 +1241,77 @@ async fn handle_ip_location(mut req: Request, env: Env) -> Result<Response> {
     if is_private_ipv4(&ip) {
         return err_res(400, &format!("「{}」是内网/保留 IP，没有公网归属地信息。请查询公网 IP，或留空 ip 字段自动查询调用方出口 IP", ip));
     }
-    let Some(cfg) = provider_cfg(&env, "gitee") else {
-        return err_res(502, "该模型的上游通道暂不可用，请稍后重试");
-    };
-    let upstream = build_upstream_req(
-        &format!("{}{}{}", cfg.base, "/ip_location", format!("?ip={}", ip)),
-        Some(&format!("Bearer {}", cfg.key)),
+
+    // ── 双通道策略 ──
+    // ① 主通道：Gitee AI ip-location 模型（数据更全，含经纬度/运营商中文）
+    // ② 备用通道：ip-api.com 免费数据集（无需密钥）——主通道密钥缺失/上游故障时兜底，
+    //    保证「大模型掉线时 IP 查询依然可用」；IPv6 上游不支持，也走备用
+    let is_ipv6 = ip.contains(':');
+
+    // ② 先判备用触发条件（IPv6 或 Gitee 通道不可用），避免无效请求
+    let gitee_ok = !is_ipv6 && provider_cfg(&env, "gitee").is_some();
+    if gitee_ok {
+        let cfg = provider_cfg(&env, "gitee").unwrap();
+        let upstream = build_upstream_req(
+            &format!("{}{}{}", cfg.base, "/ip_location", format!("?ip={}", ip)),
+            Some(&format!("Bearer {}", cfg.key)),
+            None,
+            &[],
+            Method::Get,
+        )?;
+        let res = forward(upstream, 60000).await;
+        // 上游 2xx 直接返回；4xx/5xx 落入备用通道
+        if let Ok(r) = &res {
+            if r.status_code() < 400 {
+                return res;
+            }
+        }
+    }
+
+    // ② 备用通道：ip-api.com（http 免费端点，字段名与主通道不同，这里归一化为同一结构）
+    let fallback = build_upstream_req(
+        &format!("http://ip-api.com/json/{}?lang=zh-CN&fields=status,country,regionName,city,isp,org,as,lat,lon,timezone,query", ip),
+        None,
         None,
         &[],
         Method::Get,
     )?;
-    forward(upstream, 60000).await
+    let mut res = match Fetch::Request(fallback).send().await {
+        Ok(r) => r,
+        Err(_) => {
+            // 双通道全挂：区分报错原因，方便排障
+            if is_ipv6 {
+                return err_res(502, "IPv6 查询备用数据源不可达，请稍后重试");
+            }
+            return err_res(502, "IP 查询的主/备数据源均不可达（Gitee AI 与 ip-api 均失败），请稍后重试");
+        }
+    };
+    let status = res.status_code();
+    let text = match res.text().await {
+        Ok(t) => t,
+        Err(_) => return err_res(502, "备用数据源响应解析失败，请稍后重试"),
+    };
+    let v: serde_json::Value = serde_json::from_str(&text).unwrap_or(serde_json::json!({}));
+    if v.get("status").and_then(|x| x.as_str()) != Some("success") {
+        return err_res(400, &format!("备用数据源未能查询到「{}」的归属地信息（可能为保留/未分配 IP）", ip));
+    }
+    // 归一化输出：字段名对齐主通道，附 data_source 标注来源
+    let out = serde_json::json!({
+        "ip": v.get("query").cloned().unwrap_or(serde_json::json!(ip)),
+        "country": v.get("country").cloned().unwrap_or_default(),
+        "province": v.get("regionName").cloned().unwrap_or_default(),
+        "city": v.get("city").cloned().unwrap_or_default(),
+        "isp": v.get("isp").cloned().unwrap_or_default(),
+        "org": v.get("org").cloned().unwrap_or_default(),
+        "as": v.get("as").cloned().unwrap_or_default(),
+        "lat": v.get("lat").cloned().unwrap_or_default(),
+        "lon": v.get("lon").cloned().unwrap_or_default(),
+        "timezone": v.get("timezone").cloned().unwrap_or_default(),
+        "data_source": "ip-api.com（备用数据集）",
+    });
+    let mut final_res = Response::from_json(&out)?.with_status(if status < 400 { status } else { 200 });
+    cors_headers(&mut final_res)?;
+    Ok(final_res)
 }
 
 // ---------------------------------------------------------------------------
@@ -1406,6 +1466,132 @@ async fn handle_tool_base64(req: Request) -> Result<Response> {
         _ => return err_res(400, "action 仅支持 encode / decode"),
     };
     json_res(&serde_json::json!({ "result": out }))
+}
+
+// ---------------------------------------------------------------------------
+// 子网计算器（纯算法，零上游消耗）
+// ---------------------------------------------------------------------------
+
+/// 解析点分十进制 IPv4 为 u32（大端序：192.168.1.1 → 0xC0A80101）
+fn parse_ipv4(s: &str) -> Option<u32> {
+    let parts: Vec<&str> = s.split('.').collect();
+    if parts.len() != 4 {
+        return None;
+    }
+    let mut out: u32 = 0;
+    for p in parts {
+        // 每段必须是纯数字且 ≤ 255（拒绝前导零以外的怪写法由 u16 解析自然兜底）
+        if p.is_empty() || p.len() > 3 || !p.bytes().all(|b| b.is_ascii_digit()) {
+            return None;
+        }
+        let v: u16 = p.parse().ok()?;
+        if v > 255 {
+            return None;
+        }
+        out = (out << 8) | v as u32;
+    }
+    Some(out)
+}
+
+/// u32 转回点分十进制 IPv4 字符串
+fn u32_to_ipv4(v: u32) -> String {
+    format!("{}.{}.{}.{}", (v >> 24) & 0xff, (v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff)
+}
+
+/// POST /v1/tools/subnet
+/// 入参二选一：{"cidr": "192.168.1.0/24"} 或 {"ip": "192.168.1.100", "prefix": 24}
+/// 输出网络地址/广播地址/掩码/可用主机范围/地址总数等完整子网信息
+async fn handle_tool_subnet(req: Request) -> Result<Response> {
+    let body = match read_json_body(req).await {
+        Ok(v) => v,
+        Err(res) => return Ok(res),
+    };
+    // 归一化输入：优先 cidr 字段；否则用 ip + prefix（prefix 缺省 24）
+    let raw = body
+        .get("cidr")
+        .and_then(|v| v.as_str())
+        .map(|s| s.trim().to_string())
+        .or_else(|| {
+            let ip = body.get("ip").and_then(|v| v.as_str())?.trim().to_string();
+            let prefix = body.get("prefix").and_then(|v| v.as_u64()).unwrap_or(24);
+            Some(format!("{}/{}", ip, prefix))
+        });
+    let raw = match raw {
+        Some(r) if !r.is_empty() => r,
+        _ => return err_res(400, "缺少入参：请提供 {\"cidr\": \"192.168.1.0/24\"} 或 {\"ip\": \"192.168.1.100\", \"prefix\": 24}"),
+    };
+    if raw.contains(':') {
+        return err_res(400, "IPv6 子网暂不支持，请提供 IPv4 网段（如 192.168.1.0/24）");
+    }
+    // 拆分 IP 与掩码位
+    let (ip_str, prefix) = match raw.split_once('/') {
+        Some((ip, p)) => (ip.trim().to_string(), p.trim()),
+        None => (raw.clone(), "24"),
+    };
+    let prefix: u32 = match prefix.parse::<u32>() {
+        Ok(p) if p <= 32 => p,
+        _ => return err_res(400, &format!("掩码位不合法：「{}」应为 0~32 的整数", prefix)),
+    };
+    let ip_u32 = match parse_ipv4(&ip_str) {
+        Some(v) => v,
+        None => return err_res(400, &format!("IP 格式不正确：「{}」不是合法的 IPv4 地址", ip_str)),
+    };
+
+    // ── 核心计算：掩码 → 网络地址 → 广播地址 ──
+    // 掩码：prefix 个 1 后跟 32-prefix 个 0；prefix=0 时需特判（u32 无 33 位左移）
+    let mask: u32 = if prefix == 0 { 0 } else { u32::MAX << (32 - prefix) };
+    let wildcard = !mask; // 反掩码（通配符）
+    let network = ip_u32 & mask;
+    let broadcast = network | wildcard;
+    let total: u64 = 1u64 << (32 - prefix);
+
+    // 可用主机范围：常规网段掐头去尾；/31 点对点两地址皆可用（RFC 3021）；/32 单主机
+    let (first_host, last_host, usable) = match prefix {
+        32 => (network, broadcast, 1u64),
+        31 => (network, broadcast, 2u64),
+        _ => (network + 1, broadcast - 1, total - 2),
+    };
+
+    // 地址分类（历史 Classful）：按首字节高位划分
+    let ip_class = match ip_u32 >> 24 {
+        0..=127 => "A",
+        128..=191 => "B",
+        192..=223 => "C",
+        224..=239 => "D（组播）",
+        _ => "E（保留）",
+    };
+    // 作用域判定：内网/环回/链路本地/保留 → 私有，否则公网
+    let ip_s = u32_to_ipv4(ip_u32);
+    let scope = if is_private_ipv4(&ip_s) {
+        "私有/内网（RFC 1918 等）"
+    } else {
+        "公网"
+    };
+    // 二进制掩码展示：4 段 8 位，方便教学演示
+    let bin_mask = [(mask >> 24) & 0xff, (mask >> 16) & 0xff, (mask >> 8) & 0xff, mask & 0xff]
+        .iter()
+        .map(|o| format!("{:08b}", o))
+        .collect::<Vec<_>>()
+        .join(".");
+
+    json_res(&serde_json::json!({
+        "input": format!("{}/{}", u32_to_ipv4(network), prefix),
+        "query_ip": ip_s,
+        "prefix": prefix,
+        "netmask": u32_to_ipv4(mask),
+        "wildcard": u32_to_ipv4(wildcard),
+        "binary_netmask": bin_mask,
+        "network": u32_to_ipv4(network),
+        "broadcast": u32_to_ipv4(broadcast),
+        "first_host": u32_to_ipv4(first_host),
+        "last_host": u32_to_ipv4(last_host),
+        "total_addresses": total,
+        "usable_hosts": usable,
+        "ip_class": ip_class,
+        "scope": scope,
+        "ip_int": ip_u32,
+        "ip_hex": format!("0x{:08x}", ip_u32),
+    }))
 }
 
 async fn handle_rerank(mut req: Request, env: Env) -> Result<Response> {
@@ -1614,6 +1800,9 @@ pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         .post_async("/v1/tools/base64", |req, ctx| async move {
             handle_tool_base64(req).await
+        })
+        .post_async("/v1/tools/subnet", |req, ctx| async move {
+            handle_tool_subnet(req).await
         })
         .post_async("/v1/rerank", |req, ctx| async move {
             handle_rerank(req, ctx.env).await

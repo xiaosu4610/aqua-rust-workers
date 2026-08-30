@@ -38,17 +38,15 @@ tag = "v3"
 new_sqlite_classes = ["AcuConcurrency"]
 
 # KV 缓存（模型列表，60s TTL，零溢出风险）
-# ⚠️ 部署前替换为你自己的 KV namespace id
 [[kv_namespaces]]
 binding = "MODEL_CACHE"
-id = "REPLACE_WITH_KV_ID"
+id = "357660fae94d47408f4eba0fab25638a"
 
 # D1 数据库（请求日志，7 天自动清理，< 50% 免费额度）
-# ⚠️ 部署前替换为你自己的 D1 database_id
 [[d1_databases]]
 binding = "LOGS_DB"
 database_name = "aqua_logs"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "e5b8212c-23ea-41e2-aa21-6037f634786d"
 
 # R2 存储（生成图片缓存，24h 自动清理，上限 3GB/10K 对象）
 [[r2_buckets]]
@@ -87,12 +85,12 @@ class_name = "AcuConcurrency"
 # KV 命名空间绑定（生产环境继承）
 [[env.production.kv_namespaces]]
 binding = "MODEL_CACHE"
-id = "REPLACE_WITH_KV_ID"
+id = "357660fae94d47408f4eba0fab25638a"
 # D1 数据库（请求日志，7 天自动清理）
 [[env.production.d1_databases]]
 binding = "LOGS_DB"
 database_name = "aqua_logs"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "e5b8212c-23ea-41e2-aa21-6037f634786d"
 # R2 存储（生产环境）
 [[env.production.r2_buckets]]
 binding = "IMAGES_BUCKET"
