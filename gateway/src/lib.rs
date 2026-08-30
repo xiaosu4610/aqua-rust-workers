@@ -23,9 +23,17 @@
 //!   provider_of 加前缀匹配，handle_chat 的 match 里加转发分支
 //! - 新增工具 API：写 handler → main 的 router 注册路由即可
 //!
-//! ## 错误响应约定
-//! 所有错误统一为 OpenAI 兼容结构，并附带 help 引导字段：
-//! `{ "error": { "message": "中文原因", "code": 400, "help": { site, qq_guild, ... } } }`
+//! ## 错误响应约定（非传统纯 HTTP 状态码机制）
+//! 所有错误统一返回结构化 JSON，程序识别主键为字符串业务错误码：
+//! ```json
+//! { "error": { "message": "中文原因", "code": "MODEL_UNAVAILABLE", "status": 502, "type": "aqua_api_error",
+//!     "hint": "如需帮助：加入 QQ 频道 pd57362562（…）反馈，或访问官网 …",
+//!     "help": { "site", "docs", "qq_guild", "qq_guild_url", "qq_guild_invite", "qq_group" } } }
+//! ```
+//! - `code`：稳定字符串错误码（MODEL_UNAVAILABLE / RATE_LIMITED / QUOTA_EXHAUSTED / …）
+//! - `status`：与 HTTP 状态码一致的数字（兼容旧程序与 OpenAI SDK）
+//! - 上游 4xx/5xx 错误一律经 normalize_upstream 归一化为中文说明（不再透传上游英文报文）
+//! - Content-Type 恒为 `application/json; charset=utf-8`，中文在终端/浏览器直接可读
 //!
 //! ## 性能要点
 //! 模型列表使用编译期静态目录，不依赖上游实时查询，
@@ -48,15 +56,10 @@ mod workers_ai;
 //   - 供应商标签决定路由归属（gitee-ai → Gitee 通道，其余非前缀模型 → Nvidia）
 //   - 前缀模型（zhipu/xxx、workers-ai/xxx 等）无需登记，自动按前缀路由
 // ---------------------------------------------------------------------------
+// 2026-08-30 清理：基于上游 7 天健康数据移除 61 个已下线模型（404/410 全失败），
+// 保留 83 个验证存活模型（chat 专用端点模型 ASR/TTS/embedding/rerank/图像/视频/IP/审核不计入探测失败）。
 const MODEL_CATALOG: &[(&str, &str)] = &[
-    ("01-ai/yi-large", "01-ai"),
     ("acu/deepseek-v4-flash", "acu"),
-    ("adept/fuyu-8b", "adept"),
-    ("ai21labs/jamba-1.5-large-instruct", "ai21labs"),
-    ("aisingapore/sea-lion-7b-instruct", "aisingapore"),
-    ("bigcode/starcoder2-15b", "bigcode"),
-    ("databricks/dbrx-instruct", "databricks"),
-    ("deepseek-ai/deepseek-coder-6.7b-instruct", "deepseek-ai"),
     ("deepseek-ai/deepseek-v4-flash-0731", "deepseek-ai"),
     ("deepseek-ai/deepseek-v4-pro-0813", "deepseek-ai"),
     ("DeepSeek-Prover-V2-7B", "gitee-ai"),
@@ -86,71 +89,27 @@ const MODEL_CATALOG: &[(&str, &str)] = &[
     ("ip-location", "gitee-ai"),
     ("nonescape-v0", "gitee-ai"),
     ("nsfw-classifier", "gitee-ai"),
-    ("google/codegemma-1.1-7b", "google"),
-    ("google/codegemma-7b", "google"),
-    ("google/deplot", "google"),
     ("google/diffusiongemma-26b-a4b-it", "google"),
-    ("google/gemma-2b", "google"),
-    ("google/gemma-3-12b-it", "google"),
-    ("google/gemma-3-4b-it", "google"),
     ("google/gemma-4-31b-it", "google"),
-    ("google/recurrentgemma-2b", "google"),
-    ("ibm/granite-3.0-3b-a800m-instruct", "ibm"),
-    ("ibm/granite-3.0-8b-instruct", "ibm"),
-    ("ibm/granite-34b-code-instruct", "ibm"),
-    ("ibm/granite-8b-code-instruct", "ibm"),
-    ("meta/codellama-70b", "meta"),
     ("meta/llama-3.2-11b-vision-instruct", "meta"),
     ("meta/llama-3.2-90b-vision-instruct", "meta"),
     ("meta/llama-guard-4-12b", "meta"),
-    ("meta/llama2-70b", "meta"),
     ("meta/muse-glimmer-30b", "meta"),
-    ("microsoft/kosmos-2", "microsoft"),
-    ("microsoft/phi-3-vision-128k-instruct", "microsoft"),
-    ("microsoft/phi-3.5-moe-instruct", "microsoft"),
     ("minimaxai/minimax-m3", "minimaxai"),
-    ("mistralai/codestral-22b-instruct-v0.1", "mistralai"),
-    ("mistralai/mistral-7b-instruct-v0.3", "mistralai"),
-    ("mistralai/mistral-large", "mistralai"),
-    ("mistralai/mistral-large-2-instruct", "mistralai"),
     ("mistralai/mistral-nemotron", "mistralai"),
-    ("mistralai/mixtral-8x22b-v0.1", "mistralai"),
-    ("moonshotai/kimi-k2.6", "moonshotai"),
     ("moonshotai/kimi-k3", "moonshotai"),
-    ("nv-mistralai/mistral-nemo-12b-instruct", "nv-mistralai"),
-    ("nvidia/ai-synthetic-video-detector", "nvidia"),
-    ("nvidia/cosmos-reason2-8b", "nvidia"),
-    ("nvidia/embed-qa-4", "nvidia"),
     ("nvidia/ising-calibration-1.5-31b", "nvidia"),
     ("nvidia/llama-3.1-nemoguard-8b-content-safety", "nvidia"),
     ("nvidia/llama-3.1-nemoguard-8b-topic-control", "nvidia"),
-    ("nvidia/llama-3.1-nemotron-51b-instruct", "nvidia"),
-    ("nvidia/llama-3.1-nemotron-70b-instruct", "nvidia"),
     ("nvidia/llama-3.1-nemotron-safety-guard-8b-v3", "nvidia"),
-    ("nvidia/llama-3.1-nemotron-ultra-253b-v1", "nvidia"),
-    ("nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1", "nvidia"),
-    ("nvidia/llama-3.2-nv-embedqa-1b-v1", "nvidia"),
-    ("nvidia/llama-nemotron-embed-vl-1b-v2", "nvidia"),
-    ("nvidia/llama3-chatqa-1.5-70b", "nvidia"),
-    ("nvidia/mistral-nemo-minitron-8b-8k-instruct", "nvidia"),
-    ("nvidia/nemotron-3-embed-1b", "nvidia"),
     ("nvidia/nemotron-3-nano-30b-a3b", "nvidia"),
     ("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "nvidia"),
     ("nvidia/nemotron-3-super-120b-a12b", "nvidia"),
     ("nvidia/nemotron-3-ultra-550b-a55b", "nvidia"),
     ("nvidia/nemotron-3.5-content-safety", "nvidia"),
     ("nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia"),
-    ("nvidia/nemotron-4-340b-instruct", "nvidia"),
-    ("nvidia/nemotron-4-340b-reward", "nvidia"),
-    ("nvidia/nemotron-nano-3-30b-a3b", "nvidia"),
-    ("nvidia/nemotron-parse", "nvidia"),
-    ("nvidia/neva-22b", "nvidia"),
-    ("nvidia/nv-embedqa-mistral-7b-v2", "nvidia"),
-    ("nvidia/nvclip", "nvidia"),
-    ("nvidia/riva-translate-4b-instruct", "nvidia"),
     ("nvidia/riva-translate-4b-instruct-v1.1", "nvidia"),
     ("nvidia/riva-translate-4b-instruct-v2", "nvidia"),
-    ("nvidia/vila", "nvidia"),
     ("openai/gpt-oss-120b", "openai"),
     ("openai/gpt-oss-20b", "openai"),
     ("poolside/laguna-xs-2.1", "poolside"),
@@ -158,14 +117,10 @@ const MODEL_CATALOG: &[(&str, &str)] = &[
     ("BAAI/bge-large-zh-v1.5", "siliconflow"),
     ("BAAI/bge-m3", "siliconflow"),
     ("BAAI/bge-reranker-v2-m3", "siliconflow"),
-    ("FunAudioLLM/SenseVoiceSmall", "siliconflow"),
     ("PaddlePaddle/PaddleOCR-VL-1.5", "siliconflow"),
-    ("Qwen/Qwen3-ASR-1.7B", "siliconflow"),
     ("THUDM/GLM-4-9B-0414", "siliconflow"),
     ("THUDM/GLM-Z1-9B-0414", "siliconflow"),
-    ("TeleAI/TeleSpeechASR", "siliconflow"),
     ("tencent/Hunyuan-MT-7B", "siliconflow"),
-    ("snowflake/arctic-embed-l", "snowflake"),
     ("spark/spark-lite", "spark"),
     ("workers-ai/deepseek-r1-32b", "workers-ai"),
     ("workers-ai/gemma-3-12b", "workers-ai"),
@@ -175,14 +130,9 @@ const MODEL_CATALOG: &[(&str, &str)] = &[
     ("workers-ai/llama-3.3-70b", "workers-ai"),
     ("workers-ai/mistral-7b", "workers-ai"),
     ("workers-ai/mistral-small-24b", "workers-ai"),
-    ("workers-ai/qwen1.5-7b", "workers-ai"),
     ("workers-ai/qwen2.5-coder-32b", "workers-ai"),
     ("workers-ai/qwq-32b", "workers-ai"),
     ("workers-ai/melotts", "workers-ai-tts"),
-    ("writer/palmyra-creative-122b", "writer"),
-    ("writer/palmyra-fin-70b-32k", "writer"),
-    ("writer/palmyra-med-70b", "writer"),
-    ("writer/palmyra-med-70b-32k", "writer"),
     ("zhipu/cogvideox-flash", "zhipu"),
     ("zhipu/cogview-3-flash", "zhipu"),
     ("zhipu/glm-4-flash", "zhipu"),
@@ -192,7 +142,6 @@ const MODEL_CATALOG: &[(&str, &str)] = &[
     ("zhipu/glm-4.7-flash", "zhipu"),
     ("zhipu/glm-4v-flash", "zhipu"),
     ("zhipu/glm-z1-flash", "zhipu"),
-    ("zyphra/zamba2-7b-instruct", "zyphra"),
 ];
 
 // ---------------------------------------------------------------------------
@@ -351,50 +300,157 @@ fn json_res(v: &serde_json::Value) -> Result<Response> {
     Ok(res)
 }
 
-/// 同步构造错误 Response（用于需要直接返回 Response 的场景）
-fn err_plain(status: u16, msg: &str) -> Response {
-    let v = serde_json::json!({
-        "error": {
-            "message": msg,
-            "type": "api_error",
-            "code": status,
-            "help": {
-                "site": SITE_URL,
-                "qq_guild": QQ_GUILD_ID,
-                "qq_guild_url": QQ_GUILD_URL,
-                "qq_group": QQ_GROUP_NUM,
-            }
-        }
-    });
-    let mut res = Response::from_json(&v).expect("json response");
-    let _ = cors_headers(&mut res);
-    res.with_status(status)
-}
-
 /// 官网与社区引导（附在错误响应中，方便用户自助排障）
 const SITE_URL: &str = "https://acu.ltzy.top";
+const DOCS_URL: &str = "https://acu.ltzy.top/#/api";
 const QQ_GUILD_URL: &str = "https://pd.qq.com/s/e4ktxw1b8";
 const QQ_GUILD_ID: &str = "pd57362562";
 const QQ_GROUP_NUM: i64 = 1103667832;
 
-/// 通用错误响应（OpenAI 兼容结构 + 官网/社区引导字段）
-fn err_res(status: u16, msg: &str) -> Result<Response> {
-    let v = serde_json::json!({
+/// 错误响应 JSON 体（非传统纯 HTTP 状态码机制）：
+/// - `error.code`：**字符串业务错误码**（程序识别主键，如 MODEL_UNAVAILABLE，含义稳定不随 HTTP 码漂移）
+/// - `error.status`：数字 HTTP 状态（与传统调用方/OpenAI SDK 兼容）
+/// - `error.message`：中文错误解释（终端 / 错误返回直接可读）
+/// - `error.hint` / `error.help`：加群邀请（带频道号）、官网、文档等自助排障入口
+fn err_json(status: u16, code: &str, msg: &str) -> serde_json::Value {
+    serde_json::json!({
         "error": {
             "message": msg,
-            "type": "api_error",
-            "code": status,
+            "type": "aqua_api_error",
+            "code": code,
+            "status": status,
+            "hint": format!("如需帮助：加入 QQ 频道 {}（{}）反馈，或访问官网 {}", QQ_GUILD_ID, QQ_GUILD_URL, SITE_URL),
             "help": {
                 "site": SITE_URL,
+                "site_label": "AQUA 官网",
+                "docs": DOCS_URL,
                 "qq_guild": QQ_GUILD_ID,
                 "qq_guild_url": QQ_GUILD_URL,
+                "qq_guild_invite": format!("加入 QQ 频道（频道号 {}）获取密钥、公告与支持", QQ_GUILD_ID),
                 "qq_group": QQ_GROUP_NUM,
             }
         }
-    });
-    let mut res = Response::from_json(&v)?.with_status(status);
+    })
+}
+
+/// 核心错误响应：显式指定业务错误码。UTF-8 JSON（charset=utf-8，保证终端/浏览器中文直接可读）。
+fn err_ecode(status: u16, code: &str, msg: &str) -> Result<Response> {
+    let body = serde_json::to_vec(&err_json(status, code, msg)).unwrap_or_default();
+    let mut res = Response::from_bytes(body)?.with_status(status);
+    res.headers_mut()
+        .set("Content-Type", "application/json; charset=utf-8")?;
     cors_headers(&mut res)?;
     Ok(res)
+}
+
+/// 旧签名兼容包装：按中文消息关键词 + HTTP 状态推断稳定业务错误码
+fn err_res(status: u16, msg: &str) -> Result<Response> {
+    err_ecode(status, infer_err_code(status, msg), msg)
+}
+
+/// 同步构造错误 Response（用于需要直接返回 Response 的场景）
+fn err_plain(status: u16, msg: &str) -> Response {
+    let body = serde_json::to_vec(&err_json(status, infer_err_code(status, msg), msg))
+        .expect("serialize error json");
+    let mut res = Response::from_bytes(body).expect("error response");
+    let _ = res.headers_mut().set("Content-Type", "application/json; charset=utf-8");
+    let _ = cors_headers(&mut res);
+    res.with_status(status)
+}
+
+/// 按消息关键词 / HTTP 状态推断稳定业务错误码（错误码含义一旦发布不再变更）
+fn infer_err_code(status: u16, msg: &str) -> &'static str {
+    let m = msg;
+    if m.contains("免费额度") { return "QUOTA_EXHAUSTED"; }
+    if m.contains("封锁") || m.contains("限流") { return "RATE_LIMITED"; }
+    if m.contains("busy") || m.contains("繁忙") { return "ALL_KEYS_BUSY"; }
+    if m.contains("合法 JSON") { return "INVALID_JSON"; }
+    if m.contains("读取失败") { return "BODY_READ_FAILED"; }
+    if m.contains("缺少") { return "MISSING_PARAM"; }
+    if m.contains("格式不正确") || m.contains("内网") || m.contains("无效") || m.contains("不合法") { return "INVALID_PARAM"; }
+    if m.contains("不存在") || m.contains("已下线") { return "MODEL_UNAVAILABLE"; }
+    if m.contains("不可达") || m.contains("unreachable") || m.contains("unavailable") { return "UPSTREAM_UNREACHABLE"; }
+    if m.contains("暂不可用") { return "CHANNEL_UNAVAILABLE"; }
+    match status {
+        400 => "INVALID_REQUEST",
+        401 => "UNAUTHORIZED",
+        403 => "FORBIDDEN",
+        404 => "MODEL_NOT_FOUND",
+        410 => "MODEL_RETIRED",
+        429 => "RATE_LIMITED",
+        500 => "INTERNAL_ERROR",
+        502 => "UPSTREAM_UNREACHABLE",
+        503 => "SERVICE_UNAVAILABLE",
+        504 => "GATEWAY_TIMEOUT",
+        _ => "API_ERROR",
+    }
+}
+
+/// 通道显示名（用于中文错误消息中的【通道】前缀）
+fn channel_label(channel: &str) -> &'static str {
+    match channel {
+        "nvidia" => "NVIDIA",
+        "gitee" => "Gitee AI",
+        "siliconflow" => "SiliconFlow",
+        "zhipu" => "智谱",
+        "spark" => "讯飞星火",
+        "workers-ai" | "workers-ai-tts" => "Workers AI",
+        "acu" => "acu 自营",
+        _ => "上游",
+    }
+}
+
+/// 从上游错误 JSON 中尽量提取人类可读说明（供中文消息附带「上游说明：…」）
+fn upstream_err_detail(v: &serde_json::Value) -> String {
+    if let Some(e) = v.get("error") {
+        if let Some(s) = e.as_str() {
+            return s.trim().to_string();
+        }
+        if let Some(m) = e.get("message").and_then(|x| x.as_str()) {
+            return match e.get("code").map(|c| c.to_string()) {
+                Some(c) if !c.is_empty() && c != "null" => format!("[code {}] {}", c, m),
+                _ => m.to_string(),
+            };
+        }
+    }
+    for k in ["detail", "message", "title", "msg"] {
+        if let Some(s) = v.get(k).and_then(|x| x.as_str()) {
+            if !s.trim().is_empty() {
+                return s.trim().to_string();
+            }
+        }
+    }
+    String::new()
+}
+
+/// 上游错误归一化：把上游 4xx/5xx 响应翻译为统一中文错误结构（不再透传上游英文报文）。
+/// 2xx/3xx 原样透传；404/410 不附带上游原文（可能含内部账号信息），其余附「上游说明」便于排障。
+async fn normalize_upstream(mut res: Response, channel: &str) -> Result<Response> {
+    let status = res.status_code();
+    if (200..400).contains(&status) {
+        return Ok(res);
+    }
+    let raw = res.text().await.unwrap_or_default();
+    let v: serde_json::Value = serde_json::from_str(&raw).unwrap_or(serde_json::json!({}));
+    let detail = upstream_err_detail(&v);
+    let label = channel_label(channel);
+    let (code, http, zh): (&str, u16, String) = match status {
+        404 => ("MODEL_UNAVAILABLE", 502, format!("{}模型在上游已下线或不存在，请更换模型（GET /v1/models 可查可用列表）", label)),
+        410 => ("MODEL_RETIRED", 410, format!("{}模型已在上游永久下线，请更换模型", label)),
+        400 if detail.contains("不存在") => ("MODEL_UNAVAILABLE", 502, format!("{}上游不存在该模型（可能是模型代号已变更），请更换模型", label)),
+        400 => ("UPSTREAM_REJECTED", 400, "上游拒绝了本次请求参数，请检查请求体是否符合该模型的要求".to_string()),
+        401 | 403 => ("UPSTREAM_AUTH_FAILED", 502, format!("{}通道鉴权失败（网关密钥异常），请稍后重试或向社区反馈", label)),
+        429 => ("RATE_LIMITED", 429, format!("{}通道限流或额度受限，请稍后重试或更换模型", label)),
+        408 | 504 => ("UPSTREAM_TIMEOUT", 504, format!("{}上游响应超时，请稍后重试", label)),
+        500..=599 => ("UPSTREAM_ERROR", 502, format!("{}上游服务内部错误，请稍后重试", label)),
+        _ => ("UPSTREAM_ERROR", 502, format!("{}上游返回异常状态 {}", label, status)),
+    };
+    let zh = if detail.is_empty() || status == 404 || status == 410 {
+        zh
+    } else {
+        format!("{}（上游说明：{}）", zh, detail)
+    };
+    err_ecode(http, code, &zh)
 }
 
 // ---------------------------------------------------------------------------
@@ -708,11 +764,11 @@ fn classify_upstream_err(code: u16) -> &'static str {
 async fn proxy_nvidia_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<Response> {
     let pool_ns = match env.durable_object("NV_KEY_POOL") {
         Ok(ns) => ns,
-        Err(_) => return err_res(500, "key pool unavailable"),
+        Err(_) => return err_ecode(500, "INTERNAL_ERROR", "网关密钥池组件暂不可用，请稍后重试"),
     };
     let pool = match pool_ns.id_from_name("pool").and_then(|id| id.get_stub()) {
         Ok(s) => s,
-        Err(_) => return err_res(500, "key pool unavailable"),
+        Err(_) => return err_ecode(500, "INTERNAL_ERROR", "网关密钥池组件暂不可用，请稍后重试"),
     };
 
     let mut last_code = 502;
@@ -722,25 +778,25 @@ async fn proxy_nvidia_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<
         // 从密钥池选 key
         let mut pick = match stub_json(&pool, &serde_json::json!({"cmd": "pick", "model": model})).await {
             Ok(r) => r,
-            Err(_) => return err_res(502, "Bad Gateway: upstream unreachable"),
+            Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "上游连接失败（密钥池异常），请稍后重试"),
         };
         let pj: serde_json::Value = match pick.json().await {
             Ok(v) => v,
-            Err(_) => return err_res(502, "Bad Gateway: upstream unreachable"),
+            Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "上游连接失败（密钥池异常），请稍后重试"),
         };
 
         if let Some(err) = pj.get("error").and_then(|v| v.as_str()) {
             if err == "model_blocked" {
-                return err_res(429, "该模型在上游已被封锁（3+ 密钥无访问权限），10 分钟后自动重试");
+                return err_ecode(429, "MODEL_BLOCKED", "该模型在上游已被封锁（3+ 密钥无访问权限），10 分钟后自动重试");
             }
             if err == "all_keys_busy" {
-                return err_res(503, "all keys busy");
+                return err_ecode(503, "ALL_KEYS_BUSY", "上游密钥全部繁忙（并发已满），请稍后重试");
             }
         }
 
         let key = match pj.get("key").and_then(|v| v.as_str()) {
             Some(k) => k.to_string(),
-            None => return err_res(502, "Bad Gateway: upstream unreachable"),
+            None => return err_ecode(502, "UPSTREAM_UNREACHABLE", "上游连接失败（密钥池异常），请稍后重试"),
         };
         let key_idx = pj.get("key_idx").and_then(|v| v.as_u64()).unwrap_or(0) as u32;
 
@@ -774,7 +830,7 @@ async fn proxy_nvidia_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<
                     "ok": status < 400, "err_type": "success"
                 }))
                 .await;
-            return passthrough(res);
+            return normalize_upstream(res, "nvidia").await;
         }
 
         // 401/403/429/5xx → 回滚失败并换 key 重试
@@ -788,11 +844,11 @@ async fn proxy_nvidia_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<
     }
 
     if last_err_type == "rate_limited" {
-        err_res(429, "上游限流，请稍后重试")
+        err_ecode(429, "RATE_LIMITED", "上游限流（已自动重试多把密钥），请稍后重试或更换模型")
     } else if last_code == 401 || last_code == 403 {
-        err_res(502, "Bad Gateway: upstream unreachable")
+        err_ecode(502, "UPSTREAM_AUTH_FAILED", "上游鉴权失败（已自动重试多把密钥），请稍后重试或向社区反馈")
     } else {
-        err_res(502, "Bad Gateway: upstream unreachable")
+        err_ecode(502, "UPSTREAM_UNREACHABLE", "上游不可用（已自动重试多把密钥），请稍后重试或更换模型")
     }
 }
 
@@ -808,7 +864,7 @@ async fn release_acu(acu_stub: Option<Stub>) {
 async fn proxy_acu_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<Response> {
     // 上游配置未注入时明确拒绝（不泄露任何信息）
     let Some(cfg) = provider_cfg(env, "acu") else {
-        return err_res(502, "acu 通道暂不可用，请稍后重试");
+        return err_ecode(502, "CHANNEL_UNAVAILABLE", "acu 自营通道暂不可用，请稍后重试");
     };
     // 全局并发限流：并发满时按建议时长等待（最多 10s），尽力而为
     let mut acu_stub: Option<Stub> = None;
@@ -850,11 +906,11 @@ async fn proxy_acu_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<Res
         Ok(r) => r,
         Err(_) => {
             release_acu(acu_stub).await;
-            return err_res(502, "acu 上游不可达，请稍后重试");
+            return err_ecode(502, "UPSTREAM_UNREACHABLE", "acu 上游连接失败，请稍后重试");
         }
     };
     release_acu(acu_stub).await;
-    passthrough(res)
+    normalize_upstream(res, "acu").await
 }
 
 /// 直接代理到固定密钥的上游（gitee/siliconflow/zhipu/spark）
@@ -867,7 +923,8 @@ async fn proxy_direct(base: &str, key: &str, extra_host: Option<&str>, body_byte
         body_bytes,
         Method::Post,
     )?;
-    forward(req, 60000).await
+    let res = forward(req, 60000).await?;
+    normalize_upstream(res, "direct").await
 }
 
 /// 通用「env 配置直连转发」：按 provider 读环境变量配置，转发到 {base}{path}。
@@ -889,17 +946,18 @@ async fn direct_forward(
         body,
         Method::Post,
     )?;
-    forward(req, timeout_ms).await
+    let res = forward(req, timeout_ms).await?;
+    normalize_upstream(res, provider).await
 }
 
 async fn proxy_workers_ai_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<Response> {
     let budget_ns = match env.durable_object("WAI_BUDGET") {
         Ok(ns) => ns,
-        Err(_) => return err_res(500, "Workers AI unavailable"),
+        Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试"),
     };
     let budget = match budget_ns.id_from_name("global").and_then(|id| id.get_stub()) {
         Ok(s) => s,
-        Err(_) => return err_res(500, "Workers AI unavailable"),
+        Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试"),
     };
 
     // 预算检查：按文本 token 数粗估神经元（约 input+output 每 1K token ≈ 1 神经元）
@@ -910,13 +968,13 @@ async fn proxy_workers_ai_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Res
     };
 
     if !check.get("allowed").and_then(|v| v.as_bool()).unwrap_or(false) {
-        return err_res(429, "Workers AI 今日免费额度已用尽，请等待每天 00:00 UTC 额度自动重置后重试，或切换其他模型（如 build/ 前缀的 Nvidia 模型）");
+        return err_ecode(429, "QUOTA_EXHAUSTED", "Workers AI 今日免费额度已用尽，请等待每天 00:00 UTC 额度自动重置后重试，或切换其他模型（如 build/ 前缀的 Nvidia 模型）");
     }
 
     let account_id = check.get("account_id").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let token = check.get("token").and_then(|v| v.as_str()).unwrap_or("").to_string();
     if account_id.is_empty() || token.is_empty() {
-        return err_res(502, "Workers AI unavailable");
+        return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试");
     }
 
     // 需要 max_tokens（Workers AI 要求）
@@ -943,9 +1001,9 @@ async fn proxy_workers_ai_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Res
     )?;
     let res = match Fetch::Request(req).send().await {
         Ok(r) => r,
-        Err(_) => return err_res(502, "Workers AI unavailable"),
+        Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试"),
     };
-    passthrough(res)
+    normalize_upstream(res, "workers-ai").await
 }
 
 /// 估算 Workers AI 请求的神经元用量（粗略：输入+输出 token ≈ 千字 1 神经元）
@@ -1039,11 +1097,11 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
 async fn handle_speech(mut req: Request, env: Env) -> Result<Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let parsed: serde_json::Value = match serde_json::from_slice(&body) {
         Ok(v) => v,
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let model = parsed.get("model").and_then(|v| v.as_str()).unwrap_or("").to_string();
 
@@ -1054,23 +1112,23 @@ async fn handle_speech(mut req: Request, env: Env) -> Result<Response> {
             // workers-ai-tts / melotts → Workers AI
             let budget_ns = match env.durable_object("WAI_BUDGET") {
                 Ok(ns) => ns,
-                Err(_) => return err_res(500, "Workers AI unavailable"),
+                Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试"),
             };
             let budget = match budget_ns.id_from_name("global").and_then(|id| id.get_stub()) {
                 Ok(s) => s,
-                Err(_) => return err_res(500, "Workers AI unavailable"),
+                Err(_) => return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试"),
             };
             let check = match stub_json(&budget, &serde_json::json!({"cmd": "check", "amount": 10.0})).await {
                 Ok(mut r) => r.json::<serde_json::Value>().await.unwrap_or_default(),
                 Err(_) => serde_json::json!({"allowed": true}),
             };
             if !check.get("allowed").and_then(|v| v.as_bool()).unwrap_or(false) {
-                return err_res(429, "Workers AI 今日免费额度已用尽，请等待每天 00:00 UTC 额度自动重置后重试");
+                return err_ecode(429, "QUOTA_EXHAUSTED", "Workers AI 今日免费额度已用尽，请等待每天 00:00 UTC 额度自动重置后重试");
             }
             let account_id = check.get("account_id").and_then(|v| v.as_str()).unwrap_or("").to_string();
             let token = check.get("token").and_then(|v| v.as_str()).unwrap_or("").to_string();
             if account_id.is_empty() || token.is_empty() {
-                return err_res(502, "Workers AI unavailable");
+                return err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 通道暂不可用，请稍后重试");
             }
             let wai_model = wai_upstream_model(&model);
             let mut body: serde_json::Value = parsed;
@@ -1087,8 +1145,8 @@ async fn handle_speech(mut req: Request, env: Env) -> Result<Response> {
                 Method::Post,
             )?;
             match Fetch::Request(req).send().await {
-                Ok(res) => passthrough(res),
-                Err(_) => err_res(502, "audio 上游错误"),
+                Ok(res) => normalize_upstream(res, "workers-ai").await,
+                Err(_) => err_ecode(502, "UPSTREAM_UNREACHABLE", "Workers AI 音频上游连接失败，请稍后重试"),
             }
         }
     }
@@ -1097,7 +1155,7 @@ async fn handle_speech(mut req: Request, env: Env) -> Result<Response> {
 async fn handle_transcriptions(mut req: Request, env: Env) -> Result<Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     // ASR：gitee / siliconflow / nvidia 均可。默认路由 gitee。
     direct_forward(&env, "gitee", "/audio/transcriptions", &body, 60000).await
@@ -1106,11 +1164,11 @@ async fn handle_transcriptions(mut req: Request, env: Env) -> Result<Response> {
 async fn handle_embeddings(mut req: Request, env: Env) -> Result<Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let parsed: serde_json::Value = match serde_json::from_slice(&body) {
         Ok(v) => v,
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let model = parsed.get("model").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let provider = provider_of(&model);
@@ -1145,11 +1203,11 @@ async fn handle_moderations(mut req: Request, env: Env) -> Result<Response> {
 async fn handle_images(mut req: Request, env: Env) -> Result<Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let parsed: serde_json::Value = match serde_json::from_slice(&body) {
         Ok(v) => v,
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let model = parsed.get("model").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let provider = provider_of(&model);
@@ -1163,11 +1221,11 @@ async fn handle_images(mut req: Request, env: Env) -> Result<Response> {
 async fn handle_videos(mut req: Request, env: Env) -> Result<Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let parsed: serde_json::Value = match serde_json::from_slice(&body) {
         Ok(v) => v,
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let model = parsed.get("model").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let provider = provider_of(&model);
@@ -1321,11 +1379,11 @@ async fn handle_ip_location(mut req: Request, env: Env) -> Result<Response> {
 async fn read_json_body(mut req: Request) -> std::result::Result<serde_json::Value, Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return Err(err_plain(400, "Bad Request")),
+        Err(_) => return Err(err_plain(400, "请求体读取失败，请检查网络后重试")),
     };
     match serde_json::from_slice(&body) {
         Ok(v) => Ok(v),
-        Err(_) => Err(err_plain(400, "Bad Request: invalid JSON body")),
+        Err(_) => Err(err_plain(400, "请求体不是合法 JSON，请检查后重试")),
     }
 }
 
@@ -1598,11 +1656,11 @@ async fn handle_tool_subnet(req: Request) -> Result<Response> {
 async fn handle_rerank(mut req: Request, env: Env) -> Result<Response> {
     let body = match req.bytes().await {
         Ok(b) => b.to_vec(),
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let parsed: serde_json::Value = match serde_json::from_slice(&body) {
         Ok(v) => v,
-        Err(_) => return err_res(400, "Bad Request"),
+        Err(_) => return err_ecode(400, "INVALID_REQUEST", "请求格式不正确，请检查请求体与 Content-Type"),
     };
     let model = parsed.get("model").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let provider = provider_of(&model);

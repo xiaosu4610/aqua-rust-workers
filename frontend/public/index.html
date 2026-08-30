@@ -1571,26 +1571,43 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
 
       <div class="api-card api-anchor">
         <h2>错误与状态码</h2>
-        <p class="desc">所有错误响应均采用 OpenAI 兼容的错误结构（HTTP 状态码 + JSON 错误体），客户端可直接按 OpenAI 官方错误格式解析：</p>
+        <p class="desc">所有错误响应为结构化 JSON（<b>非传统纯 HTTP 状态码机制</b>）：程序识别主键是字符串业务错误码 <code>error.code</code>，同时保留数字 <code>error.status</code>（与 HTTP 状态码一致，兼容 OpenAI SDK）。中文消息 <code>error.message</code> 直接可读（<code>Content-Type: application/json; charset=utf-8</code>），并附带 QQ 频道 / 官网自助引导字段：</p>
         <pre><button class="btn" data-copy-from="code-api-err">复制</button><code id="code-api-err">{<span class="str">"error"</span>: {
-  <span class="str">"message"</span>: <span class="str">"上游限流，请稍后重试"</span>,
-  <span class="str">"type"</span>: <span class="str">"api_error"</span>,
-  <span class="str">"code"</span>: <span class="tok">429</span>
+  <span class="str">"message"</span>: <span class="str">"上游限流或额度受限，请稍后重试或更换模型（上游说明：…）"</span>,
+  <span class="str">"type"</span>: <span class="str">"aqua_api_error"</span>,
+  <span class="str">"code"</span>: <span class="str">"RATE_LIMITED"</span>,
+  <span class="str">"status"</span>: <span class="tok">429</span>,
+  <span class="str">"hint"</span>: <span class="str">"如需帮助：加入 QQ 频道 pd57362562（https://pd.qq.com/s/e4ktxw1b8）反馈，或访问官网 https://acu.ltzy.top"</span>,
+  <span class="str">"help"</span>: { <span class="str">"site"</span>: <span class="str">"https://acu.ltzy.top"</span>, <span class="str">"docs"</span>: <span class="str">"https://acu.ltzy.top/#/api"</span>,
+            <span class="str">"qq_guild"</span>: <span class="str">"pd57362562"</span>, <span class="str">"qq_guild_url"</span>: <span class="str">"https://pd.qq.com/s/e4ktxw1b8"</span>,
+            <span class="str">"qq_guild_invite"</span>: <span class="str">"加入 QQ 频道（频道号 pd57362562）获取密钥、公告与支持"</span>, <span class="str">"qq_group"</span>: <span class="tok">1103667832</span> }
 }}</code></pre>
-        <h3>HTTP 状态码</h3>
+        <h3>业务错误码（<code>error.code</code>）</h3>
         <div class="md-table-wrap"><table class="md-table">
-          <thead><tr><th>状态码</th><th>含义</th><th>常见原因与处理</th></tr></thead>
+          <thead><tr><th>错误码</th><th>HTTP</th><th>含义与处理</th></tr></thead>
           <tbody>
-            <tr><td><code>200</code></td><td>成功</td><td>正常返回；流式请求返回 SSE 数据流（<code>Content-Type: text/event-stream</code>）</td></tr>
-            <tr><td><code>400</code></td><td>请求参数错误</td><td>请求体不是合法 JSON、缺少 <code>model</code> 字段或参数非法。检查请求体后重试</td></tr>
-            <tr><td><code>401</code></td><td>密钥被拒（仅指定密钥模式）</td><td>本站默认开放模式（任意密钥可用）；若部署者启用 <code>AUTH_MODE=key</code>，密钥需在 <code>GATEWAY_KEYS</code> 列表内。401 响应附官网与 QQ 频道/群引导字段</td></tr>
-            <tr><td><code>404</code></td><td>接口或模型不存在</td><td>请求了不存在的端点，或模型 ID 拼写错误 / 不在模型列表中</td></tr>
-            <tr><td><code>429</code></td><td>限流 / 额度耗尽</td><td>Workers AI 日额度用尽、上游限流、或官方自营通道排队超时。稍后重试即可</td></tr>
-            <tr><td><code>500</code></td><td>服务器内部错误</td><td>网关内部异常。可稍后重试；若持续出现请到交流群反馈</td></tr>
-            <tr><td><code>502</code></td><td>上游不可达</td><td>上游网关超时 / 密钥池不可用 / 上游返回 5xx。稍后重试</td></tr>
-            <tr><td><code>503</code></td><td>服务暂不可用</td><td>Nvidia 密钥池全部繁忙（<code>all keys busy</code>）。稍后重试</td></tr>
+            <tr><td><code>INVALID_JSON</code></td><td>400</td><td>请求体不是合法 JSON</td></tr>
+            <tr><td><code>MISSING_PARAM</code></td><td>400</td><td>缺少必填字段（如 <code>model</code>）</td></tr>
+            <tr><td><code>INVALID_PARAM</code></td><td>400</td><td>参数格式非法（如 IP 格式错误、内网保留 IP）</td></tr>
+            <tr><td><code>INVALID_REQUEST</code></td><td>400</td><td>请求格式不正确</td></tr>
+            <tr><td><code>UPSTREAM_REJECTED</code></td><td>400</td><td>上游拒绝请求参数，请按模型要求调整请求体</td></tr>
+            <tr><td><code>UNAUTHORIZED</code></td><td>401</td><td>密钥被拒（仅指定密钥模式；本站默认开放模式任意密钥可用）</td></tr>
+            <tr><td><code>MODEL_NOT_FOUND</code></td><td>404</td><td>模型 ID 不在目录中（GET /v1/models 可查）</td></tr>
+            <tr><td><code>MODEL_RETIRED</code></td><td>410</td><td>模型已在上游永久下线，请更换模型</td></tr>
+            <tr><td><code>QUOTA_EXHAUSTED</code></td><td>429</td><td>Workers AI 当日免费额度用尽，每天 00:00 UTC 自动重置</td></tr>
+            <tr><td><code>RATE_LIMITED</code></td><td>429</td><td>上游限流 / 模型被临时封锁，稍后重试或换模型</td></tr>
+            <tr><td><code>MODEL_BLOCKED</code></td><td>429</td><td>该模型在上游被封锁（3+ 密钥无权限），约 10 分钟自动恢复</td></tr>
+            <tr><td><code>MODEL_UNAVAILABLE</code></td><td>502</td><td>模型在上游已下线或不存在，请更换模型</td></tr>
+            <tr><td><code>UPSTREAM_UNREACHABLE</code></td><td>502</td><td>上游连接失败 / 上游 5xx，稍后重试</td></tr>
+            <tr><td><code>UPSTREAM_AUTH_FAILED</code></td><td>502</td><td>上游鉴权失败（网关密钥异常），可向社区反馈</td></tr>
+            <tr><td><code>UPSTREAM_ERROR</code></td><td>502</td><td>上游服务内部错误，稍后重试</td></tr>
+            <tr><td><code>UPSTREAM_TIMEOUT</code></td><td>504</td><td>上游响应超时，稍后重试</td></tr>
+            <tr><td><code>ALL_KEYS_BUSY</code></td><td>503</td><td>密钥池全部繁忙（并发满），稍后重试</td></tr>
+            <tr><td><code>CHANNEL_UNAVAILABLE</code></td><td>502</td><td>对应供应商通道未配置或暂不可用</td></tr>
+            <tr><td><code>INTERNAL_ERROR</code></td><td>500</td><td>网关内部异常，持续出现请到 QQ 频道反馈</td></tr>
           </tbody>
         </table></div>
+        <p class="desc">每个错误响应均带 <code>error.hint</code>（加入 QQ 频道 pd57362562 与官网引导），程序可读取 <code>error.help</code> 结构化字段直接展示求助入口。</p>
         <h3>模型状态字段（<code>/v1/models</code> 返回）</h3>
         <div class="md-table-wrap"><table class="md-table">
           <thead><tr><th>status</th><th>含义</th><th>处理建议</th></tr></thead>
@@ -1901,161 +1918,53 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   if (cur !== "light" && cur !== "dark") cur = "light";
   setTheme(cur);
   var CHECK_ICON = '<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>已复制';
+  /* 2026-08-30 与网关 MODEL_CATALOG 对齐：仅保留 83 个验证存活模型（离线兜底列表） */
   var fallbackModels = [
-    // ── 国产大模型（DeepSeek / Qwen / 智谱 / 百川 / 零一） ──
-    "deepseek-ai/deepseek-r1",
-    "deepseek-ai/deepseek-r1-distill-qwen-32b",
-    "deepseek-ai/deepseek-r1-distill-qwen-14b",
-    "deepseek-ai/deepseek-r1-distill-qwen-7b",
-    "deepseek-ai/deepseek-r1-distill-llama-8b",
-    "deepseek-ai/deepseek-coder-6.7b-instruct",
-    "qwen/qwq-32b",
-    "qwen/qwen2.5-coder-32b-instruct",
-    "qwen/qwen2.5-coder-7b-instruct",
-    "qwen/qwen2.5-7b-instruct",
-    "qwen/qwen2-7b-instruct",
-    "thudm/chatglm3-6b",
-    "baichuan-inc/baichuan2-13b-chat",
-    "01-ai/yi-large",
-    // ── Nvidia 旗舰 & 大参数 Nemotron ──
-    "nvidia/llama-3.1-nemotron-ultra-253b-v1",
-    "nvidia/nemotron-4-340b-instruct",
-    "nvidia/llama-3.3-nemotron-super-49b-v1",
-    "nvidia/llama-3.1-nemotron-70b-instruct",
-    "nvidia/llama-3.1-nemotron-nano-8b-v1",
-    "nvidia/nemotron-mini-4b-instruct",
-    // ── Meta Llama 旗舰（2026-08 实测可用的在线版本；旧 405B/3.3-70B 已下线）──
-    "moonshotai/kimi-k3",
-    "nvidia/nemotron-3-super-120b-a12b",
-    "nvidia/nemotron-3-ultra-550b-a55b",
-    "deepseek-ai/deepseek-v4-pro-0813",
-    "minimaxai/minimax-m3",
-    "meta/llama-3.2-90b-vision-instruct",
-    "meta/llama-3.2-11b-vision-instruct",
-    "meta/llama-3.2-3b-instruct",
-    "meta/llama-3.2-1b-instruct",
-    "meta/llama3-70b-instruct",
-    "meta/llama3-8b-instruct",
-    "meta/llama2-70b",
-    "meta/codellama-70b",
-    // ── Mistral 旗舰 ──
-    "mistralai/mistral-large-2-instruct",
-    "mistralai/mistral-medium-3-instruct",
-    "mistralai/mistral-small-3.1-24b-instruct-2503",
-    "mistralai/mistral-small-24b-instruct",
-    "mistralai/mixtral-8x22b-instruct-v0.1",
-    "mistralai/mixtral-8x7b-instruct-v0.1",
-    "mistralai/mistral-7b-instruct-v0.3",
-    "mistralai/codestral-22b-instruct-v0.1",
-    "mistralai/mamba-codestral-7b-v0.1",
-    "mistralai/mathstral-7b-v0.1",
-    "nv-mistralai/mistral-nemo-12b-instruct",
-    // ── Google Gemma ──
-    "google/gemma-3-27b-it",
-    "google/gemma-3-12b-it",
-    "google/gemma-3-4b-it",
-    "google/gemma-3-1b-it",
-    "google/gemma-2-27b-it",
-    "google/gemma-2-9b-it",
-    "google/gemma-2-2b-it",
-    "google/codegemma-1.1-7b",
-    "google/codegemma-7b",
-    "google/shieldgemma-9b",
-    // ── Microsoft Phi ──
-    "microsoft/phi-4-multimodal-instruct",
-    "microsoft/phi-4-mini-instruct",
-    "microsoft/phi-3.5-moe-instruct",
-    "microsoft/phi-3.5-mini-instruct",
-    "microsoft/phi-3.5-vision-instruct",
-    "microsoft/phi-3-medium-128k-instruct",
-    "microsoft/phi-3-medium-4k-instruct",
-    "microsoft/phi-3-small-128k-instruct",
-    "microsoft/phi-3-small-8k-instruct",
-    "microsoft/phi-3-mini-128k-instruct",
-    "microsoft/phi-3-mini-4k-instruct",
-    "microsoft/phi-3-vision-128k-instruct",
-    // ── 其他国际模型 ──
-    "ai21labs/jamba-1.5-large-instruct",
-    "ai21labs/jamba-1.5-mini-instruct",
-    "databricks/dbrx-instruct",
-    "igenius/colosseum_355b_instruct_16k",
-    "igenius/italia_10b_instruct_16k",
-    "writer/palmyra-creative-122b",
-    "writer/palmyra-fin-70b-32k",
-    "writer/palmyra-med-70b",
-    "writer/palmyra-med-70b-32k",
-    "ibm/granite-34b-code-instruct",
-    "ibm/granite-3.0-8b-instruct",
-    "ibm/granite-3.0-3b-a800m-instruct",
-    "ibm/granite-8b-code-instruct",
-    "ibm/granite-guardian-3.0-8b",
-    "bigcode/starcoder2-15b",
-    "bigcode/starcoder2-7b",
-    "microsoft/kosmos-2",
-    "google/deplot",
-    "google/paligemma",
-    "adept/fuyu-8b",
-    "nvidia/neva-22b",
-    "nvidia/vila",
-    "nvidia/nvclip",
-    "abacusai/dracarys-llama-3.1-70b-instruct",
-    "institute-of-science-tokyo/llama-3.1-swallow-70b-instruct-v0.1",
-    "institute-of-science-tokyo/llama-3.1-swallow-8b-instruct-v0.1",
-    "tokyotech-llm/llama-3-swallow-70b-instruct-v0.1",
-    "mediatek/breeze-7b-instruct",
-    "aisingapore/sea-lion-7b-instruct",
-    "upstage/solar-10.7b-instruct",
-    "rakuten/rakutenai-7b-chat",
-    "rakuten/rakutenai-7b-instruct",
-    "tiiuae/falcon3-7b-instruct",
-    "yentinglin/llama-3-taiwan-70b-instruct",
-    "zyphra/zamba2-7b-instruct",
-    // ── Nvidia 安全 / 嵌入 / 检索 ──
-    "nvidia/llama-3.1-nemoguard-8b-content-safety",
-    "nvidia/llama-3.1-nemoguard-8b-topic-control",
-    "nvidia/llama-3.1-nemotron-70b-reward",
-    "nvidia/nemotron-4-340b-reward",
-    "nvidia/nemotron-4-mini-hindi-4b-instruct",
-    "nvidia/llama3-chatqa-1.5-70b",
-    "nvidia/llama3-chatqa-1.5-8b",
-    "nvidia/mistral-nemo-minitron-8b-8k-instruct",
-    "nvidia/usdcode-llama-3.1-70b-instruct",
-    "nvidia/nemoretriever-parse",
-    "nvidia/embed-qa-4",
-    "nvidia/nv-embed-v1",
-    "nvidia/nv-embedcode-7b-v1",
-    "nvidia/nv-embedqa-e5-v5",
-    "nvidia/nv-embedqa-mistral-7b-v2",
-    "nvidia/llama-3.2-nv-embedqa-1b-v1",
-    "nvidia/llama-3.2-nv-embedqa-1b-v2",
-    "baai/bge-m3",
-    "snowflake/arctic-embed-l",
+    // ── 官方自营（DeepSeek V4 Flash，AQUA 自营旗舰） ──
+    "acu/deepseek-v4-flash",
+    // ── DeepSeek 官方 ──
+    "deepseek-ai/deepseek-v4-flash-0731", "deepseek-ai/deepseek-v4-pro-0813",
     // ── Gitee AI（模力方舟） ──
-    "HuatuoGPT-o1-7B", "Lingshu-32B", "DeepSeek-Prover-V2-7B", "HealthGPT-L14",
-    "GLM-4-9B-0414", "glm-4-9b-chat", "Qwen3-0.6B", "Qwen3-4B", "Qwen3-8B",
-    "Qwen2-7B-Instruct", "internlm3-8b-instruct",
+    "DeepSeek-Prover-V2-7B", "HealthGPT-L14", "HuatuoGPT-o1-7B", "Lingshu-32B",
+    "GLM-4-9B-0414", "glm-4-9b-chat", "Qwen2-7B-Instruct", "internlm3-8b-instruct",
     "DeepSeek-R1-Distill-Qwen-1.5B", "DeepSeek-R1-Distill-Qwen-7B", "DeepSeek-R1-Distill-Qwen-14B",
+    "Qwen3-0.6B", "Qwen3-4B", "Qwen3-8B",
+    "Qwen3-Embedding-4B", "Qwen3-Reranker-0.6B", "Qwen3-Reranker-4B", "Qwen3Guard-Gen-0.6B",
     "GLM-ASR", "SenseVoiceSmall", "Spark-TTS-0.5B",
-    "Qwen3-Embedding-4B", "Qwen3-Reranker-0.6B", "Qwen3-Reranker-4B",
     "bge-reranker-v2-m3", "bce-reranker-base_v1",
-    "Qwen3Guard-Gen-0.6B", "nonescape-v0", "Security-semantic-filtering", "nsfw-classifier",
-    "ip-location",
+    "nonescape-v0", "Security-semantic-filtering", "nsfw-classifier", "ip-location",
+    // ── Google ──
+    "google/diffusiongemma-26b-a4b-it", "google/gemma-4-31b-it",
+    // ── Meta ──
+    "meta/llama-3.2-11b-vision-instruct", "meta/llama-3.2-90b-vision-instruct",
+    "meta/llama-guard-4-12b", "meta/muse-glimmer-30b",
+    // ── MiniMax / Mistral / Moonshot ──
+    "minimaxai/minimax-m3", "mistralai/mistral-nemotron", "moonshotai/kimi-k3",
+    // ── Nvidia ──
+    "nvidia/ising-calibration-1.5-31b",
+    "nvidia/llama-3.1-nemoguard-8b-content-safety", "nvidia/llama-3.1-nemoguard-8b-topic-control",
+    "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+    "nvidia/nemotron-3-nano-30b-a3b", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3-ultra-550b-a55b",
+    "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2",
+    // ── OpenAI 开源 ──
+    "openai/gpt-oss-120b", "openai/gpt-oss-20b",
+    // ── Poolside ──
+    "poolside/laguna-xs-2.1",
     // ── SiliconFlow（硅基流动） ──
     "BAAI/bge-large-en-v1.5", "BAAI/bge-large-zh-v1.5", "BAAI/bge-m3", "BAAI/bge-reranker-v2-m3",
-    "FunAudioLLM/SenseVoiceSmall", "PaddlePaddle/PaddleOCR-VL-1.5", "Qwen/Qwen3-ASR-1.7B",
-    "TeleAI/TeleSpeechASR", "tencent/Hunyuan-MT-7B", "THUDM/GLM-4-9B-0414", "THUDM/GLM-Z1-9B-0414",
+    "PaddlePaddle/PaddleOCR-VL-1.5", "THUDM/GLM-4-9B-0414", "THUDM/GLM-Z1-9B-0414", "tencent/Hunyuan-MT-7B",
+    // ── 讯飞星火（Spark，免费） ──
+    "spark/spark-lite",
     // ── Workers AI（Cloudflare，有日额度限制） ──
     "workers-ai/llama-3.2-1b", "workers-ai/llama-3.2-3b", "workers-ai/llama-3.1-8b", "workers-ai/llama-3.3-70b",
-    "workers-ai/mistral-7b", "workers-ai/qwen1.5-7b", "workers-ai/deepseek-r1-32b", "workers-ai/qwen2.5-coder-32b",
-    "workers-ai/qwq-32b", "workers-ai/gemma-3-12b", "workers-ai/mistral-small-24b",
+    "workers-ai/mistral-7b", "workers-ai/deepseek-r1-32b", "workers-ai/qwen2.5-coder-32b",
+    "workers-ai/qwq-32b", "workers-ai/gemma-3-12b", "workers-ai/mistral-small-24b", "workers-ai/melotts",
     // ── 智谱 GLM（免费，含 CogView 绘图 / CogVideo 视频） ──
     "zhipu/glm-4.7-flash", "zhipu/glm-4-flash-250414", "zhipu/glm-z1-flash", "zhipu/glm-4-flash",
     "zhipu/glm-4.6v-flash", "zhipu/glm-4v-flash", "zhipu/glm-4.1v-thinking-flash",
-    "zhipu/cogview-3-flash", "zhipu/cogvideox-flash",
-    // ── 讯飞星火（Spark，免费） ──
-    "spark/spark-lite",
-    // ── 官方自营（DeepSeek V4 Flash，AQUA 自营旗舰） ──
-    "acu/deepseek-v4-flash"
+    "zhipu/cogview-3-flash", "zhipu/cogvideox-flash"
   ];
   var models = [];        // 模型 ID 数组（已排序）
   var modelMeta = {};     // id -> {platform, type}
@@ -2106,8 +2015,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   });
   SILICONFLOW_IDS = fallbackModels.filter(function (id) {
     return ["BAAI/bge-large-en-v1.5","BAAI/bge-large-zh-v1.5","BAAI/bge-m3","BAAI/bge-reranker-v2-m3",
-      "FunAudioLLM/SenseVoiceSmall","PaddlePaddle/PaddleOCR-VL-1.5","Qwen/Qwen3-ASR-1.7B",
-      "TeleAI/TeleSpeechASR","tencent/Hunyuan-MT-7B","THUDM/GLM-4-9B-0414","THUDM/GLM-Z1-9B-0414"].indexOf(id) !== -1;
+      "PaddlePaddle/PaddleOCR-VL-1.5",
+      "tencent/Hunyuan-MT-7B","THUDM/GLM-4-9B-0414","THUDM/GLM-Z1-9B-0414"].indexOf(id) !== -1;
   });
   function classify(id) {
     var l = id.toLowerCase();
@@ -2570,6 +2479,12 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
    *                       路由 #/tools/{name} 自动生效，无需改路由代码。
    * ============================================================ */
   var DEMO_KEY = "sk-playground-demo";  // 开放模式演示密钥（AUTH_MODE=open 下任意非空密钥均可用）
+  /* 网关统一错误结构：{error:{message(中文), code(字符串业务错误码), status, hint, help:{site, qq_guild...}}} */
+  function formatAquaErr(e, httpStatus) {
+    var code = e && e.code ? String(e.code) : "";
+    var msg = (e && e.message) || ("请求失败（HTTP " + httpStatus + "）");
+    return (code && !/^\d+$/.test(code) ? "【" + code + "】" : "") + msg;
+  }
   function apiFetch(path, opts) {
     opts = opts || {};
     opts.method = opts.method || "GET";
@@ -2580,31 +2495,52 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     return fetch(GATEWAY + path, opts).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (j) {
         if (!res.ok) {
-          // 网关错误统一为 { error: { message, code, help } }，透出 message
-          var msg = j && j.error && j.error.message;
-          throw new Error(msg || ("请求失败（HTTP " + res.status + "）"));
+          // 网关错误统一为 { error: { message, code, status, hint, help } }，透出中文 message + 业务错误码
+          var e = (j && j.error) || {};
+          var err = new Error(formatAquaErr(e, res.status));
+          err.aqua = e;
+          throw err;
         }
         return j;
       });
     });
   }
+  /* apiChat 失败自动回退：主模型失败后换备用健康模型重试一次（工具/游戏调用成功率保障） */
+  var APICHAT_FALLBACKS = ["acu/deepseek-v4-flash", "Qwen3-8B", "Qwen3-4B", "openai/gpt-oss-120b", "GLM-4-9B-0414", "openai/gpt-oss-20b"];
+  function apiChatFallback(failed) {
+    var pool = models.filter(pgModelOk);
+    for (var i = 0; i < APICHAT_FALLBACKS.length; i++) {
+      if (APICHAT_FALLBACKS[i] !== failed && pool.indexOf(APICHAT_FALLBACKS[i]) !== -1) return APICHAT_FALLBACKS[i];
+    }
+    return null;
+  }
   /* 非流式对话统一入口：返回模型回复文本（默认用 toolChatModel 选最优可用模型） */
   function apiChat(messages, opts) {
     opts = opts || {};
-    return apiFetch("/chat/completions", {
-      method: "POST",
-      body: JSON.stringify({
-        model: opts.model || toolChatModel(),
-        messages: messages,
-        stream: false,
-        temperature: opts.temperature != null ? opts.temperature : 0.3,
-        max_tokens: opts.max_tokens || 1024,
-      }),
-    }).then(function (j) {
-      var out = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
-      if (!out) throw new Error("模型未返回内容，请换一个模型重试");
-      return out;
-    });
+    function attempt(model, isRetry) {
+      return apiFetch("/chat/completions", {
+        method: "POST",
+        body: JSON.stringify({
+          model: model,
+          messages: messages,
+          stream: false,
+          temperature: opts.temperature != null ? opts.temperature : 0.3,
+          max_tokens: opts.max_tokens || 1024,
+        }),
+      }).then(function (j) {
+        var c = (j && j.choices && j.choices[0] && j.choices[0].message) || {};
+        // content 为空时回退 reasoning_content（部分推理模型把输出全放在思考字段）
+        var out = c.content || c.reasoning_content || "";
+        if (!out) throw new Error("模型未返回内容，请换一个模型重试");
+        return out;
+      }).catch(function (err) {
+        if (isRetry || opts.noFallback) throw err;
+        var fb = apiChatFallback(model);
+        if (!fb) throw err;
+        return attempt(fb, true);
+      });
+    }
+    return attempt(opts.model || toolChatModel(), false);
   }
   /* 工具页外壳：返回按钮 + 图标标题 + 端点标签 + 内容 */
   function toolShell(title, icon, tag, innerHtml) {
@@ -3744,9 +3680,11 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       signal: pgAbort ? pgAbort.signal : undefined,
     }).then(function (res) {
       if (!res.ok) {
-        return res.json().catch(function () { return {}; }).then(function (e) {
-          var msg = (e && e.error && e.error.message) || ("请求失败（HTTP " + res.status + "）");
-          throw new Error(msg);
+        return res.json().catch(function () { return {}; }).then(function (j) {
+          var e = (j && j.error) || {};
+          var err = new Error(formatAquaErr(e, res.status));
+          err.aqua = e;
+          throw err;
         });
       }
       // 兼容性降级：老浏览器无 ReadableStream（res.body 为空）→ 改用整段文本读取（非逐字，但功能完整）
@@ -3807,7 +3745,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     }).catch(function (err) {
       aiDiv.classList.remove("streaming");
       var msg = (err && err.name === "AbortError") ? "已停止生成。" : ("出错了：" + (err && err.message ? err.message : "网络异常"));
-      if (!aiDiv.textContent) aiDiv.innerHTML = '<span class="pg-err">' + esc(msg) + "</span>";
+      // 网关错误附带频道/官网自助引导（error.hint）
+      if (err && err.aqua && err.aqua.hint) msg += "\n" + err.aqua.hint;
+      if (!aiDiv.textContent) aiDiv.innerHTML = '<span class="pg-err">' + esc(msg).replace(/\n/g, "<br>") + "</span>";
       else aiDiv.textContent += "\n\n[" + msg + "]";
       // 失败时回滚最后一条用户消息，方便重试
       if (pgHistory.length && pgHistory[pgHistory.length - 1].role === "user") pgHistory.pop();
