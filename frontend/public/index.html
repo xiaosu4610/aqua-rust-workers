@@ -1978,6 +1978,13 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   var modelMeta = {};     // id -> {platform, type}
   var modelStatus = {};   // id -> "exhausted" | undefined
   var modelStatusMsg = {}; // id -> 中文说明
+  /* DeepSeek 官方自营通道下线守卫：2026-09-03 20:10 北京时间起前端同步灰显（与网关 CHANNEL_MAINTENANCE 同刻生效，无倒计时预告） */
+  var DS_SUNSET_MS = Date.parse("2026-09-03T20:10:00+08:00");
+  function dsRetired() { return Date.now() >= DS_SUNSET_MS; }
+  function dsModel(model) {
+    return /^acu\//.test(model) && model.toLowerCase().indexOf("deepseek") !== -1;
+  }
+  function dsMaintenance(model) { return dsModel(model) && dsRetired(); }
   var modelHealth = {};   // id -> {score, total, ok, avg_latency_ms}
   var curPlatform = "all";
   var curType = "all";
@@ -3440,7 +3447,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var meta = profile.meta;
     var st = modelStatus[id];
     var statusTag = "";
-    if (st === "exhausted") statusTag = '<span class="mtag m-status-exhausted">额度已耗尽</span>';
+    if (dsMaintenance(id)) statusTag = '<span class="mtag m-status-exhausted">服务暂停 · 维护中</span>';
+    else if (st === "exhausted") statusTag = '<span class="mtag m-status-exhausted">额度已耗尽</span>';
     else if (st === "unavailable") statusTag = '<span class="mtag m-status-unavailable">暂时不可用</span>';
     var paramRows = profile.params.map(function (p) {
       return '<tr><td class="pname"><code>' + esc(p[0]) + '</code></td><td>' + esc(p[1]) + '</td><td>' + esc(p[2]) + '</td><td>' + esc(p[3]) + '</td></tr>';
@@ -3534,7 +3542,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       var spec = modelSpec(m) || {};
       var c = capForType(meta.type);
       var st = modelStatus[m];
-      var stTag = st === "exhausted" ? '<span class="cap-card-flag flag-ex">耗尽</span>'
+      var stTag = dsMaintenance(m) ? '<span class="cap-card-flag flag-ex">维护中</span>'
+        : st === "exhausted" ? '<span class="cap-card-flag flag-ex">耗尽</span>'
         : st === "unavailable" ? '<span class="cap-card-flag flag-un">不可用</span>' : "";
       var capIcons = CAPS.map(function (cp) {
         return '<span class="cap-mini-wrap" title="' + esc(cp.label) + ': ' + esc(cp.tip) + '">' +
@@ -3612,6 +3621,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   var PG_CHAT_TYPES = ["chat"];  // playground 仅支持对话类模型
 
   function pgModelOk(id) {
+    if (dsMaintenance(id)) return false; // 官方自营下线守卫：维护中模型不出现在可选列表
     var meta = modelMeta[id];
     if (!meta) return true; // 未知类型保守放行
     if (meta.type && meta.type !== "chat") return false;
@@ -3627,9 +3637,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     sel.innerHTML = list.map(function (m) {
       return '<option value="' + esc(m) + '">' + esc(m) + (modelHealth[m] ? " · " + modelHealth[m].score + "分" : "") + "</option>";
     }).join("");
-    // 保持原选择；否则默认 acu/deepseek-v4-flash > 第一个健康分最高者 > 第一项
+    // 保持原选择；否则默认 acu/deepseek-v4-flash（未到下线时刻）> 第一个健康分最高者 > 第一项
     if (cur && list.indexOf(cur) !== -1) { sel.value = cur; return; }
-    var prefer = list.indexOf("acu/deepseek-v4-flash");
+    var prefer = (!dsRetired()) ? list.indexOf("acu/deepseek-v4-flash") : -1;
     if (prefer !== -1) { sel.selectedIndex = prefer; return; }
     var best = -1, bestScore = -1;
     list.forEach(function (m, i) {
@@ -3777,7 +3787,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var h = modelHealth[m];
     var st = modelStatus[m];
     var rows = '<div class="pg-hrow"><span>模型</span><b>' + esc(m) + "</b></div>";
-    if (st === "exhausted") rows += '<div class="pg-hrow"><span>状态</span><b style="color:#f87171;">今日额度已用尽</b></div>';
+    if (dsMaintenance(m)) rows += '<div class="pg-hrow"><span>状态</span><b style="color:#f87171;">服务暂停 · 维护中</b></div>';
+    else if (st === "exhausted") rows += '<div class="pg-hrow"><span>状态</span><b style="color:#f87171;">今日额度已用尽</b></div>';
     else if (st === "unavailable") rows += '<div class="pg-hrow"><span>状态</span><b style="color:#f87171;">暂时不可用</b></div>';
     else rows += '<div class="pg-hrow"><span>状态</span><b style="color:#34d399;">可用</b></div>';
     if (h && typeof h.score === "number") {
@@ -4000,11 +4011,14 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       }
       var st = modelStatus[m];
       var exhaustedCls = "";
-      if (st === "exhausted") {
+      if (dsMaintenance(m)) {
+        tags += '<span class="mtag m-status-exhausted" title="官方自营通道维护中，已暂停服务">服务暂停 · 维护中</span>';
+        exhaustedCls = " exhausted";
+      } else if (st === "exhausted") {
         tags += '<span class="mtag m-status-exhausted" title="' + esc(modelStatusMsg[m] || "今日免费额度已用尽") + '">额度已耗尽</span>';
         exhaustedCls = " exhausted";
-      } else if (st === "unavailable") {
-        tags += '<span class="mtag m-status-unavailable" title="' + esc(modelStatusMsg[m] || "该模型暂时不可用") + '">暂时不可用</span>';
+      } else if (st === "unavailable" || st === "maintenance") {
+        tags += '<span class="mtag m-status-unavailable" title="' + esc(modelStatusMsg[m] || (st === "maintenance" ? "官方自营通道维护中，已暂停服务" : "该模型暂时不可用")) + '">' + (st === "maintenance" ? "服务暂停 · 维护中" : "暂时不可用") + '</span>';
         exhaustedCls = " exhausted";
       }
       tags += healthTag(m);

@@ -705,6 +705,7 @@ async fn handle_models(req: Request, env: Env) -> Result<Response> {
     let created = now_ts();
 
     let mut data = Vec::with_capacity(MODEL_CATALOG.len());
+    let ds_sunset = now_ts() >= DEEPSEEK_SUNSET_TS;
     for (id, owner) in MODEL_CATALOG {
         let mut m = serde_json::json!({
             "id": id,
@@ -714,6 +715,13 @@ async fn handle_models(req: Request, env: Env) -> Result<Response> {
         });
         if let Some(h) = health.get(*id) {
             m["health"] = h.clone();
+        }
+        // DeepSeek 官方自营通道下线守卫：到点自动标记维护中（前端灰显 + 拒绝调用）
+        if ds_sunset && *owner == "acu" && id.to_ascii_lowercase().contains("deepseek") {
+            m["status"] = serde_json::Value::String("maintenance".into());
+            m["status_msg"] = serde_json::Value::String(
+                "官方自营通道维护中，已暂停服务。可先使用其他通道模型，恢复时间以社区公告为准".into(),
+            );
         }
         if *owner == "workers-ai" && wai_exhausted {
             m["status"] = serde_json::Value::String("exhausted".into());
