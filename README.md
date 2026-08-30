@@ -6,7 +6,7 @@
 
 Rust → WebAssembly · Cloudflare Workers 边缘运行 · 多上游聚合 · 任意密钥即用
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://rustup.rs/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020.svg)](https://workers.cloudflare.com/)
 
@@ -61,12 +61,13 @@ AQUA 把 **Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、Clo
 | `/v1/videos/generations` | POST | 视频生成 |
 | `/v1/audio/speech` | POST | 语音合成 TTS |
 | `/v1/audio/transcriptions` | POST | 语音识别 ASR（multipart 上传） |
-| `/v1/ip_location` | POST | IP 归属地查询 |
+| `/v1/ip_location` | POST | IP 归属地查询（双通道：Gitee AI 主 + ip-api.com 免费备用，大模型掉线依然可用） |
 | `/v1/tools/text-stats` | POST | 文本统计（字数/词频/阅读时长，纯算法） |
 | `/v1/tools/dice` | POST | 随机骰子（可指定面数与数量） |
 | `/v1/tools/uuid` | GET | 生成 UUID v4 |
 | `/v1/tools/timestamp` | GET/POST | 当前时间戳查询 / 时间戳互转 |
 | `/v1/tools/base64` | POST | Base64 编解码 |
+| `/v1/tools/subnet` | POST | IPv4 子网计算器（网络/广播地址、主机范围、掩码，纯算法） |
 | `/assets/*` | GET | 生成图片的 R2 缓存（24h 自动清理） |
 
 所有错误响应为 OpenAI 兼容结构，并附带 `help` 字段（官网、QQ 频道/群引导），方便客户端直接展示排障信息。
@@ -268,9 +269,18 @@ aqua-worker/
 - **QQ 频道（官方主阵地）**：大版本更新与重要公告均在此通知 → [点击加入](https://pd.qq.com/s/e4ktxw1b8)（频道号 `pd57362562`）
 - **QQ 群（休闲交流）**：日常闲聊、技术交流 → 群号 `1103667832`
 
-## 协议
+## 开源协议
 
-[MIT License](LICENSE)
+本项目采用 **[GNU AGPL-3.0](LICENSE)** 协议开源。
+
+> **请注意：不同的开源协议所赋予的权利与约束是不同的。**
+>
+> - 本项目此前使用的 **MIT** 协议最为宽松：允许任意使用、修改、闭源甚至商用，唯一义务是保留版权声明。
+> - 现行的 **AGPL-3.0** 是强保护（copyleft）协议：任何人**修改本项目的代码后对外提供（包括仅部署为线上服务、不分发二进制的情况）**，都必须以 AGPL-3.0 协议向其用户**开放完整源码**，并保留原版权声明与协议文本。
+>
+> 因此，如果你打算基于 AQUA 二次开发：
+> - **个人学习、内部使用** → 完全自由，无任何额外义务；
+> - **二开后对外提供服务或分发** → 必须同样以 AGPL-3.0 开源你的修改版本。想闭源商用需联系作者获得**商业授权**。
 
 ---
 

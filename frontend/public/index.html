@@ -272,6 +272,43 @@
     background: linear-gradient(180deg, var(--grad-1), var(--grad-3)); box-shadow: 0 0 10px var(--glow); }
   .sec-title .ic svg { width: 20px; height: 20px; color: var(--aqua); }
 
+  /* ===== 首页排版改版：子导航 / 直达磁贴 / 实时状态 / 代码 Tab / 社区三卡 ===== */
+  /* 子导航芯片条：不抢顶部导航的风头，仅作首页内分区锚点 */
+  .home-subnav { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 4px; }
+  .subnav-chip { cursor: pointer; font-family: inherit; font-size: 13px; color: var(--accent);
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px;
+    transition: all .15s; }
+  .subnav-chip:hover { background: var(--btn-hover); transform: translateY(-1px); }
+  /* 直达磁贴：页面入口矩阵化，首屏即点即达 */
+  .quick-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .qtile { display: flex; flex-direction: column; gap: 6px; text-decoration: none; padding: 18px;
+    background: linear-gradient(160deg, var(--card), var(--card2)); border: 1px solid var(--border);
+    border-radius: 16px; transition: transform .15s, border-color .15s, box-shadow .15s; }
+  .qtile:hover { transform: translateY(-3px); border-color: var(--aqua); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .qtile .qt-ic svg { width: 26px; height: 26px; color: var(--aqua); }
+  .qtile b { font-size: 16px; color: var(--text); }
+  .qtile .qt-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .qtile .qt-go { margin-top: auto; padding-top: 6px; font-size: 12.5px; color: var(--accent); }
+  /* 实时状态条：JS 填充真实数据，首页「活」起来 */
+  .live-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .live-card { text-align: center; padding: 22px 12px; background: linear-gradient(160deg, var(--card), var(--card2));
+    border: 1px solid var(--border); border-radius: 16px; }
+  .live-card b { display: block; font-size: 30px; font-weight: 800; font-family: var(--mono);
+    background: linear-gradient(90deg, var(--grad-1), var(--grad-3));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .live-card span { display: block; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+  /* 步骤编号徽标：接入流程从「两堆卡片」变成「01/02 有序步骤」 */
+  .step-no { flex: none; font-style: normal; font-size: 11px; font-weight: 700; color: var(--aqua);
+    border: 1px solid var(--border); background: var(--card2); border-radius: 999px; padding: 2px 9px; }
+  /* 代码示例 Tab 化：三语言切换，纵向空间省 2/3 */
+  .code-tabs { margin-top: 18px; }
+  .code-tabs .ct-bar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .code-tabs > .doc-block[data-ct-panel] { display: none; }
+  .code-tabs > .doc-block[data-ct-panel].active { display: block; }
+  /* 社区三卡并排：替代原三条全宽横幅，纵向更紧凑 */
+  .home-community { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .home-community .qq-block { flex-direction: column; align-items: flex-start; gap: 10px; }
+
   /* ===== Docs ===== */
   .doc-block { margin-bottom: 18px; }
   .doc-block .label { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
@@ -858,6 +895,16 @@
     .copy-row code { font-size: 12px; padding: 8px 10px; min-width: 0; }
     .btn { padding: 8px 12px; font-size: 12px; flex-shrink: 0; }
 
+    /* 首页改版：磁贴/状态条 2 列，社区卡单列 */
+    .quick-tiles { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .qtile { padding: 14px; }
+    .live-strip { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .live-card { padding: 16px 10px; }
+    .live-card b { font-size: 24px; }
+    .home-community { grid-template-columns: 1fr; }
+    .home-subnav { gap: 6px; }
+    .subnav-chip { padding: 6px 12px; font-size: 12px; }
+
     /* Section */
     section.block { margin: 28px 0; }
     .sec-title { font-size: 18px; gap: 7px; }
@@ -1006,9 +1053,63 @@
       </div>
     </header>
 
-    <div class="cards">
+    <!-- ===== 首页子导航：芯片条一键平滑滚动到各板块，内容分区不再堆顶 ===== -->
+    <nav class="home-subnav" aria-label="首页板块导航">
+      <button class="subnav-chip" data-target="h-quick">直达入口</button>
+      <button class="subnav-chip" data-target="h-status">实时状态</button>
+      <button class="subnav-chip" data-target="h-start">快速接入</button>
+      <button class="subnav-chip" data-target="h-community">社区支持</button>
+      <button class="subnav-chip" data-target="h-eco">生态合作</button>
+    </nav>
+
+    <!-- ===== 板块一：直达入口（页面入口矩阵化，首屏即点即达） ===== -->
+    <section id="h-quick" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>直达入口</h2>
+      <div class="quick-tiles">
+        <a class="qtile" href="#/playground">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+          <b>在线体验</b>
+          <span class="qt-desc">免登录直接对话，全模型切换即开即用</span>
+          <span class="qt-go">立即开聊 →</span>
+        </a>
+        <a class="qtile" href="#/models">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>
+          <b>模型列表</b>
+          <span class="qt-desc">全线模型实时健康分，一键复制模型 ID</span>
+          <span class="qt-go">查看全部 →</span>
+        </a>
+        <a class="qtile" href="#/tools">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+          <b>工具箱</b>
+          <span class="qt-desc">IP 定位 / 翻译 / 子网计算 / 小游戏，纯免费</span>
+          <span class="qt-go">打开工具箱 →</span>
+        </a>
+        <a class="qtile" href="#/api">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m13 4-2 16"/></svg></span>
+          <b>API 文档</b>
+          <span class="qt-desc">端点、参数、错误码一览，OpenAI 协议全兼容</span>
+          <span class="qt-go">查阅文档 →</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== 板块二：实时状态（JS 从网关拉真实数据填充） ===== -->
+    <section id="h-status" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>实时状态</h2>
+      <div class="live-strip">
+        <div class="live-card"><b id="st-models">--</b><span>在线模型</span></div>
+        <div class="live-card"><b id="st-healthy">--</b><span>健康模型（健康分 ≥ 70）</span></div>
+        <div class="live-card"><b id="st-tools">--</b><span>免费在线工具</span></div>
+        <div class="live-card"><b>0 元</b><span>接入成本（任意密钥可用）</span></div>
+      </div>
+    </section>
+
+    <!-- ===== 板块三：三步接入（步骤卡 + 代码示例 Tab 化，纵向更短） ===== -->
+    <section id="h-start" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>三步接入</h2>
+      <div class="cards">
       <div class="card">
-        <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Base URL（接口地址）</h3>
+        <h3><i class="step-no">STEP 01</i><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Base URL（接口地址）</h3>
         <div class="copy-row">
           <code id="base-url">https://your-gateway-domain.example/v1</code>
           <button class="btn" data-copy="base-url">复制</button>
@@ -1016,15 +1117,80 @@
         <p class="hint">客户端只需填入该地址，系统自动拼接 /chat/completions 等路径。</p>
       </div>
       <div class="card">
-        <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12 21 2"/><path d="M15.5 7.5 18 10"/></svg></span>API Key（密钥）</h3>
+        <h3><i class="step-no">STEP 02</i><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12 21 2"/><path d="M15.5 7.5 18 10"/></svg></span>API Key（密钥）</h3>
         <div class="copy-row">
           <code>任意密钥均可 · 填 sk-**** 即可</code>
           <a class="btn" href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener" style="text-decoration:none;">进频道交流</a>
         </div>
         <p class="hint">本站为开放模式：<b>任意非空密钥均可使用</b>（如 <code>sk-****</code>，中英文均可）。大版本更新与公告在 <b>QQ 频道</b>（频道号 <b>pd57362562</b>）通知，欢迎进频道交流。</p>
       </div>
-    </div>
+      </div>
 
+      <!-- STEP 03：代码示例（cURL / Python / JS Tab 切换，纵向空间省 2/3） -->
+      <div class="doc-block" style="margin-top:6px;">
+        <div class="label"><i class="step-no">STEP 03</i>&nbsp;发起请求 —— 三语言示例点击切换</div>
+      </div>
+      <div class="code-tabs" id="home-code-tabs">
+        <div class="ct-bar">
+          <button class="pill active" data-ct="curl">cURL</button>
+          <button class="pill" data-ct="py">Python（OpenAI SDK）</button>
+          <button class="pill" data-ct="js">JavaScript</button>
+        </div>
+        <div class="doc-block active" data-ct-panel="curl">
+          <pre><button class="btn" data-copy-from="code-curl">复制</button><code id="code-curl"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/chat/completions \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"Authorization: Bearer sk-****"</span> \
+  -d <span class="str">'{
+    "model": "zhipu/glm-4-flash",
+    "messages": [{"role": "user", "content": "你好，介绍一下自己"}],
+    "stream": true
+  }'</span></code></pre>
+        </div>
+        <div class="doc-block" data-ct-panel="py">
+          <pre><button class="btn" data-copy-from="code-py">复制</button><code id="code-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
+
+client = OpenAI(
+    base_url=<span class="str">"https://your-gateway-domain.example/v1"</span>,
+    api_key=<span class="str">"sk-****"</span>,   <span class="tok"># 任意密钥均可；公告见 QQ 频道（pd57362562）</span>
+)
+resp = client.chat.completions.create(
+    model=<span class="str">"zhipu/glm-4-flash"</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"你好"</span>}],
+    stream=<span class="kwd">True</span>,
+)
+<span class="kwd">for</span> chunk <span class="kwd">in</span> resp:
+    print(chunk.choices[<span class="tok">0</span>].delta.content <span class="kwd">or</span> <span class="str">""</span>, end=<span class="str">""</span>)</code></pre>
+        </div>
+        <div class="doc-block" data-ct-panel="js">
+          <pre><button class="btn" data-copy-from="code-js">复制</button><code id="code-js"><span class="kwd">const</span> res = <span class="kwd">await</span> fetch(<span class="str">"https://your-gateway-domain.example/v1/chat/completions"</span>, {
+  method: <span class="str">"POST"</span>,
+  headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
+             <span class="str">"Authorization"</span>: <span class="str">"Bearer sk-****"</span> },
+  body: JSON.stringify({
+    model: <span class="str">"zhipu/glm-4-flash"</span>,
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"你好"</span> }],
+    stream: <span class="kwd">true</span>,
+  }),
+});
+<span class="kwd">for await</span> (<span class="kwd">const</span> chunk <span class="kwd">of</span> res.body) {
+  console.log(<span class="kwd">new</span> TextDecoder().decode(chunk));
+}</code></pre>
+        </div>
+        <div class="doc-block">
+          <div class="label">兼容性</div>
+          <p class="hint">完整兼容 OpenAI 协议：Chat Completions（含 SSE 流式）、Embeddings、Images、Audio、Moderations、Rerank、模型列表均可直接用 OpenAI SDK 调用。NextChat、Cherry Studio、LobeChat、沉浸式翻译等主流客户端均开箱即用。详细端点与错误码见「API 文档」页。</p>
+        </div>
+        <div class="doc-block">
+          <div class="label">可用模型</div>
+          <p class="hint">点击顶部「模型列表」查看全部模型名称并一键复制模型 ID；模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM 与讯飞星火实时提供。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 板块四：社区与支持（三条全宽横幅改三卡并排，纵向更紧凑） ===== -->
+    <section id="h-community" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>社区与支持</h2>
+      <div class="home-community">
     <!-- ===== QQ 频道入口（主推：官方通知 / 密钥分发） ===== -->
     <div class="qq-block">
       <div class="qq-icon">
@@ -1068,7 +1234,7 @@
       </div>
       <div class="qq-info">
         <b>AQUA 完全开源 · 托管于 Gitee</b>
-        <p>本项目<b>全部源码开放</b>（网关 + 前台），可自由自部署、二开。欢迎访问、Follow 与 Star：<code style="font-family:var(--mono);font-size:12px;">gitee.com/xiaosu4610/aqua-rust-workers</code></p>
+        <p>本项目<b>全部源码开放</b>（网关 + 前台），基于 <b>AGPL-3.0</b> 协议：可自由自部署、二开（对外提供服务需同协议开源），欢迎访问、Follow 与 Star：<code style="font-family:var(--mono);font-size:12px;">gitee.com/xiaosu4610/aqua-rust-workers</code></p>
       </div>
       <div class="qq-actions">
         <a class="qq-join" href="https://gitee.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener">
@@ -1077,6 +1243,12 @@
         </a>
       </div>
     </div>
+      </div>
+    </section>
+
+    <!-- ===== 板块五：生态与合作（赞助商 + 友链集中一区） ===== -->
+    <section id="h-eco" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>生态与合作</h2>
     <!-- ===== 赞助商/服务商一排（JS 渲染，可扩展可锁定） ===== -->
     <div class="sponsors" id="sponsors">
       <div class="sponsors-title">赞助商与服务商</div>
@@ -1105,65 +1277,6 @@
         </a>
       </div>
     </div>
-
-    <section class="block">
-      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m13 4-2 16"/></svg></span>快速开始</h2>
-
-      <div class="doc-block">
-        <div class="label">curl 示例</div>
-        <pre><button class="btn" data-copy-from="code-curl">复制</button><code id="code-curl"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/chat/completions \
-  -H <span class="str">"Content-Type: application/json"</span> \
-  -H <span class="str">"Authorization: Bearer sk-****"</span> \
-  -d <span class="str">'{
-    "model": "zhipu/glm-4-flash",
-    "messages": [{"role": "user", "content": "你好，介绍一下自己"}],
-    "stream": true
-  }'</span></code></pre>
-      </div>
-
-      <div class="doc-block">
-        <div class="label">Python（OpenAI SDK）</div>
-        <pre><button class="btn" data-copy-from="code-py">复制</button><code id="code-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
-
-client = OpenAI(
-    base_url=<span class="str">"https://your-gateway-domain.example/v1"</span>,
-    api_key=<span class="str">"sk-****"</span>,   <span class="tok"># 任意密钥均可；公告见 QQ 频道（pd57362562）</span>
-)
-resp = client.chat.completions.create(
-    model=<span class="str">"zhipu/glm-4-flash"</span>,
-    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"你好"</span>}],
-    stream=<span class="kwd">True</span>,
-)
-<span class="kwd">for</span> chunk <span class="kwd">in</span> resp:
-    print(chunk.choices[<span class="tok">0</span>].delta.content <span class="kwd">or</span> <span class="str">""</span>, end=<span class="str">""</span>)</code></pre>
-      </div>
-
-      <div class="doc-block">
-        <div class="label">JavaScript</div>
-        <pre><button class="btn" data-copy-from="code-js">复制</button><code id="code-js"><span class="kwd">const</span> res = <span class="kwd">await</span> fetch(<span class="str">"https://your-gateway-domain.example/v1/chat/completions"</span>, {
-  method: <span class="str">"POST"</span>,
-  headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
-             <span class="str">"Authorization"</span>: <span class="str">"Bearer sk-****"</span> },
-  body: JSON.stringify({
-    model: <span class="str">"zhipu/glm-4-flash"</span>,
-    messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"你好"</span> }],
-    stream: <span class="kwd">true</span>,
-  }),
-});
-<span class="kwd">for await</span> (<span class="kwd">const</span> chunk <span class="kwd">of</span> res.body) {
-  console.log(<span class="kwd">new</span> TextDecoder().decode(chunk));
-}</code></pre>
-      </div>
-
-      <div class="doc-block">
-        <div class="label">兼容性</div>
-        <p class="hint">完整兼容 OpenAI 协议：Chat Completions（含 SSE 流式）、Embeddings、Images、Audio、Moderations、Rerank、模型列表均可直接用 OpenAI SDK 调用。NextChat、Cherry Studio、LobeChat、沉浸式翻译等主流客户端均开箱即用。详细端点与错误码见「API 文档」页。</p>
-      </div>
-
-      <div class="doc-block">
-        <div class="label">可用模型</div>
-        <p class="hint">点击顶部「模型列表」查看全部模型名称并一键复制模型 ID；模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM 与讯飞星火实时提供。</p>
-      </div>
     </section>
   </section>
 
@@ -2488,8 +2601,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     el.innerHTML = toolShell("开发者工具箱",
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>',
       "/v1/tools/*",
-      '<p class="tool-intro">常用开发小工具合集，纯算法本地运行零延迟。对应 API：<code>GET /v1/tools/uuid</code>、<code>GET/POST /v1/tools/timestamp</code>、<code>POST /v1/tools/base64</code>。</p>' +
-      '<div class="dev-tabs"><button class="pill active" data-dev="uuid">UUID</button><button class="pill" data-dev="ts">时间戳</button><button class="pill" data-dev="b64">Base64</button><button class="pill" data-dev="url">URL</button><button class="pill" data-dev="json">JSON</button></div>' +
+      '<p class="tool-intro">常用开发小工具合集，纯算法本地运行零延迟。对应 API：<code>GET /v1/tools/uuid</code>、<code>GET/POST /v1/tools/timestamp</code>、<code>POST /v1/tools/base64</code>、<code>POST /v1/tools/subnet</code>。</p>' +
+      '<div class="dev-tabs"><button class="pill active" data-dev="uuid">UUID</button><button class="pill" data-dev="ts">时间戳</button><button class="pill" data-dev="b64">Base64</button><button class="pill" data-dev="url">URL</button><button class="pill" data-dev="json">JSON</button><button class="pill" data-dev="subnet">子网计算</button></div>' +
       '<div id="dev-body"></div>');
     var body = document.getElementById("dev-body");
     function kvRow(k, v) { return '<div class="pg-hrow"><span>' + esc(k) + "</span><b>" + esc(v) + "</b></div>"; }
@@ -2547,7 +2660,36 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       document.getElementById("dev-json-go").addEventListener("click", function () { fmt(false); });
       document.getElementById("dev-json-min").addEventListener("click", function () { fmt(true); });
     }
-    var views = { uuid: showUuid, ts: showTs, b64: showB64, url: showUrl, json: showJson };
+    /* 子网计算：调用网关纯算法端点 POST /v1/tools/subnet（后端 Rust 实现，零上游消耗） */
+    function showSubnet() {
+      body.innerHTML = '<div class="tool-io"><div class="tool-btns" style="width:100%;">' +
+        '<input id="dev-sn-in" class="tool-flex1" placeholder="输入 IPv4 网段，如 192.168.1.0/24 或 10.0.0.88/26" style="font-family:var(--mono);">' +
+        '<button class="btn tool-run" id="dev-sn-go">计算</button></div>' +
+        '<div id="dev-sn-out" class="tool-kv"><div class="tool-empty">等待计算…</div></div></div>';
+      function calc() {
+        var raw = document.getElementById("dev-sn-in").value.trim();
+        var out = document.getElementById("dev-sn-out");
+        if (!raw) { out.innerHTML = '<div class="tool-empty">请先输入网段（CIDR），如 192.168.1.0/24</div>'; return; }
+        out.innerHTML = '<div class="tool-empty">计算中…</div>';
+        apiFetch("/tools/subnet", { method: "POST", body: JSON.stringify({ cidr: raw }) })
+          .then(function (j) {
+            out.innerHTML =
+              kvRow("规范网段", j.input) + kvRow("子网掩码", j.netmask) +
+              kvRow("反掩码（通配符）", j.wildcard) + kvRow("二进制掩码", j.binary_netmask) +
+              kvRow("网络地址", j.network) + kvRow("广播地址", j.broadcast) +
+              kvRow("可用主机范围", j.first_host + " ~ " + j.last_host) +
+              kvRow("地址总数", j.total_addresses) + kvRow("可用主机数", j.usable_hosts) +
+              kvRow("地址分类", j.ip_class) + kvRow("作用域", j.scope) +
+              kvRow("十进制 / 十六进制", j.ip_int + " / " + j.ip_hex);
+          })
+          .catch(function (err) {
+            out.innerHTML = '<div class="tool-empty">' + esc(err.message) + '</div>';
+          });
+      }
+      document.getElementById("dev-sn-go").addEventListener("click", calc);
+      document.getElementById("dev-sn-in").addEventListener("keydown", function (e) { if (e.key === "Enter") calc(); });
+    }
+    var views = { uuid: showUuid, ts: showTs, b64: showB64, url: showUrl, json: showJson, subnet: showSubnet };
     Array.prototype.forEach.call(el.querySelectorAll(".dev-tabs .pill"), function (btn) {
       btn.addEventListener("click", function () {
         el.querySelectorAll(".dev-tabs .pill").forEach(function (b) { b.classList.remove("active"); });
@@ -3660,6 +3802,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     if (["home", "models", "capabilities", "api", "playground", "tools"].indexOf(tab) === -1) tab = "home";
     if (tab === "models") applyFilter();
     else if (tab === "capabilities") renderCapabilities();
+    if (tab === "home") updateHomeStats();
   }
   function route() {
     var hash = (location.hash || "#/home").replace(/^#\//, "");
@@ -3690,6 +3833,46 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     renderCurrentPage();
   }
   window.addEventListener("hashchange", route);
+
+  /* ---- 首页改版：子导航平滑滚动 / 代码示例 Tab / 实时状态填充 ---- */
+  // ① 子导航芯片：点击平滑滚动到对应板块（不用 hash，避免与路由冲突）
+  document.querySelectorAll(".home-subnav .subnav-chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var el = document.getElementById(chip.getAttribute("data-target"));
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  // ② 代码示例 Tab：cURL / Python / JS 三面板切换（隐藏非当前面板）
+  (function () {
+    var box = document.getElementById("home-code-tabs");
+    if (!box) return;
+    box.querySelectorAll(".ct-bar .pill").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.getAttribute("data-ct");
+        box.querySelectorAll(".ct-bar .pill").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        box.querySelectorAll(".doc-block[data-ct-panel]").forEach(function (p) {
+          p.classList.toggle("active", p.getAttribute("data-ct-panel") === key);
+        });
+      });
+    });
+  })();
+  // ③ 实时状态：在线模型数 / 健康模型数（健康分 ≥ 70）/ 工具数，模型列表每次刷新后由 renderCurrentPage 触发
+  function updateHomeStats() {
+    var el = document.getElementById("st-models");
+    if (el) el.textContent = models.length ? String(models.length) : "--";
+    el = document.getElementById("st-healthy");
+    if (el) {
+      var ok = 0;
+      models.forEach(function (m) {
+        var h = modelHealth[m];
+        if (h && typeof h.score === "number" && h.score >= 70) ok++;
+      });
+      el.textContent = models.length ? String(ok) : "--";
+    }
+    el = document.getElementById("st-tools");
+    if (el) el.textContent = String(Object.keys(TOOL_REGISTRY).length);
+  }
 
   /* ---- 复制能力 ---- */
   function copyText(text, btn) {
