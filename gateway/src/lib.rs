@@ -423,9 +423,10 @@ async fn log_request(env: &Env, method: &str, path: &str, model: &str, upstream:
 /// 记录单次模型调用健康：ok 布尔 + err_type（rate_limited/client_error/upstream_error/network_error/timeout/success）
 async fn record_health(env: &Env, model: &str, ok: bool, err_type: &str, code: u16, latency_ms: i64) {
     if let Ok(db) = env.d1("LOGS_DB") {
+        // 列序与 SQL 完全一致：model 在前、ts 在后，杜绝字段错位
         let args = [
-            now_ts().to_string(),
             model.to_string(),
+            now_ts().to_string(),
             if ok { "1" } else { "0" }.to_string(),
             err_type.to_string(),
             code.to_string(),
