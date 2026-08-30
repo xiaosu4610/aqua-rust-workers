@@ -1899,6 +1899,27 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <span class="tool-tag">/v1/tools/*</span>
         </a>
       </div>
+      <div class="tools-sec"><span class="tools-sec-t">创作工具</span><span class="tools-sec-n">3 个 · chat 端点驱动</span></div>
+      <div class="tools-grid">
+        <a class="tool-card" href="#/tools/weekly">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 15h8M8 19h5"/></svg></span>
+          <b>周报生成器</b>
+          <span class="tool-desc">本周流水账一键炼成结构化周报：核心产出、进行中、风险与下周计划</span>
+          <span class="tool-tag">chat 端点驱动</span>
+        </a>
+        <a class="tool-card" href="#/tools/regex">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2"/><path d="M12 5v14"/><path d="M9 19h6"/><circle cx="17.5" cy="17.5" r="3.5"/><path d="M20 20l2 2"/></svg></span>
+          <b>正则解释器</b>
+          <span class="tool-desc">描述生成正则、正则翻译成人话，双向转换并标注语言方言差异</span>
+          <span class="tool-tag">chat 端点驱动</span>
+        </a>
+        <a class="tool-card" href="#/tools/polish">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></span>
+          <b>文本润色</b>
+          <span class="tool-desc">润色、极简、扩写三种模式，不改本意只改表达，拒绝空话套话</span>
+          <span class="tool-tag">chat 端点驱动</span>
+        </a>
+      </div>
       <div class="tools-sec"><span class="tools-sec-t">工具 API</span><span class="tools-sec-n">不只 AI，工具也能调</span></div>
       <div class="tools-api-note">
         <p>上述所有工具的能力同时以 REST API 形式开放在网关上——例如 <code>POST /v1/tools/text-stats</code>、<code>GET /v1/tools/uuid</code>、<code>POST /v1/tools/base64</code>。鉴权方式与主 API 相同，详见 <a href="#/api" style="color:var(--accent);">API 文档</a>。我们不只提供 AI API，也提供工具 API。</p>
@@ -2718,6 +2739,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     idiom: renderToolIdiom,
     textstats: renderToolTextStats,
     devkit: renderToolDevkit,
+    weekly: renderToolWeekly,
+    regex: renderToolRegex,
+    polish: renderToolPolish,
   };
   function renderTool(name) {
     var el = document.getElementById("tool-body");
@@ -2725,6 +2749,111 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var fn = TOOL_REGISTRY[name];
     if (fn) return fn(el);
     el.innerHTML = '<div class="model-empty">该工具正在建设中，敬请期待</div>';
+  }
+
+  /* ---- 工具：周报生成器 / 正则解释器 / 文本润色（chat 端点驱动） ---- */
+  function renderToolWeekly(el) {
+    el.innerHTML = toolShell("周报生成器",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 15h8M8 19h5"/></svg>',
+      "chat 端点驱动",
+      '<p class="tool-intro">把本周做过的零散事项（流水账即可）交给周报炼金师，产出结构化、有亮点的正式周报。</p>' +
+      '<div class="tool-io"><textarea id="wk-input" rows="8" placeholder="例：修了登录页 bug；和产品对了新需求；看了 Redis 持久化的文章；周五团建…"></textarea>' +
+      '<div class="tool-bar"><span>语气</span>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="wk-tone" value="克制" checked>克制</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="wk-tone" value="详细">详细</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="wk-tone" value="汇报体">汇报体</label>' +
+      '<button class="btn tool-run" id="wk-run">生成周报</button></div>' +
+      '<div id="wk-result" class="tool-result"></div>');
+    document.getElementById("wk-run").addEventListener("click", function () {
+      var text = document.getElementById("wk-input").value.trim();
+      var tone = (document.querySelector('input[name="wk-tone"]:checked') || {}).value || "克制";
+      var box = document.getElementById("wk-result");
+      if (!text) { box.innerHTML = '<div class="tool-empty">先写点本周做过的事，流水账也行。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">炼制中…</div>';
+      apiChat([
+        { role: "system", content: "你是周报炼金师。输出结构：1. 本周核心产出（3-5 条，动词开头，突出结果与数据，不夸大）；2. 进行中事项（进度与下一步）；3. 风险与需要的支持；4. 下周计划。语言" + tone + "，不写空话套话，缺失信息用【待补充】标注而不是编造。" },
+        { role: "user", content: "我的本周流水账：\n" + text },
+      ], { temperature: 0.4, max_tokens: 2048 })
+        .then(function (out) {
+          box.innerHTML = '<div class="tool-ai-box"><b>周报草稿</b><div class="tool-ai-text"></div></div>';
+          box.querySelector(".tool-ai-text").textContent = out;
+        })
+        .catch(function (err) {
+          box.innerHTML = '<div class="tool-empty">生成失败：' + esc(err.message) + '</div>';
+        });
+    });
+  }
+
+  function renderToolRegex(el) {
+    el.innerHTML = toolShell("正则解释器",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M4 7V5h16v2"/><path d="M12 5v14"/><path d="M9 19h6"/><circle cx="17.5" cy="17.5" r="3.5"/><path d="M20 20l2 2"/></svg>',
+      "chat 端点驱动",
+      '<p class="tool-intro">双向转换：给需求描述生成正则，或粘贴正则翻译成能看懂的人话。</p>' +
+      '<div class="tool-io">' +
+      '<div class="tool-bar"><span>方向</span>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="rg-dir" value="to-regex" checked>描述 → 正则</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="rg-dir" value="to-human">正则 → 解释</label>' +
+      '</div>' +
+      '<textarea id="rg-input" rows="6" placeholder="输入需求描述或正则表达式…"></textarea>' +
+      '<div class="tool-bar"><button class="btn tool-run" id="rg-run">转换</button></div>' +
+      '<div id="rg-result" class="tool-result"></div>');
+    document.getElementById("rg-run").addEventListener("click", function () {
+      var text = document.getElementById("rg-input").value.trim();
+      var dir = (document.querySelector('input[name="rg-dir"]:checked') || {}).value || "to-regex";
+      var box = document.getElementById("rg-result");
+      if (!text) { box.innerHTML = '<div class="tool-empty">请先输入内容。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">转换中…</div>';
+      var sys = dir === "to-regex"
+        ? "你是正则魔法师。用户给出需求描述时：生成正则表达式（放入代码块），给出 5 个匹配示例和 3 个不匹配示例，并逐段解释正则结构。标注 JS/Python/Java 方言差异。"
+        : "你是正则魔法师。用户给出正则表达式时：逐段翻译成通俗中文，列出它能匹配什么、容易误匹配什么、常见输入下的行为。标注 JS/Python/Java 方言差异。";
+      apiChat([
+        { role: "system", content: sys },
+        { role: "user", content: text },
+      ], { temperature: 0.2, max_tokens: 2048 })
+        .then(function (out) {
+          box.innerHTML = '<div class="tool-ai-box"><b>转换结果</b><div class="tool-ai-text"></div></div>';
+          box.querySelector(".tool-ai-text").textContent = out;
+        })
+        .catch(function (err) {
+          box.innerHTML = '<div class="tool-empty">转换失败：' + esc(err.message) + '</div>';
+        });
+    });
+  }
+
+  function renderToolPolish(el) {
+    el.innerHTML = toolShell("文本润色",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+      "chat 端点驱动",
+      '<p class="tool-intro">不改本意只改表达：润色（更顺更有画面感）、极简（压缩一半）、扩写（更充实具体）。</p>' +
+      '<div class="tool-io"><textarea id="pl-input" rows="7" placeholder="粘贴要润色的文字：文案 / 朋友圈 / 产品介绍 / 邮件…"></textarea>' +
+      '<div class="tool-bar"><span>模式</span>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="pl-mode" value="润色" checked>润色</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="pl-mode" value="极简">极简</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="pl-mode" value="扩写">扩写</label>' +
+      '<button class="btn tool-run" id="pl-run">开始润色</button></div>' +
+      '<div id="pl-result" class="tool-result"></div>');
+    document.getElementById("pl-run").addEventListener("click", function () {
+      var text = document.getElementById("pl-input").value.trim();
+      var mode = (document.querySelector('input[name="pl-mode"]:checked') || {}).value || "润色";
+      var box = document.getElementById("pl-result");
+      if (!text) { box.innerHTML = '<div class="tool-empty">请先输入要润色的文字。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">打磨中…</div>';
+      var ask = "";
+      if (mode === "润色") ask = "保持原意只改表达：删冗余、换具象词、调节奏。输出润色版，再用一句话说明主要改了什么。";
+      else if (mode === "极简") ask = "把原意压缩到一半篇幅，只保留最核心的信息与最有力的表达。输出极简版。";
+      else ask = "在不编造事实的前提下扩写：补充细节、画面感与情绪层次，篇幅约为原文 1.5-2 倍。输出扩写版。";
+      apiChat([
+        { role: "system", content: "你是文案点睛手。禁止使用「赋能」「抓手」「闭环」这类词。" },
+        { role: "user", content: ask + "\n\n【原文】\n" + text },
+      ], { temperature: 0.5, max_tokens: 2048 })
+        .then(function (out) {
+          box.innerHTML = '<div class="tool-ai-box"><b>' + esc(mode) + '版</b><div class="tool-ai-text"></div></div>';
+          box.querySelector(".tool-ai-text").textContent = out;
+        })
+        .catch(function (err) {
+          box.innerHTML = '<div class="tool-empty">润色失败：' + esc(err.message) + '</div>';
+        });
+    });
   }
 
   /* ---- 工具：开发者工具箱（UUID/时间戳/Base64/URL/JSON，纯算法） ---- */
