@@ -1069,10 +1069,10 @@
     <!-- ===== 首页子导航：芯片条一键平滑滚动到各板块，内容分区不再堆顶 ===== -->
     <nav class="home-subnav" aria-label="首页板块导航">
       <button class="subnav-chip" data-target="h-quick">直达入口</button>
+      <button class="subnav-chip" data-target="h-eco">生态合作</button>
       <button class="subnav-chip" data-target="h-status">实时状态</button>
       <button class="subnav-chip" data-target="h-start">快速接入</button>
       <button class="subnav-chip" data-target="h-community">社区支持</button>
-      <button class="subnav-chip" data-target="h-eco">生态合作</button>
     </nav>
 
     <!-- ===== 板块一：直达入口（页面入口矩阵化，首屏即点即达） ===== -->
@@ -1106,7 +1106,47 @@
       </div>
     </section>
 
-    <!-- ===== 板块二：实时状态（JS 从网关拉真实数据填充） ===== -->
+    <!-- ===== 板块二：生态与合作（赞助商为核心收益来源，前移增加曝光；友链随区展示） ===== -->
+    <section id="h-eco" class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>生态与合作</h2>
+    <!-- ===== 赞助商/服务商一排（JS 渲染，可扩展可锁定） ===== -->
+    <div class="sponsors" id="sponsors">
+      <div class="sponsors-title">赞助商与服务商</div>
+      <div class="sponsors-row" id="sponsors-row"></div>
+      <div class="sponsors-restore" id="sponsors-restore" style="display:none;">
+        已隐藏部分赞助商 · <a id="sponsors-restore-link">恢复显示全部</a>
+      </div>
+    </div>
+    <!-- ===== 友情链接（非广告，独立小卡；仅项目维护者手动确认添加） ===== -->
+    <div class="friends">
+      <div class="friends-title">友情链接</div>
+      <div class="friends-row">
+        <a class="friend-card" href="https://miofog.top/" target="_blank" rel="noopener" title="miofog公益API">
+          <img src="https://miofog.top/favicon.ico" alt="miofog公益API" onerror="this.style.display='none';this.parentElement.classList.add('no-logo')">
+          <span class="f-info">
+            <span class="f-name">miofog公益API</span>
+            <span class="f-desc">免费 AI 模型平台 · 首个基于 AQUA 开源版二开</span>
+          </span>
+        </a>
+        <a class="friend-card" href="https://guliang.me/guliang-ai" target="_blank" rel="noopener" title="顾凉中转站">
+          <img src="https://guliang.me/i/u/PNThg82.png" alt="顾凉中转站" loading="lazy" onerror="this.style.display='none'">
+          <span class="f-info">
+            <span class="f-name">顾凉中转站</span>
+            <span class="f-desc">自研聚合中转 · 纯免费公益</span>
+          </span>
+        </a>
+        <a class="friend-card" href="https://cloudagnetnew.nsdmc.top" target="_blank" rel="noopener" title="CloudAgent API 网关">
+          <img src="https://cloudagnetnew.nsdmc.top/favicon.ico" alt="CloudAgent API 网关" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-logo')">
+          <span class="f-info">
+            <span class="f-name">CloudAgent API 网关</span>
+            <span class="f-desc">统一 API 网关 · 海量模型聚合接入</span>
+          </span>
+        </a>
+      </div>
+    </div>
+    </section>
+
+    <!-- ===== 板块三：实时状态（JS 从网关拉真实数据填充） ===== -->
     <section id="h-status" class="block">
       <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>实时状态</h2>
       <div class="live-strip">
@@ -1279,45 +1319,6 @@ resp = client.chat.completions.create(
       </div>
     </section>
 
-    <!-- ===== 板块五：生态与合作（赞助商 + 友链集中一区） ===== -->
-    <section id="h-eco" class="block">
-      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>生态与合作</h2>
-    <!-- ===== 赞助商/服务商一排（JS 渲染，可扩展可锁定） ===== -->
-    <div class="sponsors" id="sponsors">
-      <div class="sponsors-title">赞助商与服务商</div>
-      <div class="sponsors-row" id="sponsors-row"></div>
-      <div class="sponsors-restore" id="sponsors-restore" style="display:none;">
-        已隐藏部分赞助商 · <a id="sponsors-restore-link">恢复显示全部</a>
-      </div>
-    </div>
-    <!-- ===== 友情链接（非广告，独立小卡；仅项目维护者手动确认添加） ===== -->
-    <div class="friends">
-      <div class="friends-title">友情链接</div>
-      <div class="friends-row">
-        <a class="friend-card" href="https://miofog.top/" target="_blank" rel="noopener" title="miofog公益API">
-          <img src="https://miofog.top/favicon.ico" alt="miofog公益API" onerror="this.style.display='none';this.parentElement.classList.add('no-logo')">
-          <span class="f-info">
-            <span class="f-name">miofog公益API</span>
-            <span class="f-desc">免费 AI 模型平台 · 首个基于 AQUA 开源版二开</span>
-          </span>
-        </a>
-        <a class="friend-card" href="https://guliang.me/guliang-ai" target="_blank" rel="noopener" title="顾凉中转站">
-          <img src="https://guliang.me/i/u/PNThg82.png" alt="顾凉中转站" loading="lazy" onerror="this.style.display='none'">
-          <span class="f-info">
-            <span class="f-name">顾凉中转站</span>
-            <span class="f-desc">自研聚合中转 · 纯免费公益</span>
-          </span>
-        </a>
-        <a class="friend-card" href="https://cloudagnetnew.nsdmc.top" target="_blank" rel="noopener" title="CloudAgent API 网关">
-          <img src="https://cloudagnetnew.nsdmc.top/favicon.ico" alt="CloudAgent API 网关" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-logo')">
-          <span class="f-info">
-            <span class="f-name">CloudAgent API 网关</span>
-            <span class="f-desc">统一 API 网关 · 海量模型聚合接入</span>
-          </span>
-        </a>
-      </div>
-    </div>
-    </section>
   </section>
 
   <!-- ===== 页面二：模型中心（模型列表 + 模型能力，子目录切换） ===== -->
