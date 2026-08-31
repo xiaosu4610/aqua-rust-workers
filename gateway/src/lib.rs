@@ -1287,20 +1287,20 @@ fn is_auto_model(model: &str) -> bool {
     m == "acu/auto-models" || m == "acu/auto" || m == "auto"
 }
 
-/// Auto 路由解析：从 D1 健康数据（近 6 小时）选出当前响应最快、成功率最高的模型。
+/// Auto 路由候选列表：从 D1 健康数据（近 6 小时）按响应速度与成功率排序。
 /// 健康数据随每次调用实时变化，因此不保证每次请求都命中同一模型；
-/// 成功率 ≥90% 且调用量 ≥3 的候选中按（成功率 desc、延迟 asc）取 top8，
-/// 再按时间戳随机取一个分散负载，避免把流量全压到单一模型上。
-async fn resolve_auto_model(env: &Env) -> String {
+/// 成功率 ≥90% 且调用量 ≥3 的候选中按（成功率 desc、延迟 asc）排序，
+/// 调用方逐个尝试直到成功（绝对可用性），从而分散负载避免压垮单一模型。
+async fn auto_candidates(env: &Env) -> Vec<String> {
     let now = now_ts();
     let since = now - 6 * 3600;
+    let mut cands: Vec<(String, f64, f64)> = Vec::new();
     if let Ok(db) = env.d1("LOGS_DB") {
         let sql = "SELECT model, COUNT(*) AS calls, \
                    SUM(CASE WHEN ok = 1 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS succ, \
                    AVG(latency_ms) AS lat \
                    FROM model_health WHERE ts >= ?1 GROUP BY model";
         let rows = d1_query_all(&db, sql, &[since.to_string()]).await;
-        let mut cands: Vec<(String, f64, f64)> = Vec::new();
         for row in rows {
             let Some(m) = row.get("model").and_then(|v| v.as_str()) else { continue };
             let Some(calls) = row.get("calls").and_then(|v| v.as_i64()) else { continue };
@@ -1314,23 +1314,19 @@ async fn resolve_auto_model(env: &Env) -> String {
             }
             cands.push((m.to_string(), succ, lat));
         }
-        if !cands.is_empty() {
-            cands.sort_by(|a, b| {
-                b.1.partial_cmp(&a.1)
-                    .unwrap_or(std::cmp::Ordering::Equal)
-                    .then(a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal))
-            });
-            let top = &cands[..cands.len().min(8)];
-            let idx = (now as usize) % top.len();
-            return top[idx].0.clone();
-        }
     }
-    // 无健康数据时的兜底：自营通道最稳；到点下线后切 Qwen 免费通道
-    if now >= DEEPSEEK_SUNSET_TS {
-        "Qwen3-8B".to_string()
-    } else {
-        "acu/deepseek-v4-flash".to_string()
+    cands.sort_by(|a, b| {
+        b.1.partial_cmp(&a.1)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then(a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal))
+    });
+    let mut out: Vec<String> = cands.into_iter().map(|(m, _, _)| m).collect();
+    // 兜底链：健康数据为空或全部失格时仍有绝对可用的落点（自营通道最稳；下线后切 Qwen）
+    let fallback = if now >= DEEPSEEK_SUNSET_TS { "Qwen3-8B" } else { "acu/deepseek-v4-flash" };
+    if !out.iter().any(|m| m == fallback) {
+        out.push(fallback.to_string());
     }
+    out
 }
 
 /// 统一 chat 分发：按模型前缀路由到对应上游（handle_chat / 树洞共用）
@@ -1381,18 +1377,36 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
         return err_res(400, "缺少 model 字段：请求体必须包含 \"model\": \"<模型 ID>\"，可先 GET /v1/models 查看可用模型");
     }
 
-    // Auto 智能路由：acu/Auto-models → 动态解析为当前最快最稳的模型（解析结果通过 X-AQUA-Model 暴露）
-    let (model, auto_used) = if is_auto_model(&model) {
-        (resolve_auto_model(&env).await, true)
+    // Auto 智能路由：acu/Auto-models → 按健康数据候选序逐个尝试（最多 3 个），
+    // 任一候选成功即用之（绝对可用性）；全部失败返回最后一个错误。
+    // 实际使用的模型通过响应头 X-AQUA-Model 暴露。
+    let (model, mut res) = if is_auto_model(&model) {
+        let cands = auto_candidates(&env).await;
+        let mut tried = 0usize;
+        let mut last: Result<Response> = err_ecode(503, "AUTO_NO_CANDIDATE", "当前没有可用的路由候选，请稍后重试或直接指定模型");
+        let mut chosen = String::new();
+        for m in cands.iter().take(3) {
+            tried += 1;
+            let r = dispatch_chat(&env, m, &body_bytes).await;
+            let ok = r.as_ref().map(|x| x.status_code() < 400).unwrap_or(false);
+            chosen = m.clone();
+            if ok {
+                last = r;
+                break;
+            }
+            last = r;
+        }
+        if tried > 1 {
+            console_log!("[auto] retried {} candidates before success", tried);
+        }
+        (chosen, last)
     } else {
-        (model, false)
+        let r = dispatch_chat(&env, &model, &body_bytes).await;
+        (model, r)
     };
 
-    let res = dispatch_chat(&env, &model, &body_bytes).await;
-
     // Auto 路由：响应头暴露实际使用的模型，便于客户端/前端展示
-    let mut res = res;
-    if auto_used {
+    if res.as_ref().map(|r| r.status_code() < 400).unwrap_or(false) {
         if let Ok(r) = res.as_mut() {
             r.headers_mut().set("X-AQUA-Model", model.as_str()).ok();
         }
