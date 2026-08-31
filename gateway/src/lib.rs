@@ -704,7 +704,16 @@ async fn handle_models(req: Request, env: Env) -> Result<Response> {
     let wai_exhausted = fetch_wai_exhausted(&env).await;
     let created = now_ts();
 
-    let mut data = Vec::with_capacity(MODEL_CATALOG.len());
+    let mut data = Vec::with_capacity(MODEL_CATALOG.len() + 16);
+    // Auto 智能路由（列表首位）：每次请求动态选择当前最快最稳的模型
+    data.push(serde_json::json!({
+        "id": "acu/Auto-models",
+        "object": "model",
+        "created": created,
+        "owned_by": "acu",
+        "auto": true,
+        "description": "智能自动路由：每次请求实时选择当前成功率最高、响应最快的模型，快与稳优先，不保证每次命中同一模型",
+    }));
     let ds_sunset = now_ts() >= DEEPSEEK_SUNSET_TS;
     for (id, owner) in MODEL_CATALOG {
         let mut m = serde_json::json!({
@@ -822,8 +831,7 @@ async fn sync_fetch_list(env: &Env) -> Vec<String> {
     if let Some(arr) = j.get("data").and_then(|v| v.as_array()) {
         for m in arr {
             if let Some(id) = m.get("id").and_then(|v| v.as_str()) {
-                let lower = id.to_ascii_lowercase();
-                if NVIDIA_DYNAMIC_SKIP.iter().any(|k| lower.contains(k)) {
+                if is_special_endpoint_model(id) {
                     continue; // 专用端点模型（embed/rerank/TTS/视觉任务等）不进 chat 目录
                 }
                 ids.push(id.to_string());
@@ -1265,6 +1273,66 @@ fn deepseek_sunset_blocked(model: &str) -> bool {
         && now_ts() >= DEEPSEEK_SUNSET_TS
 }
 
+// ---------------------------------------------------------------------------
+// Auto 智能路由：acu/Auto-models → 每次请求动态解析为当前最快最稳的模型
+// ---------------------------------------------------------------------------
+fn is_special_endpoint_model(id: &str) -> bool {
+    let lower = id.to_ascii_lowercase();
+    NVIDIA_DYNAMIC_SKIP.iter().any(|k| lower.contains(k))
+}
+
+/// 是否为 Auto 智能路由模型 ID（大小写不敏感，兼容 acu/Auto-models / acu/auto / auto）
+fn is_auto_model(model: &str) -> bool {
+    let m = model.trim().to_ascii_lowercase();
+    m == "acu/auto-models" || m == "acu/auto" || m == "auto"
+}
+
+/// Auto 路由解析：从 D1 健康数据（近 6 小时）选出当前响应最快、成功率最高的模型。
+/// 健康数据随每次调用实时变化，因此不保证每次请求都命中同一模型；
+/// 成功率 ≥90% 且调用量 ≥3 的候选中按（成功率 desc、延迟 asc）取 top8，
+/// 再按时间戳随机取一个分散负载，避免把流量全压到单一模型上。
+async fn resolve_auto_model(env: &Env) -> String {
+    let now = now_ts();
+    let since = now - 6 * 3600;
+    if let Ok(db) = env.d1("LOGS_DB") {
+        let sql = "SELECT model, COUNT(*) AS calls, \
+                   SUM(CASE WHEN ok = 1 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS succ, \
+                   AVG(latency_ms) AS lat \
+                   FROM model_health WHERE ts >= ?1 GROUP BY model";
+        let rows = d1_query_all(&db, sql, &[since.to_string()]).await;
+        let mut cands: Vec<(String, f64, f64)> = Vec::new();
+        for row in rows {
+            let Some(m) = row.get("model").and_then(|v| v.as_str()) else { continue };
+            let Some(calls) = row.get("calls").and_then(|v| v.as_i64()) else { continue };
+            let Some(succ) = row.get("succ").and_then(|v| v.as_f64()) else { continue };
+            let lat = row.get("lat").and_then(|v| v.as_f64()).unwrap_or(99999.0);
+            if calls < 3 || succ < 0.9 {
+                continue; // 绝对可用性门槛：样本不足或成功率不达标直接出局
+            }
+            if is_special_endpoint_model(m) {
+                continue; // 专用端点（向量/语音/图像等）不参与对话路由
+            }
+            cands.push((m.to_string(), succ, lat));
+        }
+        if !cands.is_empty() {
+            cands.sort_by(|a, b| {
+                b.1.partial_cmp(&a.1)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+                    .then(a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal))
+            });
+            let top = &cands[..cands.len().min(8)];
+            let idx = (now as usize) % top.len();
+            return top[idx].0.clone();
+        }
+    }
+    // 无健康数据时的兜底：自营通道最稳；到点下线后切 Qwen 免费通道
+    if now >= DEEPSEEK_SUNSET_TS {
+        "Qwen3-8B".to_string()
+    } else {
+        "acu/deepseek-v4-flash".to_string()
+    }
+}
+
 /// 统一 chat 分发：按模型前缀路由到对应上游（handle_chat / 树洞共用）
 async fn dispatch_chat(env: &Env, model: &str, body_bytes: &[u8]) -> Result<Response> {
     // 官方自营通道下线守卫（自营接口特殊对待：明确错误码 + 中文说明）
@@ -1313,7 +1381,22 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
         return err_res(400, "缺少 model 字段：请求体必须包含 \"model\": \"<模型 ID>\"，可先 GET /v1/models 查看可用模型");
     }
 
+    // Auto 智能路由：acu/Auto-models → 动态解析为当前最快最稳的模型（解析结果通过 X-AQUA-Model 暴露）
+    let (model, auto_used) = if is_auto_model(&model) {
+        (resolve_auto_model(&env).await, true)
+    } else {
+        (model, false)
+    };
+
     let res = dispatch_chat(&env, &model, &body_bytes).await;
+
+    // Auto 路由：响应头暴露实际使用的模型，便于客户端/前端展示
+    let mut res = res;
+    if auto_used {
+        if let Ok(r) = res.as_mut() {
+            r.headers_mut().set("X-AQUA-Model", model.as_str()).ok();
+        }
+    }
 
     // D1 日志 + 健康记录（尽力而为）
     let code = res.as_ref().map(|r| r.status_code()).unwrap_or(502);
