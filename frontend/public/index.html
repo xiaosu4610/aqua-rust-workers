@@ -1528,6 +1528,90 @@ resp = client.chat.completions.create(
         <a class="repo-link" href="https://github.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener">GitHub 仓库 ⭐</a>
       </div>
 
+      <!-- ===== 新手村：零基础三分钟入门（菜鸟教程风格） ===== -->
+      <div class="api-card api-anchor">
+        <h2>零基础入门：先别急着写代码</h2>
+        <p class="desc">第一次接触 API？没问题——这一节全程说人话，把该懂的词都讲明白。已经会用的同学，直接往下看端点详解。</p>
+        <h3>API 是什么？——一家「自动点餐」的餐厅</h3>
+        <p class="desc">想象一家餐厅：<b>你（你的程序）</b>写好一份<b>点菜单（请求）</b>递给<b>服务员（API）</b>，服务员把单子送进<b>后厨（AI 模型）</b>，做好菜再把<b>结果（回复）</b>端出来。你不需要知道后厨怎么炒的——会递单子、能接菜，就够了。<b>API 就是这套「递单子 → 出菜」的规矩</b>，大家按同一个规矩来，程序之间就能互相使唤。</p>
+        <h3>API 网关是什么？——前台总服务台</h3>
+        <p class="desc">AQUA 就是那个前台。后面有十几家后厨（Nvidia、智谱、SiliconFlow、官方自营……几十个模型），但你只跟前台一个窗口打交道：<b>报一个菜名（模型 ID），前台自动转给对应的后厨</b>。菜名在前缀里就写明了是哪家的——<code>zhipu/</code> 开头是智谱、<code>acu/</code> 开头是官方自营、<code>workers-ai/</code> 开头是 Workers AI，就像「川菜馆的麻婆豆腐」和「粤菜馆的虾饺」。</p>
+        <h3>API Key（密钥）是什么？——一张随便领的门票</h3>
+        <p class="desc">大部分网站的 API Key 像<b>演唱会门票</b>：要实名申请、要花钱、丢了要补办。而 AQUA 是开放模式，Key 就是一张<b>随便领的门票</b>：<b>你自己随手编一个就行</b>（比如 <code>sk-my-cat-123</code>），填什么都能进门——<b>不固定、不变更、不用申请、更不用来问任何人</b>。唯一的要求：别空着。</p>
+        <h3>一次调用的完整旅程</h3>
+        <pre><code>你的程序                          AQUA 网关                        AI 模型（后厨）
+   │                                 │                                │
+   │  ① 递单子：带密钥的 HTTP 请求     │                                │
+   │  「模型 acu/deepseek-v4-flash，   │  ② 看菜名找后厨                 │
+   │   用户问：你好」  ───────────────►│  acu/ 前缀 → 官方自营后厨 ─────►│  ③ 思考并作答
+   │                                 │                                │
+   │  ④ 端菜：JSON 回复               │  ◄─────────────  原样转交        │
+   │  「你好！很高兴见到你」 ◄─────────│                                │
+   ▼</code></pre>
+        <p class="desc">所以对接 AQUA 你只需要记三样东西：<b>① 接口地址</b>（本站 <code>https://api.ltzy.top/v1</code>）；<b>② 密钥</b>（随便编）；<b>③ 模型 ID</b>（去「模型中心」抄）。往下看，三分钟跑通第一条请求。</p>
+      </div>
+
+      <!-- ===== 快速开始：三分钟跑通第一条请求 ===== -->
+      <div class="api-card api-anchor">
+        <h2>三分钟跑通你的第一条请求</h2>
+        <p class="desc">不用注册、不用充值、不用等审核。跟着做，三步出结果。</p>
+        <h3>第 1 步：准备两样东西</h3>
+        <ul class="tips">
+          <li><b>接口地址</b>：<code>https://api.ltzy.top/v1</code>（自部署的同学换成你自己的网关域名）</li>
+          <li><b>密钥</b>：随手编一个，如 <code>sk-hello-aqua</code>——记住，填什么都能过</li>
+        </ul>
+        <h3>第 2 步：挑一种你喜欢的方式，复制 → 运行</h3>
+        <p class="desc"><b>方式一：命令行 curl</b>（电脑自带，直接粘贴到终端）：</p>
+        <pre><button class="btn" data-copy-from="code-quick-curl">复制</button><code id="code-quick-curl"><span class="kwd">curl</span> https://api.ltzy.top/v1/chat/completions \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"Authorization: Bearer sk-hello-aqua"</span> \
+  -d <span class="str">'{"model": "zhipu/glm-4-flash", "messages": [{"role": "user", "content": "用一句话介绍你自己"}]}'</span></code></pre>
+        <p class="desc"><b>方式二：Python</b>（先 <code>pip install openai</code>）：</p>
+        <pre><button class="btn" data-copy-from="code-quick-py">复制</button><code id="code-quick-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="str">"sk-hello-aqua"</span>,                              <span class="tok"># 随便填，别空着就行</span>
+    base_url=<span class="str">"https://api.ltzy.top/v1"</span>,                   <span class="tok"># 注意结尾带 /v1</span>
+)
+r = client.chat.completions.create(
+    model=<span class="str">"zhipu/glm-4-flash"</span>,                            <span class="tok"># 去模型中心随便抄一个</span>
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"用一句话介绍你自己"</span>}],
+)
+<span class="kwd">print</span>(r.choices[<span class="tok">0</span>].message.content)                       <span class="tok"># 打印 AI 的回答</span></code></pre>
+        <p class="desc"><b>方式三：JavaScript / Node.js</b>：</p>
+        <pre><button class="btn" data-copy-from="code-quick-js">复制</button><code id="code-quick-js"><span class="kwd">import</span> OpenAI <span class="kwd">from</span> <span class="str">"openai"</span>;
+
+<span class="kwd">const</span> client = <span class="kwd">new</span> OpenAI({
+  apiKey: <span class="str">"sk-hello-aqua"</span>,                                <span class="tok">// 随便填</span>
+  baseURL: <span class="str">"https://api.ltzy.top/v1"</span>,                     <span class="tok">// 结尾带 /v1</span>
+});
+<span class="kwd">const</span> r = <span class="kwd">await</span> client.chat.completions.create({
+  model: <span class="str">"zhipu/glm-4-flash"</span>,
+  messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"用一句话介绍你自己"</span> }],
+});
+console.log(r.choices[<span class="tok">0</span>].message.content);</code></pre>
+        <h3>第 3 步：看懂返回结果（每个字段是什么）</h3>
+        <pre><code>{
+  <span class="str">"id"</span>: <span class="str">"chatcmpl-xxxx"</span>,          <span class="tok">// 这次对话的编号（流水号，出问题反馈时报它）</span>
+  <span class="str">"model"</span>: <span class="str">"zhipu/glm-4-flash"</span>,   <span class="tok">// 实际干活的模型</span>
+  <span class="str">"choices"</span>: [{                    <span class="tok">// 回答在这里（数组，一般只取第 0 个）</span>
+    <span class="str">"message"</span>: {
+      <span class="str">"role"</span>: <span class="str">"assistant"</span>,         <span class="tok">// 说话的人是 AI</span>
+      <span class="str">"content"</span>: <span class="str">"你好！我是智谱 GLM…"</span>  <span class="tok">// ★ 你要的答案就是它</span>
+    },
+    <span class="str">"finish_reason"</span>: <span class="str">"stop"</span>        <span class="tok">// stop=正常说完；length=字数到上限被截断</span>
+  }],
+  <span class="str">"usage"</span>: { ... }                 <span class="tok">// 用量统计（本站免费，仅供参考）</span>
+}</code></pre>
+        <h3>新手最容易踩的三个坑</h3>
+        <ul class="tips">
+          <li><b>base_url 忘了带 <code>/v1</code></b>：写成 <code>https://api.ltzy.top</code> 会 404。SDK 的 base_url 要以 <code>/v1</code> 结尾。</li>
+          <li><b>密钥填了空字符串</b>：开放模式「填什么都过」，但空字符串等于没带门票。随便填点东西。</li>
+          <li><b>模型 ID 抄错</b>：ID 要一字不差（区分大小写），拿不准就去「模型中心 · 模型列表」复制，或调 <code>GET /v1/models</code> 查。</li>
+        </ul>
+        <p class="desc">跑通了？恭喜，你已经会用 80% 的功能了——剩下的端点全是「换个地址、换个参数」的重复动作。继续往下看概念词典和端点详解。</p>
+      </div>
+
       <div class="api-card api-anchor">
         <h2><span class="api-method">GET</span><span class="api-endpoint">/v1/models</span></h2>
         <p class="desc">获取可用模型列表。返回 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、官方自营与 Workers AI 的全部模型。</p>
