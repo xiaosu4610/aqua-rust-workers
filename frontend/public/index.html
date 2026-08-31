@@ -368,6 +368,9 @@
     vertical-align: 2px; letter-spacing: .5px; }
   .api-endpoint { font-family: var(--mono); font-size: 13px; color: var(--code-color3); word-break: break-all; }
   .api-anchor { scroll-margin-top: 80px; }
+  #page-api details { margin: 6px 0; padding: 8px 12px; border-radius: 8px; background: rgba(34,211,238,.05); }
+  #page-api summary { cursor: pointer; user-select: none; line-height: 1.6; }
+  #page-api details[open] summary { margin-bottom: 4px; }
 
   /* ===== 模型分类筛选 ===== */
   .filter-row { display: flex; align-items: center; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
@@ -1315,7 +1318,7 @@
       <div class="card">
         <h3><i class="step-no">STEP 01</i><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Base URL（接口地址）</h3>
         <div class="copy-row">
-          <code id="base-url">https://your-gateway-domain.example/v1</code>
+          <code id="base-url">https://api.ltzy.top/v1</code>
           <button class="btn" data-copy="base-url">复制</button>
         </div>
         <p class="hint">客户端只需填入该地址，系统自动拼接 /chat/completions 等路径。</p>
@@ -1341,7 +1344,7 @@
           <button class="pill" data-ct="js">JavaScript</button>
         </div>
         <div class="doc-block active" data-ct-panel="curl">
-          <pre><button class="btn" data-copy-from="code-curl">复制</button><code id="code-curl"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/chat/completions \
+          <pre><button class="btn" data-copy-from="code-curl">复制</button><code id="code-curl"><span class="kwd">curl</span> https://api.ltzy.top/v1/chat/completions \
   -H <span class="str">"Content-Type: application/json"</span> \
   -H <span class="str">"Authorization: Bearer sk-****"</span> \
   -d <span class="str">'{
@@ -1354,7 +1357,7 @@
           <pre><button class="btn" data-copy-from="code-py">复制</button><code id="code-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
 
 client = OpenAI(
-    base_url=<span class="str">"https://your-gateway-domain.example/v1"</span>,
+    base_url=<span class="str">"https://api.ltzy.top/v1"</span>,
     api_key=<span class="str">"sk-****"</span>,   <span class="tok"># 任意密钥均可；公告见 QQ 频道（pd57362562）</span>
 )
 resp = client.chat.completions.create(
@@ -1366,7 +1369,7 @@ resp = client.chat.completions.create(
     print(chunk.choices[<span class="tok">0</span>].delta.content <span class="kwd">or</span> <span class="str">""</span>, end=<span class="str">""</span>)</code></pre>
         </div>
         <div class="doc-block" data-ct-panel="js">
-          <pre><button class="btn" data-copy-from="code-js">复制</button><code id="code-js"><span class="kwd">const</span> res = <span class="kwd">await</span> fetch(<span class="str">"https://your-gateway-domain.example/v1/chat/completions"</span>, {
+          <pre><button class="btn" data-copy-from="code-js">复制</button><code id="code-js"><span class="kwd">const</span> res = <span class="kwd">await</span> fetch(<span class="str">"https://api.ltzy.top/v1/chat/completions"</span>, {
   method: <span class="str">"POST"</span>,
   headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
              <span class="str">"Authorization"</span>: <span class="str">"Bearer sk-****"</span> },
@@ -1719,7 +1722,7 @@ console.log(full);</code></pre>
     <span class="str">"owned_by"</span>: <span class="str">"zhipu"</span>
   }]}</code></pre>
         <h3>curl</h3>
-        <pre><button class="btn" data-copy-from="code-api-models-curl">复制</button><code id="code-api-models-curl"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/models
+        <pre><button class="btn" data-copy-from="code-api-models-curl">复制</button><code id="code-api-models-curl"><span class="kwd">curl</span> https://api.ltzy.top/v1/models
   -H <span class="str">"Authorization: Bearer sk-****"</span></code></pre>
       </div>
 
@@ -1737,7 +1740,7 @@ console.log(full);</code></pre>
 }</code></pre>
         <h3>python</h3>
         <pre><button class="btn" data-copy-from="code-api-chat-py">复制</button><code id="code-api-chat-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
-client = OpenAI(api_key=<span class="str">"sk-****"</span>, base_url=<span class="str">"https://your-gateway-domain.example/v1"</span>)
+client = OpenAI(api_key=<span class="str">"sk-****"</span>, base_url=<span class="str">"https://api.ltzy.top/v1"</span>)
 r = client.chat.completions.create(
   model=<span class="str">"zhipu/glm-4-flash"</span>,
   messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"你好"</span>}])
@@ -1747,7 +1750,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/embeddings</span></h2>
         <p class="desc">向量化。向量模型（如 BAAI/bge-m3）由 Gitee AI / SiliconFlow 提供。</p>
-        <pre><button class="btn" data-copy-from="code-api-emb">复制</button><code id="code-api-emb"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/embeddings \
+        <pre><button class="btn" data-copy-from="code-api-emb">复制</button><code id="code-api-emb"><span class="kwd">curl</span> https://api.ltzy.top/v1/embeddings \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "BAAI/bge-m3", "input": "AQUA 网关"}'</span></code></pre>
       </div>
@@ -1755,7 +1758,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/rerank</span></h2>
         <p class="desc">重排。用于 RAG 检索结果排序，支持 bge-reranker-v2-m3 等重排模型。</p>
-        <pre><button class="btn" data-copy-from="code-api-rerank">复制</button><code id="code-api-rerank"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/rerank \
+        <pre><button class="btn" data-copy-from="code-api-rerank">复制</button><code id="code-api-rerank"><span class="kwd">curl</span> https://api.ltzy.top/v1/rerank \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "bge-reranker-v2-m3", "query": "你好", "documents": ["A", "B"]}'</span></code></pre>
       </div>
@@ -1763,7 +1766,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/audio/transcriptions</span></h2>
         <p class="desc">语音识别（ASR）。使用 multipart/form-data 上传音频文件，内容类型透传；支持 GLM-ASR、SenseVoiceSmall 等。</p>
-        <pre><button class="btn" data-copy-from="code-api-asr">复制</button><code id="code-api-asr"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/audio/transcriptions \
+        <pre><button class="btn" data-copy-from="code-api-asr">复制</button><code id="code-api-asr"><span class="kwd">curl</span> https://api.ltzy.top/v1/audio/transcriptions \
   -F <span class="str">"file=@audio.wav"</span> \
   -F <span class="str">"model=GLM-ASR"</span></code></pre>
       </div>
@@ -1771,7 +1774,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/audio/speech</span></h2>
         <p class="desc">语音合成（TTS）。部分 TTS 模型的文本合成能力取决于上游平台；可携带 prompt_audio / prompt_audio_url 参考音频（语音克隆类模型）。</p>
-        <pre><button class="btn" data-copy-from="code-api-tts">复制</button><code id="code-api-tts"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/audio/speech \
+        <pre><button class="btn" data-copy-from="code-api-tts">复制</button><code id="code-api-tts"><span class="kwd">curl</span> https://api.ltzy.top/v1/audio/speech \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "Spark-TTS-0.5B", "input": "你好，欢迎使用 AQUA"}'</span></code></pre>
       </div>
@@ -1779,7 +1782,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/moderations</span></h2>
         <p class="desc">内容安全检测。支持 Qwen3Guard-Gen-0.6B、nonescape-v0、nsfw-classifier 等风控模型。</p>
-        <pre><button class="btn" data-copy-from="code-api-mod">复制</button><code id="code-api-mod"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/moderations \
+        <pre><button class="btn" data-copy-from="code-api-mod">复制</button><code id="code-api-mod"><span class="kwd">curl</span> https://api.ltzy.top/v1/moderations \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "Qwen3Guard-Gen-0.6B", "input": "待检测文本"}'</span></code></pre>
       </div>
@@ -1787,7 +1790,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/images/generations</span></h2>
         <p class="desc">文生图。由智谱 CogView 系列免费提供，模型 ID 以 <code>zhipu/cogview-</code> 开头（如 <code>zhipu/cogview-3-flash</code>）。</p>
-        <pre><button class="btn" data-copy-from="code-api-img">复制</button><code id="code-api-img"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/images/generations \
+        <pre><button class="btn" data-copy-from="code-api-img">复制</button><code id="code-api-img"><span class="kwd">curl</span> https://api.ltzy.top/v1/images/generations \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "zhipu/cogview-3-flash", "prompt": "一只坐在沙发上的橘猫", "size": "1024x1024"}'</span></code></pre>
       </div>
@@ -1795,7 +1798,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/videos/generations</span></h2>
         <p class="desc">文生视频。由智谱 CogVideoX 免费提供（如 <code>zhipu/cogvideox-flash</code>）。视频生成耗时较长，客户端超时建议设置 5 分钟以上。</p>
-        <pre><button class="btn" data-copy-from="code-api-vid">复制</button><code id="code-api-vid"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/videos/generations \
+        <pre><button class="btn" data-copy-from="code-api-vid">复制</button><code id="code-api-vid"><span class="kwd">curl</span> https://api.ltzy.top/v1/videos/generations \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "zhipu/cogvideox-flash", "prompt": "一只小狗在草地上奔跑"}'</span></code></pre>
       </div>
@@ -1803,7 +1806,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/ip_location</span></h2>
         <p class="desc">IP 归属地查询。模型 ID 为 <code>ip-location</code>，由 Gitee AI 提供。</p>
-        <pre><button class="btn" data-copy-from="code-api-ip">复制</button><code id="code-api-ip"><span class="kwd">curl</span> https://your-gateway-domain.example/v1/ip_location \
+        <pre><button class="btn" data-copy-from="code-api-ip">复制</button><code id="code-api-ip"><span class="kwd">curl</span> https://api.ltzy.top/v1/ip_location \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"model": "ip-location", "ip": "8.8.8.8"}'</span></code></pre>
       </div>
@@ -1811,7 +1814,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2><span class="api-method">GET</span><span class="api-endpoint">/assets/{key}</span></h2>
         <p class="desc">R2 媒体缓存访问。生成类接口（图片/音频/视频）产出的文件会写入缓存，可通过该路径直接访问，路径形如 <code>/assets/&#123;key&#125;</code>。</p>
-        <pre><button class="btn" data-copy-from="code-api-asset">复制</button><code id="code-api-asset"><span class="kwd">curl</span> https://your-gateway-domain.example/assets/2026/08/abc123.png \
+        <pre><button class="btn" data-copy-from="code-api-asset">复制</button><code id="code-api-asset"><span class="kwd">curl</span> https://api.ltzy.top/assets/2026/08/abc123.png \
   -H <span class="str">"Authorization: Bearer sk-****"</span></code></pre>
       </div>
 
@@ -1892,6 +1895,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
             <tr><td><code>/v1/tools/uuid</code></td><td>GET</td><td>—</td><td>生成 UUID v4</td></tr>
             <tr><td><code>/v1/tools/timestamp</code></td><td>GET/POST</td><td>POST: <code>{"timestamp":123}</code></td><td>当前时间戳 / 时间戳转日期（ISO/UTC）</td></tr>
             <tr><td><code>/v1/tools/base64</code></td><td>POST</td><td><code>{"action":"encode","text":"..."}</code></td><td>Base64 编解码（action: encode/decode）</td></tr>
+            <tr><td><code>/v1/tools/subnet</code></td><td>POST</td><td><code>{"cidr":"192.168.1.0/24"}</code></td><td>子网计算器：网络/广播地址、掩码、可用主机范围</td></tr>
+            <tr><td><code>/v1/tools/treehole</code></td><td>POST</td><td><code>{"mode":"gentle","messages":[...]}</code></td><td>树洞情感陪伴（mode: gentle=小溪 / anime=星璃），OpenAI chat 格式，支持流式</td></tr>
+            <tr><td><code>/v1/tools/prompts</code></td><td>GET</td><td>—</td><td>提示词工坊：官方收录的智能体人设与 Skill 提示词（分类/建议模型）</td></tr>
           </tbody>
         </table></div>
         <p class="desc" style="margin-top:8px;">示例：<code>curl https://你的网关/v1/tools/uuid -H "Authorization: Bearer sk-****"</code></p>
@@ -1990,7 +1996,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           </div>
           <div class="pg-side-card">
             <b>调用方式</b>
-            <p>本页面与 API 调用行为一致，接口地址 <code>https://你的网关/v1/chat/completions</code>，任意密钥即可调用。</p>
+            <p>本页面与 API 调用行为一致，接口地址 <code>https://api.ltzy.top/v1/chat/completions</code>，任意密钥即可调用。</p>
           </div>
         </aside>
       </div>
@@ -2850,7 +2856,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     } else if (t === "rerank") {
       body = '{"model":"' + id + '","query":"你好","documents":["文档A","文档B"]}';
     } else if (t === "asr") {
-      return '# 使用 multipart 上传音频文件\ncurl https://your-gateway-domain.example/v1/audio/transcriptions \\\n  -F "file=@audio.wav" \\\n  -F "model=' + id + '"';
+      return '# 使用 multipart 上传音频文件\ncurl https://api.ltzy.top/v1/audio/transcriptions \\\n  -F "file=@audio.wav" \\\n  -F "model=' + id + '"';
     } else if (t === "tts") {
       body = '{"model":"' + id + '","input":"你好，欢迎使用 AQUA","voice":"default"}';
     } else if (t === "moderation") {
@@ -2860,9 +2866,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     } else if (t === "video") {
       body = '{"model":"' + id + '","prompt":"一只小狗在草地上奔跑"}';
     } else if (t === "ip") {
-      return 'curl https://your-gateway-domain.example/v1/ip_location\n  -H "Content-Type: application/json"\n  -d \'{"ip":""}\'';
+      return 'curl https://api.ltzy.top/v1/ip_location\n  -H "Content-Type: application/json"\n  -d \'{"ip":""}\'';
     }
-    return 'curl https://your-gateway-domain.example/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-****" \\\n  -d \'' + body + '\'';
+    return 'curl https://api.ltzy.top/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-****" \\\n  -d \'' + body + '\'';
   }
   /* ============================================================
    * 工具子页基建（可拓展性核心）
