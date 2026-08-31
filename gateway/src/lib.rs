@@ -835,7 +835,7 @@ async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
     ids.sort();
     ids.dedup();
 
-    // 轻量探测（max_tokens=1）：上游目录 ≠ 账号实际可调用（部分模型对旧密钥 404/403），
+    // 轻量探测（max_tokens=1，10 并发分批）：上游目录 ≠ 账号实际可调用（部分模型对旧密钥 404/403），
     // 仅收录当前账号真实可调用的模型，避免用户调用时撞"上游已下线"错误
     let nk = env_or(env, "NVIDIA_KEYS", "")
         .split(',')
@@ -846,30 +846,37 @@ async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
     let probe_url = format!("{}/v1/chat/completions", env_or(env, "NVIDIA_BASE", NVIDIA_BASE_DEFAULT));
     let mut ok_ids: Vec<String> = Vec::new();
     let mut probed = 0usize;
-    for id in &ids {
+    for chunk in ids.chunks(10) {
         if nk.is_empty() {
-            ok_ids.push(id.clone()); // 无密钥时退化为不过滤
+            ok_ids.extend(chunk.iter().cloned()); // 无密钥时退化为不过滤
             continue;
         }
-        probed += 1;
-        let body = serde_json::json!({
-            "model": id,
-            "messages": [{"role": "user", "content": "hi"}],
-            "max_tokens": 1,
-        })
-        .to_string();
-        let mut blocked = false;
-        if let Ok(req) = build_upstream_req(&probe_url, Some(&format!("Bearer {}", nk)), None, body.as_bytes(), Method::Post) {
-            if let Ok(res) = Fetch::Request(req).send().await {
-                let st = res.status_code();
-                // 404 = NIM 函数不存在；403 = 账号无访问权限。其余（429/5xx/4xx 暂时性）保留
-                if st == 404 || st == 403 {
-                    blocked = true;
+        probed += chunk.len();
+        let futs = chunk.iter().map(|id| {
+            let body = serde_json::json!({
+                "model": id,
+                "messages": [{"role": "user", "content": "hi"}],
+                "max_tokens": 1,
+            })
+            .to_string();
+            let url = probe_url.clone();
+            let key = nk.clone();
+            async move {
+                match build_upstream_req(&url, Some(&format!("Bearer {}", key)), None, body.as_bytes(), Method::Post) {
+                    Ok(req) => match Fetch::Request(req).send().await {
+                        // 404 = NIM 函数不存在；403 = 账号无访问权限。其余（429/5xx 暂时性）保留
+                        Ok(res) => res.status_code() != 404 && res.status_code() != 403,
+                        Err(_) => true, // 网络错误不确定，保留由运行时兜底
+                    },
+                    Err(_) => true,
                 }
             }
-        }
-        if !blocked {
-            ok_ids.push(id.clone());
+        });
+        let results = futures_util::future::join_all(futs).await;
+        for (id, ok) in chunk.iter().zip(results) {
+            if ok {
+                ok_ids.push(id.clone());
+            }
         }
     }
 
