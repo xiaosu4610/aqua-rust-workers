@@ -1379,16 +1379,31 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
 
     // Auto 智能路由：acu/Auto-models → 按健康数据候选序逐个尝试（最多 3 个），
     // 任一候选成功即用之（绝对可用性）；全部失败返回最后一个错误。
-    // 实际使用的模型通过响应头 X-AQUA-Model 暴露。
-    let (model, mut res) = if is_auto_model(&model) {
+    // 注意：必须重写请求体中的 model 字段（上游只认真实模型 ID）；
+    // 每个失败候选立即记入健康数据，使其快速掉出路由池（数据自愈）。
+    let (model, mut res, auto_used) = if is_auto_model(&model) {
         let cands = auto_candidates(&env).await;
-        let mut tried = 0usize;
         let mut last: Result<Response> = err_ecode(503, "AUTO_NO_CANDIDATE", "当前没有可用的路由候选，请稍后重试或直接指定模型");
         let mut chosen = String::new();
         for m in cands.iter().take(3) {
-            tried += 1;
-            let r = dispatch_chat(&env, m, &body_bytes).await;
-            let ok = r.as_ref().map(|x| x.status_code() < 400).unwrap_or(false);
+            let mut pj = parsed.clone();
+            pj["model"] = serde_json::Value::String(m.clone());
+            let Ok(body2) = serde_json::to_vec(&pj) else { continue };
+            let t0 = now_ts();
+            let r = dispatch_chat(&env, m, &body2).await;
+            let code = r.as_ref().map(|x| x.status_code()).unwrap_or(502);
+            let dur_ms = now_ts() - t0;
+            let ok = code < 400;
+            let err_type = if ok {
+                "success"
+            } else if code == 429 {
+                "rate_limited"
+            } else if code >= 500 {
+                "upstream_error"
+            } else {
+                "client_error"
+            };
+            record_health(&env, m, ok, err_type, code, dur_ms * 1000).await;
             chosen = m.clone();
             if ok {
                 last = r;
@@ -1396,13 +1411,10 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
             }
             last = r;
         }
-        if tried > 1 {
-            console_log!("[auto] retried {} candidates before success", tried);
-        }
-        (chosen, last)
+        (chosen, last, true)
     } else {
         let r = dispatch_chat(&env, &model, &body_bytes).await;
-        (model, r)
+        (model, r, false)
     };
 
     // Auto 路由：响应头暴露实际使用的模型，便于客户端/前端展示
@@ -1427,7 +1439,10 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
         "client_error"
     };
     log_request(&env, "POST", "/v1/chat/completions", &model, provider, code, dur_ms).await;
-    record_health(&env, &model, ok, err_type, code, dur_ms * 1000).await;
+    if !auto_used {
+        // auto 路径的健康记录已在候选循环内逐个完成（含失败候选）
+        record_health(&env, &model, ok, err_type, code, dur_ms * 1000).await;
+    }
 
     res
 }
