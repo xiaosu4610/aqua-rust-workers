@@ -189,6 +189,7 @@
     background-attachment: fixed;
   }
   .wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+  html { overflow-x: hidden; }  /* 兜底：任何遗漏的超宽元素不再撑破视口出横向滚动条 */
 
   /* ===== SVG 图标通用 ===== */
   .ic { display: inline-flex; align-items: center; justify-content: center; }
@@ -1085,6 +1086,8 @@
     .nav-inner { height: auto; min-height: 54px; flex-wrap: wrap; padding: 7px 0; row-gap: 6px; }
     .nav-right { flex: 1; min-width: 0; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
     .nav-tabs { order: 10; flex: 1 1 100%; justify-content: flex-start; }
+    /* 换行后下拉面板可能贴近视口右缘：平板档一律向左展开，杜绝溢出 */
+    .nav-drop .drop-panel { left: 0; right: auto; }
   }
 
   /* ===== 手机 (≤720px) ===== */
@@ -1103,6 +1106,30 @@
     .theme-switch { padding: 2px; }
     .theme-btn { padding: 5px 6px; }
     .theme-btn svg { width: 14px; height: 14px; }
+
+    /* 下拉大板块手机化：手风琴展开——面板随文档流，杜绝绝对定位横向溢出 */
+    .nav-tabs { flex-direction: column; align-items: stretch; gap: 2px; }
+    .nav-tabs > a { justify-content: flex-start; }
+    .nav-drop { display: block; }
+    .drop-toggle { width: 100%; justify-content: flex-start; padding: 6px 12px; font-size: 13px; gap: 5px; }
+    .drop-toggle .ic svg { width: 14px; height: 14px; }
+    .drop-toggle .caret { margin-left: auto; }
+    .drop-panel { position: static; min-width: 0; width: 100%; background: transparent;
+      border: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+      padding: 0 0 2px 12px; gap: 0; }
+    .nav-drop.open .drop-panel { display: block; }
+    .drop-panel a { padding: 8px 10px; }
+    .drop-panel a .ddesc { white-space: normal; }
+
+    /* 赞助页手机适配 */
+    .sponsor-head { padding: 32px 0 2px; }
+    .sponsor-head h1 { font-size: 22px; gap: 8px; }
+    .sponsor-head h1 .ic svg { width: 22px; height: 22px; }
+    .sponsor-head p { font-size: 13.5px; }
+    .sponsor-grid { gap: 12px; margin-top: 18px; }
+    .sponsor-card { padding: 16px; }
+    .sponsor-card img { max-width: 230px; }
+    .sponsor-tag { margin-bottom: 10px; }
 
     /* Hero */
     header.home-hero { padding: 36px 14px 24px; }
@@ -1215,6 +1242,10 @@
     .tt-board { grid-template-columns: repeat(3, 64px); grid-auto-rows: 64px; }
     /* 单列卡片布局下超长模型名允许换行（原 nowrap 的 min-content 会撑破 grid 轨道） */
     .model-link { white-space: normal; word-break: break-all; }
+    /* 磁贴/数据卡单列：320px 下 2 列每列仅 ~140px，文字挤压不可读 */
+    .quick-tiles { grid-template-columns: 1fr; }
+    .dash-cards { grid-template-columns: 1fr; }
+    .sponsor-card { padding: 14px; }
   }
 </style>
 </head>
