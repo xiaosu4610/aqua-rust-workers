@@ -2,6 +2,10 @@ name = "aqua-gateway"
 main = "build/worker/shim.mjs"
 compatibility_date = "2024-01-01"
 
+# 每日定时同步 NVIDIA 上游模型列表（UTC 16:00 = 北京时间 00:00）
+[triggers]
+crons = ["0 16 * * *"]
+
 # 网关固定密钥（逗号分隔，支持多把并存做平滑轮换）。
 # ⚠️ 真实密钥不入 Git：提交时保持占位符，部署前通过 wrangler secret / vars 注入真实值。
 [vars]

@@ -742,6 +742,36 @@ async fn handle_models(req: Request, env: Env) -> Result<Response> {
         data.push(m);
     }
 
+    // 动态 NVIDIA 目录：每日 Cron 从上游同步的模型（MODEL_CATALOG 之外的 nvidia/ 模型）
+    if let Ok(db) = env.d1("LOGS_DB") {
+        let rows = d1_query_all(&db, "SELECT id FROM nvidia_models", &[]).await;
+        for row in rows {
+            let Some(id) = row.get("id").and_then(|v| v.as_str()).map(|s| s.to_string()) else {
+                continue;
+            };
+            if MODEL_CATALOG.iter().any(|(c, _)| *c == id) {
+                continue; // 静态目录已收录，不重复展示
+            }
+            let mut m = serde_json::json!({
+                "id": id,
+                "object": "model",
+                "created": created,
+                "owned_by": "nvidia",
+                "dynamic": true,
+            });
+            if let Some(h) = health.get(&id) {
+                m["health"] = h.clone();
+            }
+            if let Some(_until) = blocked.get(id.as_str()) {
+                m["status"] = serde_json::Value::String("unavailable".into());
+                m["status_msg"] = serde_json::Value::String(
+                    "该模型在上游不存在或已被拒绝（3+ 密钥无访问权限），10 分钟后自动重试".into(),
+                );
+            }
+            data.push(m);
+        }
+    }
+
     let out = serde_json::json!({
         "object": "list",
         "created": created,
@@ -756,6 +786,70 @@ async fn handle_models(req: Request, env: Env) -> Result<Response> {
     }
 
     json_res(&out)
+}
+
+// ---------------------------------------------------------------------------
+// NVIDIA 上游模型目录每日同步（Cron：北京时间每天 00:00 / UTC 16:00）
+// ---------------------------------------------------------------------------
+/// 专用端点模型关键字：不能走 chat/completions 的上游模型不进入动态目录
+const NVIDIA_DYNAMIC_SKIP: &[&str] = &[
+    "embed", "rerank", "tts", "asr", "speech", "translate", "ocr", "parse",
+    "safety", "guard", "moderation", "clip", "yolo", "detr", "deplot",
+    "super-resolution", "relighting", "animate", "cosmos", "ising",
+    "image", "video", "audio", "diarizer", "vad", "riva", "reward",
+];
+
+/// 从 NVIDIA 上游拉取最新模型列表并同步进 D1 动态目录（nvidia_models 表）。
+/// 上游 /v1/models 公开可读，无需密钥；同步后清除 MODEL_CACHE 立即生效。
+async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
+    let ts = now_ts();
+    let url = format!("{}/v1/models", env_or(env, "NVIDIA_BASE", NVIDIA_BASE_DEFAULT));
+    let req = match build_upstream_req(&url, None, None, b"", Method::Get) {
+        Ok(r) => r,
+        Err(_) => return serde_json::json!({"ok": false, "error": "build_req_failed"}),
+    };
+    let mut res = match Fetch::Request(req).send().await {
+        Ok(r) => r,
+        Err(_) => return serde_json::json!({"ok": false, "error": "upstream_unreachable"}),
+    };
+    if res.status_code() != 200 {
+        return serde_json::json!({"ok": false, "error": format!("upstream_status_{}", res.status_code())});
+    }
+    let j: serde_json::Value = match res.json().await {
+        Ok(v) => v,
+        Err(_) => return serde_json::json!({"ok": false, "error": "upstream_parse_failed"}),
+    };
+
+    let mut ids: Vec<String> = Vec::new();
+    if let Some(arr) = j.get("data").and_then(|v| v.as_array()) {
+        for m in arr {
+            if let Some(id) = m.get("id").and_then(|v| v.as_str()) {
+                let lower = id.to_ascii_lowercase();
+                if NVIDIA_DYNAMIC_SKIP.iter().any(|k| lower.contains(k)) {
+                    continue; // 专用端点模型（embed/rerank/TTS/视觉任务等）不进 chat 目录
+                }
+                ids.push(id.to_string());
+            }
+        }
+    }
+    ids.sort();
+    ids.dedup();
+
+    if let Ok(db) = env.d1("LOGS_DB") {
+        d1_run(&db, "CREATE TABLE IF NOT EXISTS nvidia_models (id TEXT PRIMARY KEY, ts INTEGER NOT NULL)", &[]).await;
+        d1_run(&db, "DELETE FROM nvidia_models", &[]).await;
+        for id in &ids {
+            let args = [id.clone(), ts.to_string()];
+            d1_run(&db, "INSERT OR REPLACE INTO nvidia_models (id, ts) VALUES (?1, ?2)", &args).await;
+        }
+    }
+
+    // 清缓存：/v1/models 立即反映新目录
+    if let Ok(kv) = env.kv("MODEL_CACHE") {
+        let _ = kv.delete("models_list").await;
+    }
+
+    serde_json::json!({"ok": true, "synced": ids.len(), "ts": ts})
 }
 
 // ---------------------------------------------------------------------------
@@ -2217,9 +2311,34 @@ pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         .post_async("/v1/rerank", |req, ctx| async move {
             handle_rerank(req, ctx.env).await
         })
+        .post_async("/v1/_internal/sync-models", |req, ctx| async move {
+            // 管理端点：强制要求 GATEWAY_KEYS 管理密钥（open 模式下公开 demo key 不放行）
+            let authorized = match extract_key(&req).await {
+                Some(k) => key_valid(&ctx.env, &k),
+                None => false,
+            };
+            if !authorized {
+                return err_ecode(403, "FORBIDDEN", "仅管理员密钥可触发模型同步");
+            }
+            json_res(&sync_nvidia_models(&ctx.env).await)
+        })
         .get_async("/assets/*path", |req, ctx| async move {
             handle_assets(req, ctx.env).await
         })
         .run(req, env)
         .await
+}
+
+/// 每日定时任务：北京时间 00:00（UTC 16:00）从 NVIDIA 上游同步最新模型列表
+#[event(scheduled)]
+pub async fn main(_event: ScheduledEvent, env: Env, _ctx: ScheduleContext) -> Result<()> {
+    console_error_panic_hook::set_once();
+    let out = sync_nvidia_models(&env).await;
+    // 同步结果写运行日志，便于 Cron 抖动排查（成功/失败均有迹可循）
+    if let Some(code) = out.get("error").and_then(|v| v.as_str()) {
+        console_log!("[cron] nvidia sync failed: {}", code);
+    } else if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
+        console_log!("[cron] nvidia sync ok: {} models", n);
+    }
+    Ok(())
 }
