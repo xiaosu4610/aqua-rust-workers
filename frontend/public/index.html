@@ -1896,6 +1896,58 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         </table></div>
         <p class="desc" style="margin-top:8px;">示例：<code>curl https://你的网关/v1/tools/uuid -H "Authorization: Bearer sk-****"</code></p>
       </div>
+
+      <!-- ===== 对接指南：把 AQUA 接进你的软件 ===== -->
+      <div class="api-card api-anchor">
+        <h2>对接指南：把 AQUA 接进你的软件</h2>
+        <p class="desc">AQUA 说的是标准「OpenAI 方言」——凡是支持自定义 OpenAI 接口的软件（聊天客户端、翻译插件、IDE 编程助手、自动化工作流…）都能直接接。</p>
+        <h3>通用三要素（所有软件都问这三样）</h3>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>要素</th><th>填什么</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>接口地址<br>（API Host / Base URL）</td><td><code>https://api.ltzy.top</code></td><td><b>注意：有的软件要带 <code>/v1</code>，有的不带</b>——规则见下方「翻车对照表」第 1 条</td></tr>
+            <tr><td>API Key</td><td>随便编一个，如 <code>sk-my-key</code></td><td>不能为空；填什么都能过</td></tr>
+            <tr><td>模型（Model）</td><td>去「模型中心」抄，如 <code>acu/deepseek-v4-flash</code></td><td>一字不差，区分大小写</td></tr>
+          </tbody>
+        </table></div>
+        <h3>常见客户端配置示例</h3>
+        <ul class="tips">
+          <li><b>ChatGPT Next Web（NextChat）</b>：设置 → 自定义接口：API 地址填 <code>https://api.ltzy.top</code>（不带 /v1），API Key 随便填，模型手动输入模型 ID。</li>
+          <li><b>LobeChat / Open WebUI</b>：语言模型 → OpenAI 兼容：API 代理地址填 <code>https://api.ltzy.top/v1</code>（带 /v1），Key 随便填，添加模型 ID。</li>
+          <li><b>沉浸式翻译</b>：翻译服务 → OpenAI：APIKEY 随便填，自定义模型接口地址 <code>https://api.ltzy.top/v1/chat/completions</code>（填到端点），模型填 ID。</li>
+          <li><b>IDE 编程助手（Continue / Cline 等）</b>：provider 选 openai，apiBase 填 <code>https://api.ltzy.top/v1</code>，apiKey 随便填，model 填 ID。</li>
+          <li><b>通用口诀</b>：不确定带不带 <code>/v1</code> 时，两种都试一遍——反正密钥免费，试错零成本。</li>
+        </ul>
+        <h3>对接翻车对照表（症状 → 病因 → 处方）</h3>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>症状</th><th>病因</th><th>处方</th></tr></thead>
+          <tbody>
+            <tr><td>404 Not Found / 401</td><td>base_url 的 <code>/v1</code> 多了或少了</td><td>OpenAI SDK 类填<b>带 <code>/v1</code></b>（它自己再拼 /chat/completions）；NextChat 等「填域名」类填<b>不带</b>。两种各试一次</td></tr>
+            <tr><td><code>MODEL_NOT_FOUND</code></td><td>模型 ID 抄错（大小写、多空格、前缀漏了）</td><td>去模型中心复制完整 ID，如 <code>zhipu/glm-4-flash</code> 不能只写 <code>glm-4-flash</code></td></tr>
+            <tr><td>连不上 / 超时</td><td>域名写错、本地网络拦截</td><td>核对 <code>api.ltzy.top</code>；浏览器先开 <code>https://api.ltzy.top/v1/models</code> 能看到 JSON 说明网络通</td></tr>
+            <tr><td><code>INVALID_JSON</code></td><td>请求体不是合法 JSON（多了逗号、用了单引号）</td><td>用 JSON 校验器检查；字符串一律双引号</td></tr>
+            <tr><td>中文显示乱码</td><td>没按 UTF-8 解码</td><td>响应头是 <code>charset=utf-8</code>；自写代码请用 UTF-8 读流</td></tr>
+            <tr><td><code>RATE_LIMITED</code> / 429</td><td>上游限流或触发站点速率保护</td><td>等 10 秒再试；程序里加退避重试；换一个模型</td></tr>
+            <tr><td><code>ALL_KEYS_BUSY</code> / 503</td><td>官方自营通道并发满（全局 10 并发）</td><td>稍后重试；高峰期可换其他平台模型</td></tr>
+            <tr><td>回复内容像「另一个人」</td><td>多轮对话没带历史 messages</td><td>把完整聊天记录按顺序传回（见「对话接口进阶」）</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- ===== FAQ：高频提问 ===== -->
+      <div class="api-card api-anchor">
+        <h2>FAQ：新手高频提问</h2>
+        <p class="desc">点开看答案。没找到你的问题？QQ 群 1103667832 或频道 pd57362562 随时提问。</p>
+        <details><summary><b>密钥到底怎么获取？要申请吗？</b></summary><p class="desc">不用申请。<b>你自己随便编一个就行</b>——比如 <code>sk-my-key</code>、<code>123456</code> 甚至一句中文都可以。开放模式下填任何东西都会通过，密钥不固定、不变更，不需要问任何人。</p></details>
+        <details><summary><b>真的免费吗？有没有隐藏收费？</b></summary><p class="desc">本站所有模型与工具均免费使用，无隐藏收费。个别通道有并发/额度保护（如 Workers AI 日额度、自营通道 10 并发），是为了让所有人都能公平使用，不是收费墙。</p></details>
+        <details><summary><b>有官方 SDK 吗？</b></summary><p class="desc">不需要专门的 SDK——AQUA 完整兼容 OpenAI 协议，<b>直接用 OpenAI 官方 SDK</b>（Python / JS / Go / Java 全平台都有），只改 <code>base_url</code> 和 <code>api_key</code> 两个参数即可（见「三分钟跑通第一条请求」）。</p></details>
+        <details><summary><b>模型这么多，我该用哪个？</b></summary><p class="desc">按场景选：<b>日常聊天</b>→<code>zhipu/glm-4-flash</code> 或 <code>acu/deepseek-v4-flash</code>；<b>写代码</b>→ DeepSeek / Qwen Coder 系列；<b>长文写作</b>→ GLM / Qwen 长文本模型；<b>画图</b>→ <code>zhipu/cogview-3-flash</code>；<b>语音转文字</b>→ <code>GLM-ASR</code>；<b>读文字出语音</b>→ Spark-TTS 系列。选哪个都不亏，自由试。</p></details>
+        <details><summary><b>为什么 AI 不记得上一句说了什么？</b></summary><p class="desc">AI 没有记忆，每次调用都是全新开始。要多轮对话，请把历史聊天记录放进 <code>messages</code> 数组一起传回（详见「对话接口进阶 · 多轮对话」）。</p></details>
+        <details><summary><b>报 429 / 排队怎么办？</b></summary><p class="desc">429 = 限流或额度保护，不是封禁。等 10 秒~1 分钟重试；高峰期换其他平台模型；程序里建议加「指数退避」重试（第一次等 1 秒、第二次 2 秒、第三次 4 秒…）。不要连续狂点，那样只会更堵。</p></details>
+        <details><summary><b>支持联网搜索 / 文件上传吗？</b></summary><p class="desc">模型本身的能力决定：通用 chat 模型不做实时联网。需要最新信息时，把内容直接粘贴进问题里（RAG 思路：先给资料再提问）。</p></details>
+        <details><summary><b>我想自己部署一套 AQUA 可以吗？</b></summary><p class="desc">可以！AQUA 是 ACU 工程系列开源项目（AGPL-3.0），Rust→WASM 编译，一条命令部署到 Cloudflare Workers。仓库：<a href="https://gitee.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener">Gitee</a> / <a href="https://github.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener">GitHub</a>，README 有完整自部署教程。</p></details>
+        <details><summary><b>调用出错时，怎么向社区求助最有效？</b></summary><p class="desc">带上三样东西：① 完整的错误 JSON（里面有 <code>error.code</code> 和 <code>hint</code>）；② 你请求的模型 ID 和端点；③ 时间点。发到 QQ 群 1103667832 或频道 pd57362562，一般很快有人响应。</p></details>
+      </div>
     </div>
   </section>
 
