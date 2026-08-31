@@ -799,25 +799,23 @@ const NVIDIA_DYNAMIC_SKIP: &[&str] = &[
     "image", "video", "audio", "diarizer", "vad", "riva", "reward",
 ];
 
-/// 从 NVIDIA 上游拉取最新模型列表并同步进 D1 动态目录（nvidia_models 表）。
-/// 上游 /v1/models 公开可读，无需密钥；同步后清除 MODEL_CACHE 立即生效。
-async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
-    let ts = now_ts();
+/// 拉取 NVIDIA 上游模型列表并按专用端点关键字过滤（快速，无探测，<2s）
+async fn sync_fetch_list(env: &Env) -> Vec<String> {
     let url = format!("{}/v1/models", env_or(env, "NVIDIA_BASE", NVIDIA_BASE_DEFAULT));
     let req = match build_upstream_req(&url, None, None, b"", Method::Get) {
         Ok(r) => r,
-        Err(_) => return serde_json::json!({"ok": false, "error": "build_req_failed"}),
+        Err(_) => return Vec::new(),
     };
     let mut res = match Fetch::Request(req).send().await {
         Ok(r) => r,
-        Err(_) => return serde_json::json!({"ok": false, "error": "upstream_unreachable"}),
+        Err(_) => return Vec::new(),
     };
     if res.status_code() != 200 {
-        return serde_json::json!({"ok": false, "error": format!("upstream_status_{}", res.status_code())});
+        return Vec::new();
     }
     let j: serde_json::Value = match res.json().await {
         Ok(v) => v,
-        Err(_) => return serde_json::json!({"ok": false, "error": "upstream_parse_failed"}),
+        Err(_) => return Vec::new(),
     };
 
     let mut ids: Vec<String> = Vec::new();
@@ -834,8 +832,14 @@ async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
     }
     ids.sort();
     ids.dedup();
+    ids
+}
 
-    // 轻量探测（max_tokens=1，10 并发分批）：上游目录 ≠ 账号实际可调用（部分模型对旧密钥 404/403），
+/// 探测每个候选模型的账号可用性（10 并发分批）→ 入库 D1 → 清 KV 缓存。
+/// 可独立跑在 wait_until 后台（探测慢模型可能拖到数分钟，不能阻塞 HTTP 响应）。
+async fn sync_probe_and_store(env: &Env, ids: Vec<String>) -> serde_json::Value {
+    let ts = now_ts();
+    // 轻量探测（max_tokens=1）：上游目录 ≠ 账号实际可调用（部分模型对旧密钥 404/403），
     // 仅收录当前账号真实可调用的模型，避免用户调用时撞"上游已下线"错误
     let nk = env_or(env, "NVIDIA_KEYS", "")
         .split(',')
@@ -2198,7 +2202,7 @@ fn auth_mode(env: &Env) -> &'static str {
 }
 
 #[event(fetch)]
-pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
+pub async fn main(req: Request, env: Env, ctx: Context) -> Result<Response> {
     console_error_panic_hook::set_once();
 
     // ===== 防扫保底（zone 级 WAF 之外的第二道防线，Workers 层零成本拦截） =====
@@ -2266,6 +2270,41 @@ pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         let mut res = Response::empty()?;
         cors_headers(&mut res)?;
         return Ok(res);
+    }
+
+    // ===== 管理端点：NVIDIA 模型目录同步（快速返回，探测在 wait_until 后台完成） =====
+    // 独立于通用鉴权（强制 GATEWAY_KEYS 管理密钥，open 模式下公开 demo key 不放行）
+    if p == "/v1/_internal/sync-models" {
+        if req.method() != Method::Post {
+            return err_ecode(405, "METHOD_NOT_ALLOWED", "请使用 POST 请求触发同步");
+        }
+        let authorized = match extract_key(&req).await {
+            Some(k) => key_valid(&env, &k),
+            None => false,
+        };
+        if !authorized {
+            return err_ecode(403, "FORBIDDEN", "仅管理员密钥可触发模型同步");
+        }
+        let ids = sync_fetch_list(&env).await;
+        if ids.is_empty() {
+            return err_ecode(502, "UPSTREAM_UNREACHABLE", "NVIDIA 上游模型列表拉取失败，请稍后重试");
+        }
+        let listed = ids.len();
+        let env2 = env.clone();
+        ctx.wait_until(async move {
+            let out = sync_probe_and_store(&env2, ids).await;
+            if let Some(code) = out.get("error").and_then(|v| v.as_str()) {
+                console_log!("[sync] nvidia probe failed: {}", code);
+            } else if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
+                console_log!("[sync] nvidia probe done: {} models stored", n);
+            }
+        });
+        return json_res(&serde_json::json!({
+            "ok": true,
+            "listed": listed,
+            "probe": "background",
+            "note": "列表已拉取；账号可用性探测在后台进行，约 1-2 分钟后 /v1/models 反映最终目录"
+        }));
     }
 
     // 鉴权白名单：健康检查根路径 + 公开模型列表（营销入口）。
@@ -2356,17 +2395,6 @@ pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         .post_async("/v1/rerank", |req, ctx| async move {
             handle_rerank(req, ctx.env).await
         })
-        .post_async("/v1/_internal/sync-models", |req, ctx| async move {
-            // 管理端点：强制要求 GATEWAY_KEYS 管理密钥（open 模式下公开 demo key 不放行）
-            let authorized = match extract_key(&req).await {
-                Some(k) => key_valid(&ctx.env, &k),
-                None => false,
-            };
-            if !authorized {
-                return err_ecode(403, "FORBIDDEN", "仅管理员密钥可触发模型同步");
-            }
-            json_res(&sync_nvidia_models(&ctx.env).await)
-        })
         .get_async("/assets/*path", |req, ctx| async move {
             handle_assets(req, ctx.env).await
         })
@@ -2374,16 +2402,25 @@ pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         .await
 }
 
-/// 每日定时任务：北京时间 00:00（UTC 16:00）从 NVIDIA 上游同步最新模型列表
+/// 每日定时任务：北京时间 00:00（UTC 16:00）从 NVIDIA 上游同步最新模型列表。
+/// 列表拉取快速完成；探测在 wait_until 后台继续（慢模型不占用 Cron 主流程）。
 #[event(scheduled)]
-pub async fn main(_event: ScheduledEvent, env: Env, _ctx: ScheduleContext) -> Result<()> {
+pub async fn main(_event: ScheduledEvent, env: Env, ctx: ScheduleContext) -> Result<()> {
     console_error_panic_hook::set_once();
-    let out = sync_nvidia_models(&env).await;
-    // 同步结果写运行日志，便于 Cron 抖动排查（成功/失败均有迹可循）
-    if let Some(code) = out.get("error").and_then(|v| v.as_str()) {
-        console_log!("[cron] nvidia sync failed: {}", code);
-    } else if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
-        console_log!("[cron] nvidia sync ok: {} models", n);
+    let ids = sync_fetch_list(&env).await;
+    if ids.is_empty() {
+        console_log!("[cron] nvidia sync failed: upstream list unavailable");
+        return Ok(());
     }
+    let listed = ids.len();
+    let env2 = env.clone();
+    ctx.wait_until(async move {
+        let out = sync_probe_and_store(&env2, ids).await;
+        if let Some(code) = out.get("error").and_then(|v| v.as_str()) {
+            console_log!("[cron] nvidia probe failed: {}", code);
+        } else if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
+            console_log!("[cron] nvidia sync done: {}/{} models stored", n, listed);
+        }
+    });
     Ok(())
 }
