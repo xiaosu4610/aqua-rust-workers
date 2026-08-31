@@ -92,7 +92,6 @@
   [data-theme="light"] .mtag.m-nvidia { color: #0284c7; }
   [data-theme="light"] .mtag.m-gitee { color: #0f766e; }
   [data-theme="light"] .mtag.m-siliconflow { color: #6d28d9; }
-  [data-theme="light"] .mtag.m-workers-ai { color: #047857; }
   [data-theme="light"] .mtag.m-zhipu { color: #b45309; }
   [data-theme="light"] .mtag.m-spark { color: #1d4ed8; }
   [data-theme="light"] .mtag.m-acu { color: #0284c7; }
@@ -385,7 +384,6 @@
   .mtag.m-nvidia { color: #7dd3fc; }
   .mtag.m-gitee { color: #a5f3fc; }
   .mtag.m-siliconflow { color: #c4b5fd; }
-  .mtag.m-workers-ai { color: #6ee7b7; }
   .mtag.m-zhipu { color: #fbbf24; }
   .mtag.m-spark { color: #60a5fa; }
   .mtag.m-acu { color: #38bdf8; }
@@ -458,7 +456,7 @@
   .cap-model-col:hover a.cap-link { color: var(--accent); text-decoration: underline; }
   .cap-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: middle; flex: none; }
   .cap-dot.m-nvidia { background: #7dd3fc; } .cap-dot.m-gitee { background: #a5f3fc; }
-  .cap-dot.m-siliconflow { background: #c4b5fd; } .cap-dot.m-workers-ai { background: #6ee7b7; } .cap-dot.m-zhipu { background: #fbbf24; } .cap-dot.m-spark { background: #60a5fa; } .cap-dot.m-acu { background: #38bdf8; }
+  .cap-dot.m-siliconflow { background: #c4b5fd; } .cap-dot.m-zhipu { background: #fbbf24; } .cap-dot.m-spark { background: #60a5fa; } .cap-dot.m-acu { background: #38bdf8; }
   .cap-type-badge { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: var(--btn-bg); color: var(--muted); border: 1px solid var(--border); white-space: nowrap; }
   .cap-type-badge.t-vision { color: #4f86f7; } .cap-type-badge.t-embedding { color: #8b5cf6; }
   .cap-type-badge.t-rerank { color: #f59e0b; } .cap-type-badge.t-asr { color: #e879f9; }
@@ -1348,7 +1346,7 @@
   -H <span class="str">"Content-Type: application/json"</span> \
   -H <span class="str">"Authorization: Bearer sk-****"</span> \
   -d <span class="str">'{
-    "model": "zhipu/glm-4-flash",
+    "model": "glm-4-flash",
     "messages": [{"role": "user", "content": "你好，介绍一下自己"}],
     "stream": true
   }'</span></code></pre>
@@ -1361,7 +1359,7 @@ client = OpenAI(
     api_key=<span class="str">"sk-****"</span>,   <span class="tok"># 任意密钥均可；公告见 QQ 频道（pd57362562）</span>
 )
 resp = client.chat.completions.create(
-    model=<span class="str">"zhipu/glm-4-flash"</span>,
+    model=<span class="str">"glm-4-flash"</span>,
     messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"你好"</span>}],
     stream=<span class="kwd">True</span>,
 )
@@ -1374,7 +1372,7 @@ resp = client.chat.completions.create(
   headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
              <span class="str">"Authorization"</span>: <span class="str">"Bearer sk-****"</span> },
   body: JSON.stringify({
-    model: <span class="str">"zhipu/glm-4-flash"</span>,
+    model: <span class="str">"glm-4-flash"</span>,
     messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"你好"</span> }],
     stream: <span class="kwd">true</span>,
   }),
@@ -1408,14 +1406,14 @@ resp = client.chat.completions.create(
     </nav>
     <div class="hub-pane" data-pane="models">
     <p class="hub-desc">以下模型由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火与官方自营平台提供，点击「复制」即可获取模型 ID，填入客户端使用。</p>
-    <div class="acu-models-banner" data-copy-text="acu/deepseek-v4-flash" title="点击复制模型 ID">
+    <div class="acu-models-banner" data-copy-text="deepseek-v4-flash" title="点击复制模型 ID">
       <div class="mb-top">
         <div class="mb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26 6.86.63-5.2 4.55 1.56 6.71L12 16.9 5.88 20.15l1.56-6.71-5.2-4.55 6.86-.63z"/></svg></div>
         <span class="mb-badge">官方自营 · 社区共同赞助</span>
       </div>
       <div class="mb-main">
         <b class="mb-title">官方自营旗舰 · DeepSeek V4 Flash</b>
-        <div class="mb-id"><code>acu/deepseek-v4-flash</code><span class="mb-copy-hint">点击复制</span></div>
+        <div class="mb-id"><code>deepseek-v4-flash</code><span class="mb-copy-hint">点击复制</span></div>
       </div>
       <p class="mb-desc">由 AQUA 全体用户与热心伙伴共同出资、<b>官方团队亲自运营</b> 的自营通道，不走第三方中转，长期稳定、完全免费。</p>
       <div class="mb-meta">
@@ -1441,7 +1439,6 @@ resp = client.chat.completions.create(
         <button class="pill" data-platform="nvidia">Nvidia NIM</button>
         <button class="pill" data-platform="gitee">Gitee AI</button>
         <button class="pill" data-platform="siliconflow">SiliconFlow</button>
-        <button class="pill" data-platform="workers-ai">Workers AI</button>
         <button class="pill" data-platform="zhipu">智谱 GLM</button>
         <button class="pill" data-platform="spark">讯飞星火</button>
         <button class="pill" data-platform="acu">官方自营</button>
@@ -1538,15 +1535,15 @@ resp = client.chat.completions.create(
         <h3>API 是什么？——一家「自动点餐」的餐厅</h3>
         <p class="desc">想象一家餐厅：<b>你（你的程序）</b>写好一份<b>点菜单（请求）</b>递给<b>服务员（API）</b>，服务员把单子送进<b>后厨（AI 模型）</b>，做好菜再把<b>结果（回复）</b>端出来。你不需要知道后厨怎么炒的——会递单子、能接菜，就够了。<b>API 就是这套「递单子 → 出菜」的规矩</b>，大家按同一个规矩来，程序之间就能互相使唤。</p>
         <h3>API 网关是什么？——前台总服务台</h3>
-        <p class="desc">AQUA 就是那个前台。后面有十几家后厨（Nvidia、智谱、SiliconFlow、官方自营……几十个模型），但你只跟前台一个窗口打交道：<b>报一个菜名（模型 ID），前台自动转给对应的后厨</b>。菜名在前缀里就写明了是哪家的——<code>zhipu/</code> 开头是智谱、<code>acu/</code> 开头是官方自营、<code>workers-ai/</code> 开头是 Workers AI，就像「川菜馆的麻婆豆腐」和「粤菜馆的虾饺」。</p>
+        <p class="desc">AQUA 就是那个前台。后面有十几家后厨（Nvidia、智谱、SiliconFlow、官方自营……几十个模型），但你只跟前台一个窗口打交道：<b>报一个菜名（模型 ID），前台自动转给对应的后厨</b>。菜名全部小写、不带商家前缀（比如 <code>glm-4-flash</code>、<code>qwen3-8b</code>），前台拿着菜名查自己的「菜单目录」，就知道该送往哪家后厨。</p>
         <h3>API Key（密钥）是什么？——一张随便领的门票</h3>
         <p class="desc">大部分网站的 API Key 像<b>演唱会门票</b>：要实名申请、要花钱、丢了要补办。而 AQUA 是开放模式，Key 就是一张<b>随便领的门票</b>：<b>你自己随手编一个就行</b>（比如 <code>sk-my-cat-123</code>），填什么都能进门——<b>不固定、不变更、不用申请、更不用来问任何人</b>。唯一的要求：别空着。</p>
         <h3>一次调用的完整旅程</h3>
         <pre><code>你的程序                          AQUA 网关                        AI 模型（后厨）
    │                                 │                                │
    │  ① 递单子：带密钥的 HTTP 请求     │                                │
-   │  「模型 acu/deepseek-v4-flash，   │  ② 看菜名找后厨                 │
-   │   用户问：你好」  ───────────────►│  acu/ 前缀 → 官方自营后厨 ─────►│  ③ 思考并作答
+   │  「模型 deepseek-v4-flash，   │  ② 看菜名找后厨                 │
+   │   用户问：你好」  ───────────────►│  查目录 → 官方自营后厨 ────────►│  ③ 思考并作答
    │                                 │                                │
    │  ④ 端菜：JSON 回复               │  ◄─────────────  原样转交        │
    │  「你好！很高兴见到你」 ◄─────────│                                │
@@ -1568,7 +1565,7 @@ resp = client.chat.completions.create(
         <pre><button class="btn" data-copy-from="code-quick-curl">复制</button><code id="code-quick-curl"><span class="kwd">curl</span> https://api.ltzy.top/v1/chat/completions \
   -H <span class="str">"Content-Type: application/json"</span> \
   -H <span class="str">"Authorization: Bearer sk-hello-aqua"</span> \
-  -d <span class="str">'{"model": "zhipu/glm-4-flash", "messages": [{"role": "user", "content": "用一句话介绍你自己"}]}'</span></code></pre>
+  -d <span class="str">'{"model": "glm-4-flash", "messages": [{"role": "user", "content": "用一句话介绍你自己"}]}'</span></code></pre>
         <p class="desc"><b>方式二：Python</b>（先 <code>pip install openai</code>）：</p>
         <pre><button class="btn" data-copy-from="code-quick-py">复制</button><code id="code-quick-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
 
@@ -1577,7 +1574,7 @@ client = OpenAI(
     base_url=<span class="str">"https://api.ltzy.top/v1"</span>,                   <span class="tok"># 注意结尾带 /v1</span>
 )
 r = client.chat.completions.create(
-    model=<span class="str">"zhipu/glm-4-flash"</span>,                            <span class="tok"># 去模型中心随便抄一个</span>
+    model=<span class="str">"glm-4-flash"</span>,                            <span class="tok"># 去模型中心随便抄一个</span>
     messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"用一句话介绍你自己"</span>}],
 )
 <span class="kwd">print</span>(r.choices[<span class="tok">0</span>].message.content)                       <span class="tok"># 打印 AI 的回答</span></code></pre>
@@ -1589,14 +1586,14 @@ r = client.chat.completions.create(
   baseURL: <span class="str">"https://api.ltzy.top/v1"</span>,                     <span class="tok">// 结尾带 /v1</span>
 });
 <span class="kwd">const</span> r = <span class="kwd">await</span> client.chat.completions.create({
-  model: <span class="str">"zhipu/glm-4-flash"</span>,
+  model: <span class="str">"glm-4-flash"</span>,
   messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"用一句话介绍你自己"</span> }],
 });
 console.log(r.choices[<span class="tok">0</span>].message.content);</code></pre>
         <h3>第 3 步：看懂返回结果（每个字段是什么）</h3>
         <pre><code>{
   <span class="str">"id"</span>: <span class="str">"chatcmpl-xxxx"</span>,          <span class="tok">// 这次对话的编号（流水号，出问题反馈时报它）</span>
-  <span class="str">"model"</span>: <span class="str">"zhipu/glm-4-flash"</span>,   <span class="tok">// 实际干活的模型</span>
+  <span class="str">"model"</span>: <span class="str">"glm-4-flash"</span>,   <span class="tok">// 实际干活的模型</span>
   <span class="str">"choices"</span>: [{                    <span class="tok">// 回答在这里（数组，一般只取第 0 个）</span>
     <span class="str">"message"</span>: {
       <span class="str">"role"</span>: <span class="str">"assistant"</span>,         <span class="tok">// 说话的人是 AI</span>
@@ -1649,7 +1646,7 @@ console.log(r.choices[<span class="tok">0</span>].message.content);</code></pre>
         <div class="md-table-wrap"><table class="md-table">
           <thead><tr><th>参数</th><th>必填</th><th>默认</th><th>大白话</th></tr></thead>
           <tbody>
-            <tr><td><code>model</code></td><td>必填</td><td>—</td><td>点哪个「厨师」做菜，如 <code>acu/deepseek-v4-flash</code></td></tr>
+            <tr><td><code>model</code></td><td>必填</td><td>—</td><td>点哪个「厨师」做菜，如 <code>deepseek-v4-flash</code></td></tr>
             <tr><td><code>messages</code></td><td>必填</td><td>—</td><td>聊天记录本（见上方词典），至少一条</td></tr>
             <tr><td><code>temperature</code></td><td>可选</td><td>1</td><td>创造力旋钮 0~2，代码/数学用 0，聊天用 0.7</td></tr>
             <tr><td><code>max_tokens</code></td><td>可选</td><td>模型上限</td><td>回答字数上限，防止小作文</td></tr>
@@ -1667,7 +1664,7 @@ messages = [
   {<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="str">"列表像一个能装任何东西的收纳盒…"</span>}, <span class="tok"># 第 1 答（也要带上！）</span>
   {<span class="str">"role"</span>: <span class="str">"user"</span>,     <span class="str">"content"</span>: <span class="str">"那字典呢？"</span>}                    <span class="tok"># 第 2 问</span>
 ]
-r = client.chat.completions.create(model=<span class="str">"zhipu/glm-4-flash"</span>, messages=messages)</code></pre>
+r = client.chat.completions.create(model=<span class="str">"glm-4-flash"</span>, messages=messages)</code></pre>
         <ul class="tips">
           <li><b>AI 回答「失忆」了？</b>九成是没把历史 messages 带回去。</li>
           <li>记录太长会超出上下文窗口——常规做法：只带<b>最近 10~20 条</b>，或把更早的内容总结成一条。</li>
@@ -1677,7 +1674,7 @@ r = client.chat.completions.create(model=<span class="str">"zhipu/glm-4-flash"</
         <p class="desc">请求里加 <code>"stream": true</code>，服务器就会通过 SSE 小水管一段段推送。每一段都是一个标准 JSON（<code>data: {...}</code>），你把 <code>choices[0].delta.content</code> 拼接到界面上即可：</p>
         <pre><button class="btn" data-copy-from="code-stream-py">复制</button><code id="code-stream-py"><span class="tok"># Python：一行开启流式</span>
 stream = client.chat.completions.create(
-    model=<span class="str">"zhipu/glm-4-flash"</span>,
+    model=<span class="str">"glm-4-flash"</span>,
     messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"讲个冷笑话"</span>}],
     stream=<span class="kwd">True</span>,                          <span class="tok"># ← 打字机开关</span>
 )
@@ -1688,7 +1685,7 @@ stream = client.chat.completions.create(
 <span class="kwd">const</span> res = <span class="kwd">await</span> fetch(<span class="str">"https://api.ltzy.top/v1/chat/completions"</span>, {
   method: <span class="str">"POST"</span>,
   headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>, <span class="str">"Authorization"</span>: <span class="str">"Bearer sk-anything"</span> },
-  body: JSON.stringify({ model: <span class="str">"zhipu/glm-4-flash"</span>, stream: <span class="kwd">true</span>,
+  body: JSON.stringify({ model: <span class="str">"glm-4-flash"</span>, stream: <span class="kwd">true</span>,
     messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"讲个冷笑话"</span> }] }),
 });
 <span class="kwd">const</span> reader = res.body.getReader(), dec = <span class="kwd">new</span> TextDecoder();
@@ -1713,11 +1710,11 @@ console.log(full);</code></pre>
 
       <div class="api-card api-anchor">
         <h2><span class="api-method">GET</span><span class="api-endpoint">/v1/models</span></h2>
-        <p class="desc">获取可用模型列表。返回 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、官方自营与 Workers AI 的全部模型。</p>
+        <p class="desc">获取可用模型列表。返回 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火与官方自营的全部模型。</p>
         <h3>响应结构</h3>
         <pre><button class="btn" data-copy-from="code-api-models-resp">复制</button><code id="code-api-models-resp">{<span class="str">"object"</span>: <span class="str">"list"</span>,
   <span class="str">"data"</span>: [{
-    <span class="str">"id"</span>: <span class="str">"zhipu/glm-4-flash"</span>,
+    <span class="str">"id"</span>: <span class="str">"glm-4-flash"</span>,
     <span class="str">"object"</span>: <span class="str">"model"</span>,
     <span class="str">"owned_by"</span>: <span class="str">"zhipu"</span>
   }]}</code></pre>
@@ -1730,7 +1727,7 @@ console.log(full);</code></pre>
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/chat/completions</span></h2>
         <p class="desc">对话补全，支持流式（SSE）。根据填入的模型 ID 自动路由到对应上游。</p>
         <h3>请求体</h3>
-        <pre><button class="btn" data-copy-from="code-api-chat-body">复制</button><code id="code-api-chat-body">{<span class="str">"model"</span>: <span class="str">"zhipu/glm-4-flash"</span>,
+        <pre><button class="btn" data-copy-from="code-api-chat-body">复制</button><code id="code-api-chat-body">{<span class="str">"model"</span>: <span class="str">"glm-4-flash"</span>,
   <span class="str">"messages"</span>: [
     {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"你是 AQUA 助手"</span>},
     {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"你好"</span>}
@@ -1742,17 +1739,17 @@ console.log(full);</code></pre>
         <pre><button class="btn" data-copy-from="code-api-chat-py">复制</button><code id="code-api-chat-py"><span class="kwd">from</span> openai <span class="kwd">import</span> OpenAI
 client = OpenAI(api_key=<span class="str">"sk-****"</span>, base_url=<span class="str">"https://api.ltzy.top/v1"</span>)
 r = client.chat.completions.create(
-  model=<span class="str">"zhipu/glm-4-flash"</span>,
+  model=<span class="str">"glm-4-flash"</span>,
   messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"你好"</span>}])
 print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       </div>
 
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/embeddings</span></h2>
-        <p class="desc">向量化。向量模型（如 BAAI/bge-m3）由 Gitee AI / SiliconFlow 提供。</p>
+        <p class="desc">向量化。向量模型（如 bge-m3）由 Gitee AI / SiliconFlow 提供。</p>
         <pre><button class="btn" data-copy-from="code-api-emb">复制</button><code id="code-api-emb"><span class="kwd">curl</span> https://api.ltzy.top/v1/embeddings \
   -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"model": "BAAI/bge-m3", "input": "AQUA 网关"}'</span></code></pre>
+  -d <span class="str">'{"model": "bge-m3", "input": "AQUA 网关"}'</span></code></pre>
       </div>
 
       <div class="api-card api-anchor">
@@ -1765,10 +1762,10 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
 
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/audio/transcriptions</span></h2>
-        <p class="desc">语音识别（ASR）。使用 multipart/form-data 上传音频文件，内容类型透传；支持 GLM-ASR、SenseVoiceSmall 等。</p>
+        <p class="desc">语音识别（ASR）。使用 multipart/form-data 上传音频文件，内容类型透传；支持 glm-asr、sensevoice-small 等。</p>
         <pre><button class="btn" data-copy-from="code-api-asr">复制</button><code id="code-api-asr"><span class="kwd">curl</span> https://api.ltzy.top/v1/audio/transcriptions \
   -F <span class="str">"file=@audio.wav"</span> \
-  -F <span class="str">"model=GLM-ASR"</span></code></pre>
+  -F <span class="str">"model=glm-asr"</span></code></pre>
       </div>
 
       <div class="api-card api-anchor">
@@ -1776,31 +1773,31 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         <p class="desc">语音合成（TTS）。部分 TTS 模型的文本合成能力取决于上游平台；可携带 prompt_audio / prompt_audio_url 参考音频（语音克隆类模型）。</p>
         <pre><button class="btn" data-copy-from="code-api-tts">复制</button><code id="code-api-tts"><span class="kwd">curl</span> https://api.ltzy.top/v1/audio/speech \
   -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"model": "Spark-TTS-0.5B", "input": "你好，欢迎使用 AQUA"}'</span></code></pre>
+  -d <span class="str">'{"model": "spark-tts-0.5b", "input": "你好，欢迎使用 AQUA"}'</span></code></pre>
       </div>
 
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/moderations</span></h2>
-        <p class="desc">内容安全检测。支持 Qwen3Guard-Gen-0.6B、nonescape-v0、nsfw-classifier 等风控模型。</p>
+        <p class="desc">内容安全检测。支持 qwen3guard-gen-0.6b、nonescape-v0、nsfw-classifier 等风控模型。</p>
         <pre><button class="btn" data-copy-from="code-api-mod">复制</button><code id="code-api-mod"><span class="kwd">curl</span> https://api.ltzy.top/v1/moderations \
   -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"model": "Qwen3Guard-Gen-0.6B", "input": "待检测文本"}'</span></code></pre>
+  -d <span class="str">'{"model": "qwen3guard-gen-0.6b", "input": "待检测文本"}'</span></code></pre>
       </div>
 
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/images/generations</span></h2>
-        <p class="desc">文生图。由智谱 CogView 系列免费提供，模型 ID 以 <code>zhipu/cogview-</code> 开头（如 <code>zhipu/cogview-3-flash</code>）。</p>
+        <p class="desc">文生图。由智谱 CogView 系列免费提供，模型 ID 如 <code>cogview-3-flash</code>。</p>
         <pre><button class="btn" data-copy-from="code-api-img">复制</button><code id="code-api-img"><span class="kwd">curl</span> https://api.ltzy.top/v1/images/generations \
   -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"model": "zhipu/cogview-3-flash", "prompt": "一只坐在沙发上的橘猫", "size": "1024x1024"}'</span></code></pre>
+  -d <span class="str">'{"model": "cogview-3-flash", "prompt": "一只坐在沙发上的橘猫", "size": "1024x1024"}'</span></code></pre>
       </div>
 
       <div class="api-card api-anchor">
         <h2><span class="api-method">POST</span><span class="api-endpoint">/v1/videos/generations</span></h2>
-        <p class="desc">文生视频。由智谱 CogVideoX 免费提供（如 <code>zhipu/cogvideox-flash</code>）。视频生成耗时较长，客户端超时建议设置 5 分钟以上。</p>
+        <p class="desc">文生视频。由智谱 CogVideoX 免费提供（如 <code>cogvideox-flash</code>）。视频生成耗时较长，客户端超时建议设置 5 分钟以上。</p>
         <pre><button class="btn" data-copy-from="code-api-vid">复制</button><code id="code-api-vid"><span class="kwd">curl</span> https://api.ltzy.top/v1/videos/generations \
   -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"model": "zhipu/cogvideox-flash", "prompt": "一只小狗在草地上奔跑"}'</span></code></pre>
+  -d <span class="str">'{"model": "cogvideox-flash", "prompt": "一只小狗在草地上奔跑"}'</span></code></pre>
       </div>
 
       <div class="api-card api-anchor">
@@ -1821,11 +1818,10 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       <div class="api-card api-anchor">
         <h2>特殊模型说明</h2>
         <ul class="tips">
-          <li><b>Auto 路由</b>：填入 <code>auto</code> 或 <code>acu/auto</code>，网关自动从 Nvidia 候选池随机命中一个主流模型。</li>
-          <li><b>Workers AI</b>：模型 ID 为 <code>workers-ai/&#123;alias&#125;</code>（如 <code>workers-ai/llama-3.1-8b</code>），有日额度限制，超出自动返回 429。</li>
-          <li><b>智谱 GLM</b>：模型 ID 为 <code>zhipu/&#123;model&#125;</code>（如 <code>zhipu/glm-4-flash</code>），含 CogView 绘图 / CogVideo 视频，同样免费。</li>
-          <li><b>讯飞星火</b>：模型 ID 为 <code>spark/&#123;model&#125;</code>（如 <code>spark/spark-lite</code>），由科大讯飞免费提供。</li>
-          <li><b>官方自营</b>：模型 ID 为 <code>acu/&#123;model&#125;</code>（如 <code>acu/deepseek-v4-flash</code>），由 AQUA 官方自营旗舰通道提供，长期服务、稳定可靠。</li>
+          <li><b>Auto 路由</b>：填入 <code>auto</code>（旧写法 <code>acu/auto-models</code> 仍兼容），网关自动从 Nvidia 候选池随机命中一个主流模型。</li>
+          <li><b>智谱 GLM</b>：模型 ID 如 <code>glm-4-flash</code>（直接用小写短 ID，无需前缀），含 CogView 绘图 / CogVideo 视频，同样免费。</li>
+          <li><b>讯飞星火</b>：模型 ID 如 <code>spark-lite</code>，由科大讯飞免费提供。</li>
+          <li><b>官方自营</b>：模型 ID 如 <code>deepseek-v4-flash</code>，由 AQUA 官方自营旗舰通道提供，长期服务、稳定可靠。</li>
           <li><b>自营排队</b>：上游并发有限（全局 10 并发），高峰期会自动排队等待（先到先得，最长约 15 秒）；排队超时会返回 429 提示，请稍后重试，不要重复提交。</li>
           <li><b>非标准端点</b>：embedding / rerank / asr / tts 等特殊模型已适配为标准 OpenAI SDK 端点，可直接用官方 SDK 调用。</li>
           <li><b>任意密钥可用</b>：本站为开放模式，任意非空密钥均可调用（如 <code>sk-****</code>，中英文均可）——密钥不固定、不变更，填任何东西都会通过，<b>无需申请、不用来问密钥</b>。大版本更新与公告在 QQ 频道（频道号 pd57362562）通知。</li>
@@ -1857,7 +1853,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
             <tr><td><code>UNAUTHORIZED</code></td><td>401</td><td>密钥被拒（仅指定密钥模式；本站默认开放模式任意密钥可用）</td></tr>
             <tr><td><code>MODEL_NOT_FOUND</code></td><td>404</td><td>模型 ID 不在目录中（GET /v1/models 可查）</td></tr>
             <tr><td><code>MODEL_RETIRED</code></td><td>410</td><td>模型已在上游永久下线，请更换模型</td></tr>
-            <tr><td><code>QUOTA_EXHAUSTED</code></td><td>429</td><td>Workers AI 当日免费额度用尽，每天 00:00 UTC 自动重置</td></tr>
+            <tr><td><code>QUOTA_EXHAUSTED</code></td><td>429</td><td>上游通道当日免费额度用尽，次日自动重置</td></tr>
             <tr><td><code>RATE_LIMITED</code></td><td>429</td><td>上游限流 / 模型被临时封锁，稍后重试或换模型</td></tr>
             <tr><td><code>MODEL_BLOCKED</code></td><td>429</td><td>该模型在上游被封锁（3+ 密钥无权限），约 10 分钟自动恢复</td></tr>
             <tr><td><code>MODEL_UNAVAILABLE</code></td><td>502</td><td>模型在上游已下线或不存在，请更换模型</td></tr>
@@ -1876,7 +1872,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <thead><tr><th>status</th><th>含义</th><th>处理建议</th></tr></thead>
           <tbody>
             <tr><td>（无）</td><td>正常可用</td><td>直接调用</td></tr>
-            <tr><td><code>exhausted</code></td><td>Workers AI 今日额度已用尽</td><td>等待每天 00:00 UTC 自动重置，或切换其他平台模型</td></tr>
+            <tr><td><code>exhausted</code></td><td>该模型今日免费额度已用尽</td><td>等待额度自动重置，或切换其他模型</td></tr>
             <tr><td><code>unavailable</code></td><td>模型在上游被封锁（3+ 密钥无访问权限）</td><td>约 10 分钟后自动恢复，期间可先切换其他模型</td></tr>
           </tbody>
         </table></div>
@@ -1913,7 +1909,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <tbody>
             <tr><td>接口地址<br>（API Host / Base URL）</td><td><code>https://api.ltzy.top</code></td><td><b>注意：有的软件要带 <code>/v1</code>，有的不带</b>——规则见下方「翻车对照表」第 1 条</td></tr>
             <tr><td>API Key</td><td>随便编一个，如 <code>sk-my-key</code></td><td>不能为空；填什么都能过</td></tr>
-            <tr><td>模型（Model）</td><td>去「模型中心」抄，如 <code>acu/deepseek-v4-flash</code></td><td>一字不差，区分大小写</td></tr>
+            <tr><td>模型（Model）</td><td>去「模型中心」抄，如 <code>deepseek-v4-flash</code></td><td>一字不差，区分大小写</td></tr>
           </tbody>
         </table></div>
         <h3>常见客户端配置示例</h3>
@@ -1929,7 +1925,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <thead><tr><th>症状</th><th>病因</th><th>处方</th></tr></thead>
           <tbody>
             <tr><td>404 Not Found / 401</td><td>base_url 的 <code>/v1</code> 多了或少了</td><td>OpenAI SDK 类填<b>带 <code>/v1</code></b>（它自己再拼 /chat/completions）；NextChat 等「填域名」类填<b>不带</b>。两种各试一次</td></tr>
-            <tr><td><code>MODEL_NOT_FOUND</code></td><td>模型 ID 抄错（大小写、多空格、前缀漏了）</td><td>去模型中心复制完整 ID，如 <code>zhipu/glm-4-flash</code> 不能只写 <code>glm-4-flash</code></td></tr>
+            <tr><td><code>MODEL_NOT_FOUND</code></td><td>模型 ID 抄错（大小写、多空格、前缀漏了）</td><td>去模型中心复制完整 ID，如 <code>glm-4-flash</code> 不能只写 <code>glm-4-flash</code></td></tr>
             <tr><td>连不上 / 超时</td><td>域名写错、本地网络拦截</td><td>核对 <code>api.ltzy.top</code>；浏览器先开 <code>https://api.ltzy.top/v1/models</code> 能看到 JSON 说明网络通</td></tr>
             <tr><td><code>INVALID_JSON</code></td><td>请求体不是合法 JSON（多了逗号、用了单引号）</td><td>用 JSON 校验器检查；字符串一律双引号</td></tr>
             <tr><td>中文显示乱码</td><td>没按 UTF-8 解码</td><td>响应头是 <code>charset=utf-8</code>；自写代码请用 UTF-8 读流</td></tr>
@@ -1945,9 +1941,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
         <h2>FAQ：新手高频提问</h2>
         <p class="desc">点开看答案。没找到你的问题？QQ 群 1103667832 或频道 pd57362562 随时提问。</p>
         <details><summary><b>密钥到底怎么获取？要申请吗？</b></summary><p class="desc">不用申请。<b>你自己随便编一个就行</b>——比如 <code>sk-my-key</code>、<code>123456</code> 甚至一句中文都可以。开放模式下填任何东西都会通过，密钥不固定、不变更，不需要问任何人。</p></details>
-        <details><summary><b>真的免费吗？有没有隐藏收费？</b></summary><p class="desc">本站所有模型与工具均免费使用，无隐藏收费。个别通道有并发/额度保护（如 Workers AI 日额度、自营通道 10 并发），是为了让所有人都能公平使用，不是收费墙。</p></details>
+        <details><summary><b>真的免费吗？有没有隐藏收费？</b></summary><p class="desc">本站所有模型与工具均免费使用，无隐藏收费。个别通道有并发/额度保护（如部分通道日额度、自营通道 10 并发），是为了让所有人都能公平使用，不是收费墙。</p></details>
         <details><summary><b>有官方 SDK 吗？</b></summary><p class="desc">不需要专门的 SDK——AQUA 完整兼容 OpenAI 协议，<b>直接用 OpenAI 官方 SDK</b>（Python / JS / Go / Java 全平台都有），只改 <code>base_url</code> 和 <code>api_key</code> 两个参数即可（见「三分钟跑通第一条请求」）。</p></details>
-        <details><summary><b>模型这么多，我该用哪个？</b></summary><p class="desc">按场景选：<b>日常聊天</b>→<code>zhipu/glm-4-flash</code> 或 <code>acu/deepseek-v4-flash</code>；<b>写代码</b>→ DeepSeek / Qwen Coder 系列；<b>长文写作</b>→ GLM / Qwen 长文本模型；<b>画图</b>→ <code>zhipu/cogview-3-flash</code>；<b>语音转文字</b>→ <code>GLM-ASR</code>；<b>读文字出语音</b>→ Spark-TTS 系列。选哪个都不亏，自由试。</p></details>
+        <details><summary><b>模型这么多，我该用哪个？</b></summary><p class="desc">按场景选：<b>日常聊天</b>→<code>glm-4-flash</code> 或 <code>deepseek-v4-flash</code>；<b>写代码</b>→ DeepSeek / Qwen Coder 系列；<b>长文写作</b>→ GLM / Qwen 长文本模型；<b>画图</b>→ <code>cogview-3-flash</code>；<b>语音转文字</b>→ <code>glm-asr</code>；<b>读文字出语音</b>→ Spark-TTS 系列。选哪个都不亏，自由试。</p></details>
         <details><summary><b>为什么 AI 不记得上一句说了什么？</b></summary><p class="desc">AI 没有记忆，每次调用都是全新开始。要多轮对话，请把历史聊天记录放进 <code>messages</code> 数组一起传回（详见「对话接口进阶 · 多轮对话」）。</p></details>
         <details><summary><b>报 429 / 排队怎么办？</b></summary><p class="desc">429 = 限流或额度保护，不是封禁。等 10 秒~1 分钟重试；高峰期换其他平台模型；程序里建议加「指数退避」重试（第一次等 1 秒、第二次 2 秒、第三次 4 秒…）。不要连续狂点，那样只会更堵。</p></details>
         <details><summary><b>支持联网搜索 / 文件上传吗？</b></summary><p class="desc">模型本身的能力决定：通用 chat 模型不做实时联网。需要最新信息时，把内容直接粘贴进问题里（RAG 思路：先给资料再提问）。</p></details>
@@ -2175,7 +2171,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
 </div>
 
 <footer>
-  <p>AQUA · <b>ACU 工程系列</b>开源旗舰项目 —— 更多生态链项目（工具、网关、应用）持续开发中，敬请期待 · 数据由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、官方自营与 Workers AI 提供 · 仅用于技术学习与交流</p>
+  <p>AQUA · <b>ACU 工程系列</b>开源旗舰项目 —— 更多生态链项目（工具、网关、应用）持续开发中，敬请期待 · 数据由 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火与官方自营提供 · 仅用于技术学习与交流</p>
   <p style="margin-top:8px;">开源仓库：<a href="https://gitee.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" style="color:var(--accent);">Gitee 仓库 ⭐</a> · <a href="https://github.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" style="color:var(--accent);">GitHub 仓库 ⭐</a>（喜欢就点个 Star）</p>
   <p style="margin-top:8px;">官方社群：<a href="https://qm.qq.com/q/qoe6XbsVge" target="_blank" rel="noopener" style="color:var(--accent);">AQUA 官方交流群 · QQ 群</a>（群号 1103667832） · 公告与密钥动态：<a href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener" style="color:var(--accent);">QQ 频道</a>（频道号 pd57362562）</p>
 </footer>
@@ -2318,53 +2314,44 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   if (cur !== "light" && cur !== "dark") cur = "light";
   setTheme(cur);
   var CHECK_ICON = '<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>已复制';
-  /* 2026-08-30 与网关 MODEL_CATALOG 对齐：仅保留 83 个验证存活模型（离线兜底列表） */
+  /* 2026-08-31 模型 ID 体系变更：取消厂商前缀 + 全小写（与网关 MODEL_CATALOG 对齐，离线兜底列表） */
   var fallbackModels = [
     // ── 官方自营（DeepSeek V4 Flash，AQUA 自营旗舰） ──
-    "acu/deepseek-v4-flash",
-    // ── DeepSeek 官方 ──
-    "deepseek-ai/deepseek-v4-flash-0731", "deepseek-ai/deepseek-v4-pro-0813",
+    "deepseek-v4-flash",
+    // ── DeepSeek 官方（NVIDIA NIM） ──
+    "deepseek-v4-flash-0731", "deepseek-v4-pro-0813",
     // ── Gitee AI（模力方舟） ──
-    "DeepSeek-Prover-V2-7B", "HealthGPT-L14", "HuatuoGPT-o1-7B", "Lingshu-32B",
-    "GLM-4-9B-0414", "glm-4-9b-chat", "Qwen2-7B-Instruct", "internlm3-8b-instruct",
-    "DeepSeek-R1-Distill-Qwen-1.5B", "DeepSeek-R1-Distill-Qwen-7B", "DeepSeek-R1-Distill-Qwen-14B",
-    "Qwen3-0.6B", "Qwen3-4B", "Qwen3-8B",
-    "Qwen3-Embedding-4B", "Qwen3-Reranker-0.6B", "Qwen3-Reranker-4B", "Qwen3Guard-Gen-0.6B",
-    "GLM-ASR", "SenseVoiceSmall", "Spark-TTS-0.5B",
+    "deepseek-prover-v2-7b", "healthgpt-l14", "huatuogpt-o1-7b", "lingshu-32b",
+    "glm-4-9b-0414", "glm-4-9b-chat", "qwen2-7b-instruct", "internlm3-8b-instruct",
+    "deepseek-r1-distill-qwen-1.5b", "deepseek-r1-distill-qwen-7b", "deepseek-r1-distill-qwen-14b",
+    "qwen3-0.6b", "qwen3-4b", "qwen3-8b",
+    "qwen3-embedding-4b", "qwen3-reranker-0.6b", "qwen3-reranker-4b", "qwen3guard-gen-0.6b",
+    "glm-asr", "sensevoice-small", "spark-tts-0.5b",
     "bge-reranker-v2-m3", "bce-reranker-base_v1",
-    "nonescape-v0", "Security-semantic-filtering", "nsfw-classifier", "ip-location",
-    // ── Google ──
-    "google/diffusiongemma-26b-a4b-it", "google/gemma-4-31b-it",
-    // ── Meta ──
-    "meta/llama-3.2-11b-vision-instruct", "meta/llama-3.2-90b-vision-instruct",
-    "meta/llama-guard-4-12b", "meta/muse-glimmer-30b",
-    // ── MiniMax / Mistral / Moonshot ──
-    "minimaxai/minimax-m3", "mistralai/mistral-nemotron", "moonshotai/kimi-k3",
-    // ── Nvidia ──
-    "nvidia/ising-calibration-1.5-31b",
-    "nvidia/llama-3.1-nemoguard-8b-content-safety", "nvidia/llama-3.1-nemoguard-8b-topic-control",
-    "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
-    "nvidia/nemotron-3-nano-30b-a3b", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-    "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3-ultra-550b-a55b",
-    "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b",
-    "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2",
-    // ── OpenAI 开源 ──
-    "openai/gpt-oss-120b", "openai/gpt-oss-20b",
-    // ── Poolside ──
-    "poolside/laguna-xs-2.1",
+    "nonescape-v0", "security-semantic-filtering", "nsfw-classifier", "ip-location",
+    // ── Google / Meta / MiniMax / Mistral / Moonshot / Nvidia / OpenAI / Poolside（NVIDIA NIM） ──
+    "diffusiongemma-26b-a4b-it", "gemma-4-31b-it",
+    "llama-3.2-11b-vision-instruct", "llama-3.2-90b-vision-instruct",
+    "llama-guard-4-12b", "muse-glimmer-30b",
+    "minimax-m3", "mistral-nemotron", "kimi-k3",
+    "ising-calibration-1.5-31b",
+    "llama-3.1-nemoguard-8b-content-safety", "llama-3.1-nemoguard-8b-topic-control",
+    "llama-3.1-nemotron-safety-guard-8b-v3",
+    "nemotron-3-nano-30b-a3b", "nemotron-3-nano-omni-30b-a3b-reasoning",
+    "nemotron-3-super-120b-a12b", "nemotron-3-ultra-550b-a55b",
+    "nemotron-3.5-content-safety", "nemotron-3.5-lightning-30b-a3b",
+    "riva-translate-4b-instruct-v1.1", "riva-translate-4b-instruct-v2",
+    "gpt-oss-120b", "gpt-oss-20b",
+    "laguna-xs-2.1",
     // ── SiliconFlow（硅基流动） ──
-    "BAAI/bge-large-en-v1.5", "BAAI/bge-large-zh-v1.5", "BAAI/bge-m3", "BAAI/bge-reranker-v2-m3",
-    "PaddlePaddle/PaddleOCR-VL-1.5", "THUDM/GLM-4-9B-0414", "THUDM/GLM-Z1-9B-0414", "tencent/Hunyuan-MT-7B",
+    "bge-large-en-v1.5", "bge-large-zh-v1.5", "bge-m3",
+    "paddleocr-vl-1.5", "glm-z1-9b-0414", "hunyuan-mt-7b",
     // ── 讯飞星火（Spark，免费） ──
-    "spark/spark-lite",
-    // ── Workers AI（Cloudflare，有日额度限制） ──
-    "workers-ai/llama-3.2-1b", "workers-ai/llama-3.2-3b", "workers-ai/llama-3.1-8b", "workers-ai/llama-3.3-70b",
-    "workers-ai/mistral-7b", "workers-ai/deepseek-r1-32b", "workers-ai/qwen2.5-coder-32b",
-    "workers-ai/qwq-32b", "workers-ai/gemma-3-12b", "workers-ai/mistral-small-24b", "workers-ai/melotts",
+    "spark-lite",
     // ── 智谱 GLM（免费，含 CogView 绘图 / CogVideo 视频） ──
-    "zhipu/glm-4.7-flash", "zhipu/glm-4-flash-250414", "zhipu/glm-z1-flash", "zhipu/glm-4-flash",
-    "zhipu/glm-4.6v-flash", "zhipu/glm-4v-flash", "zhipu/glm-4.1v-thinking-flash",
-    "zhipu/cogview-3-flash", "zhipu/cogvideox-flash"
+    "glm-4.7-flash", "glm-4-flash-250414", "glm-z1-flash", "glm-4-flash",
+    "glm-4.6v-flash", "glm-4v-flash", "glm-4.1v-thinking-flash",
+    "cogview-3-flash", "cogvideox-flash"
   ];
   var models = [];        // 模型 ID 数组（已排序）
   var modelMeta = {};     // id -> {platform, type}
@@ -2374,70 +2361,57 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   var DS_SUNSET_MS = Date.parse("2026-09-03T20:10:00+08:00");
   function dsRetired() { return Date.now() >= DS_SUNSET_MS; }
   function dsModel(model) {
-    return /^acu\//.test(model) && model.toLowerCase().indexOf("deepseek") !== -1;
+    return model.toLowerCase() === "deepseek-v4-flash";
   }
   function dsMaintenance(model) { return dsModel(model) && dsRetired(); }
   var modelHealth = {};   // id -> {score, total, ok, avg_latency_ms}
   var curPlatform = "all";
   var curType = "all";
 
-  /* ---- 模型分类元数据：平台 + 类型 ---- */
-  var GITEE_IDS = [];
-  var SILICONFLOW_IDS = [];
-  var WORKERS_AI_IDS = [];
-  var ZHIPU_IDS = [];
-  var SPARK_IDS = [];
-  var ACU_IDS = [];
+  /* ---- 模型分类元数据：平台 + 类型（2026-08-31 新 ID 体系：静态平台表 + 类型规则） ---- */
+  var PLATFORM = {
+    "deepseek-v4-flash": "acu",
+    /* Gitee AI */
+    "deepseek-prover-v2-7b": "gitee", "healthgpt-l14": "gitee", "huatuogpt-o1-7b": "gitee", "lingshu-32b": "gitee",
+    "glm-4-9b-0414": "gitee", "glm-4-9b-chat": "gitee", "qwen2-7b-instruct": "gitee", "internlm3-8b-instruct": "gitee",
+    "deepseek-r1-distill-qwen-1.5b": "gitee", "deepseek-r1-distill-qwen-7b": "gitee", "deepseek-r1-distill-qwen-14b": "gitee",
+    "qwen3-0.6b": "gitee", "qwen3-4b": "gitee", "qwen3-8b": "gitee",
+    "qwen3-embedding-4b": "gitee", "qwen3-reranker-0.6b": "gitee", "qwen3-reranker-4b": "gitee", "qwen3guard-gen-0.6b": "gitee",
+    "glm-asr": "gitee", "sensevoice-small": "gitee", "spark-tts-0.5b": "gitee",
+    "bge-reranker-v2-m3": "gitee", "bce-reranker-base_v1": "gitee",
+    "nonescape-v0": "gitee", "security-semantic-filtering": "gitee", "nsfw-classifier": "gitee", "ip-location": "gitee",
+    /* SiliconFlow */
+    "bge-large-en-v1.5": "siliconflow", "bge-large-zh-v1.5": "siliconflow", "bge-m3": "siliconflow",
+    "paddleocr-vl-1.5": "siliconflow", "glm-z1-9b-0414": "siliconflow", "hunyuan-mt-7b": "siliconflow",
+    /* 讯飞 */
+    "spark-lite": "spark",
+    /* 智谱 */
+    "glm-4-flash": "zhipu", "glm-4-flash-250414": "zhipu", "glm-4.1v-thinking-flash": "zhipu", "glm-4.6v-flash": "zhipu",
+    "glm-4.7-flash": "zhipu", "glm-4v-flash": "zhipu", "glm-z1-flash": "zhipu",
+    "cogview-3-flash": "zhipu", "cogvideox-flash": "zhipu"
+    /* 其余（DeepSeek/Google/Meta/MiniMax/Mistral/Moonshot/Nvidia/OpenAI/Poolside 系）→ 兜底 nvidia */
+  };
   var TYPES = {};
   fallbackModels.forEach(function (id) {
-    var l = id.toLowerCase();
-    if (l.indexOf("workers-ai/") === 0) { WORKERS_AI_IDS.push(id); TYPES[id] = "chat"; }
-    else if (l.indexOf("spark/") === 0) { SPARK_IDS.push(id); TYPES[id] = "chat"; }
-    else if (l.indexOf("acu/") === 0) { ACU_IDS.push(id); TYPES[id] = "chat"; }
-    else if (l.indexOf("zhipu/") === 0) {
-      ZHIPU_IDS.push(id);
-      TYPES[id] = (l.indexOf("cogview") !== -1) ? "image"
-        : (l.indexOf("cogvideo") !== -1) ? "video"
-        : (/v-[a-z]/.test(l)) ? "vision" : "chat";
-    }
-    else if (["BAAI/bge-large-en-v1.5","BAAI/bge-large-zh-v1.5","BAAI/bge-m3"].indexOf(id) !== -1) { SILICONFLOW_IDS.push(id); TYPES[id] = "embedding"; }
-    else if (id.indexOf("BAAI/bge-reranker-v2-m3") !== -1) { SILICONFLOW_IDS.push(id); TYPES[id] = "rerank"; }
-    else if (id.indexOf("SenseVoiceSmall") !== -1); // handled below
-    else if (l.indexOf("asr") !== -1 || (/GLM-ASR|SenseVoiceSmall|TeleASR|Qwen3-ASR/.test(id))) { TYPES[id] = "asr"; }
-    else if (id.indexOf("rerank") !== -1 || (/reranker|bce-rerank/.test(id))) { TYPES[id] = "rerank"; }
-    else if (id.indexOf("embed") !== -1 || (/bge-m3|arctic-embed|nv-embed|nv-embedqa/.test(l))) { TYPES[id] = "embedding"; }
+    var l = id; // 新 ID 已全小写
+    if (["bge-large-en-v1.5","bge-large-zh-v1.5","bge-m3","qwen3-embedding-4b"].indexOf(id) !== -1) { TYPES[id] = "embedding"; }
+    else if (l.indexOf("reranker") !== -1 || l.indexOf("rerank") !== -1) { TYPES[id] = "rerank"; }
+    else if (l.indexOf("cogview") !== -1) { TYPES[id] = "image"; }
+    else if (l.indexOf("cogvideo") !== -1) { TYPES[id] = "video"; }
+    else if (/glm-asr|sensevoice|teleasr|qwen3-asr/.test(l)) { TYPES[id] = "asr"; }
+    else if (l.indexOf("tts") !== -1) { TYPES[id] = "tts"; }
+    else if (/v-[a-z]/.test(l)) { TYPES[id] = "vision"; }
     else if (/guard|moderat|nonescape|security|nsfw|reward|nemoguard/.test(l)) { TYPES[id] = "moderation"; }
-    else if (/vision|kosmos|fuyu|paligemma|neva|vila|ocr/.test(l)) { TYPES[id] = "vision"; }
-    else if (/tts/.test(l)) { TYPES[id] = "tts"; }
     else { TYPES[id] = "chat"; }
-  });
-  // 手动补充 Gitee / SiliconFlow 归属
-  GITEE_IDS = fallbackModels.filter(function (id) {
-    return ["HuatuoGPT-o1-7B","Lingshu-32B","DeepSeek-Prover-V2-7B","HealthGPT-L14","GLM-4-9B-0414",
-      "glm-4-9b-chat","Qwen3-0.6B","Qwen3-4B","Qwen3-8B","Qwen2-7B-Instruct","internlm3-8b-instruct",
-      "DeepSeek-R1-Distill-Qwen-1.5B","DeepSeek-R1-Distill-Qwen-7B","DeepSeek-R1-Distill-Qwen-14B",
-      "GLM-ASR","SenseVoiceSmall","Spark-TTS-0.5B","Qwen3-Embedding-4B","Qwen3-Reranker-0.6B",
-      "Qwen3-Reranker-4B","bge-reranker-v2-m3","bce-reranker-base_v1","Qwen3Guard-Gen-0.6B",
-      "nonescape-v0","Security-semantic-filtering","nsfw-classifier","ip-location"].indexOf(id) !== -1;
-  });
-  SILICONFLOW_IDS = fallbackModels.filter(function (id) {
-    return ["BAAI/bge-large-en-v1.5","BAAI/bge-large-zh-v1.5","BAAI/bge-m3","BAAI/bge-reranker-v2-m3",
-      "PaddlePaddle/PaddleOCR-VL-1.5",
-      "tencent/Hunyuan-MT-7B","THUDM/GLM-4-9B-0414","THUDM/GLM-Z1-9B-0414"].indexOf(id) !== -1;
   });
   function classify(id) {
     var l = id.toLowerCase();
-    var platform, type = TYPES[id] || inferType(id) || "chat";
-    if (l.indexOf("workers-ai/") === 0) platform = "workers-ai";
-    else if (l.indexOf("zhipu/") === 0) platform = "zhipu";
-    else if (l.indexOf("spark/") === 0) platform = "spark";
-    else if (l.indexOf("acu/") === 0) platform = "acu";
-    else if (GITEE_IDS.indexOf(id) !== -1) platform = "gitee";
-    else if (SILICONFLOW_IDS.indexOf(id) !== -1) platform = "siliconflow";
-    else platform = "nvidia";
-    // SiliconFlow 中的语音/向量等特殊模型类型修正
-    if (platform === "siliconflow") {
-      if (l.indexOf("asr") !== -1 || /SenseVoiceSmall|TeleASR|Qwen3-ASR/.test(id)) type = "asr";
+    var type = TYPES[id] || inferType(id) || "chat";
+    // 新 ID 体系：静态平台表优先；表外（动态目录/未来新模型）兜底 nvidia
+    var platform = PLATFORM[id];
+    if (!platform) {
+      if (modelMeta[id] && modelMeta[id].platform && PLATFORM[modelMeta[id].platform] === undefined) platform = modelMeta[id].platform;
+      else platform = "nvidia";
     }
     return { platform: platform, type: type };
   }
@@ -2455,7 +2429,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     if (/vision|kosmos|fuyu|paligemma|neva|vila|llama-3\.2-1[19]b/.test(l)) return "vision";
     return "chat";
   }
-  function PLATFORM_LABEL(p) { return { nvidia: "Nvidia", gitee: "Gitee", siliconflow: "SiliconFlow", "workers-ai": "Workers AI", zhipu: "智谱", spark: "讯飞星火", acu: "官方自营" }[p] || p; }
+  function PLATFORM_LABEL(p) { return { nvidia: "Nvidia", gitee: "Gitee", siliconflow: "SiliconFlow", zhipu: "智谱", spark: "讯飞星火", acu: "官方自营" }[p] || p; }
   function hideTag(type) { return type === "chat"; } // 对话不显示标签，精简
 
   /* ============ 模型详情知识库 ============ */
@@ -2690,8 +2664,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     { re: /granite-8b-code/, ctx: "8K", size: "8B", released: "2024-05" },
     { re: /granite-guardian/, ctx: "8K", size: "8B", released: "2024-10" },
     // ── 其他国际模型 ──
-    { re: /01-ai\/yi-large/, ctx: "32K", size: "34B", released: "2024-05" },
-    { re: /adept\/fuyu-8b/, ctx: "16K", size: "8B", released: "2023-10" },
+    { re: /yi-large/, ctx: "32K", size: "34B", released: "2024-05" },
+    { re: /fuyu-8b/, ctx: "16K", size: "8B", released: "2023-10" },
     { re: /jamba-1\.5-large/, ctx: "256K", size: "398B (MoE)", released: "2024-08" },
     { re: /jamba-1\.5-mini/, ctx: "256K", size: "52B (MoE)", released: "2024-08" },
     { re: /sea-lion-7b/, ctx: "3K", size: "7B", released: "2024-02" },
@@ -2757,32 +2731,19 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     { re: /paddleocr-vl/, ctx: "—", size: "—", released: "2024-08" },
     { re: /teleasr|telespeech/, ctx: "30s", size: "—", released: "2024-06" },
     // ── 智谱 GLM ──
-    { re: /zhipu\/glm-4\.7-flash/, ctx: "128K", size: "~10B", released: "2025-06" },
-    { re: /zhipu\/glm-4-flash-250414/, ctx: "128K", size: "~10B", released: "2025-04" },
-    { re: /zhipu\/glm-z1-flash/, ctx: "128K", size: "~10B", released: "2025-01" },
-    { re: /zhipu\/glm-4-flash$/, ctx: "128K", size: "~10B", released: "2024-01" },
-    { re: /zhipu\/glm-4\.6v-flash/, ctx: "32K", size: "~10B", released: "2025-10" },
-    { re: /zhipu\/glm-4v-flash/, ctx: "8K", size: "~9B", released: "2024-07" },
-    { re: /zhipu\/glm-4\.1v-thinking-flash/, ctx: "32K", size: "~10B", released: "2025-02" },
-    { re: /zhipu\/cogview-3-flash/, ctx: "—", size: "—", dims: 0, released: "2024-06" },
-    { re: /zhipu\/cogvideox-flash/, ctx: "—", size: "5B", dims: 0, released: "2024-08" },
+    { re: /glm-4\.7-flash/, ctx: "128K", size: "~10B", released: "2025-06" },
+    { re: /glm-4-flash-250414/, ctx: "128K", size: "~10B", released: "2025-04" },
+    { re: /glm-z1-flash$/, ctx: "128K", size: "~10B", released: "2025-01" },
+    { re: /glm-4-flash$/, ctx: "128K", size: "~10B", released: "2024-01" },
+    { re: /glm-4\.6v-flash/, ctx: "32K", size: "~10B", released: "2025-10" },
+    { re: /glm-4v-flash/, ctx: "8K", size: "~9B", released: "2024-07" },
+    { re: /glm-4\.1v-thinking-flash/, ctx: "32K", size: "~10B", released: "2025-02" },
+    { re: /cogview-3-flash/, ctx: "—", size: "—", dims: 0, released: "2024-06" },
+    { re: /cogvideox-flash/, ctx: "—", size: "5B", dims: 0, released: "2024-08" },
     // ── 讯飞星火（Spark）──
-    { re: /spark\/spark-lite/, ctx: "8K", size: "—", released: "2023-05" },
+    { re: /spark-lite/, ctx: "8K", size: "—", released: "2023-05" },
     // ── 官方自营（DeepSeek V4 Flash）──
-    { re: /acu\/deepseek-v4-flash/, ctx: "128K", size: "—", released: "2025-07" },
-    // ── Cloudflare Workers AI ──
-    { re: /workers-ai\/llama-3\.1-8b/, ctx: "128K", size: "8B", released: "2024-07" },
-    { re: /workers-ai\/llama-3\.3-70b/, ctx: "128K", size: "70B", released: "2024-12" },
-    { re: /workers-ai\/llama-3\.2-1b/, ctx: "128K", size: "1B", released: "2024-09" },
-    { re: /workers-ai\/llama-3\.2-3b/, ctx: "128K", size: "3B", released: "2024-09" },
-    { re: /workers-ai\/mistral-7b/, ctx: "32K", size: "7B", released: "2023-09" },
-    { re: /workers-ai\/qwen1\.5-7b/, ctx: "32K", size: "7B", released: "2024-02" },
-    { re: /workers-ai\/qwq-32b/, ctx: "32K", size: "32B", released: "2024-11" },
-    { re: /workers-ai\/deepseek-r1-32b/, ctx: "32K", size: "32B", released: "2025-01" },
-    { re: /workers-ai\/qwen2\.5-coder-32b/, ctx: "32K", size: "32B", released: "2024-11" },
-    { re: /workers-ai\/gemma-3-12b/, ctx: "128K", size: "12B", released: "2025-02" },
-    { re: /workers-ai\/mistral-small/, ctx: "96K", size: "24B", released: "2025-03" },
-    { re: /workers-ai\/melotts/, ctx: "—", size: "0.6B", released: "2024-06" }
+    { re: /deepseek-v4-flash$/, ctx: "128K", size: "—", released: "2025-07" }
   ];
   function modelSpec(id) {
     for (var i = 0; i < MODEL_SPECS.length; i++) {
@@ -2792,8 +2753,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   }
   // 热门模型定制描述（按模型名关键词匹配，先匹配先生效）
   var MODEL_NOTES = [
-    { match: /deepseek-ai\/deepseek-v4/, name: "DeepSeek-V4", desc: "DeepSeek 最新旗舰模型，兼顾推理能力与速度，支持超大上下文，中文表现优秀。" },
-    { match: /deepseek-r1|deepseek-ai\/deepseek-r1/, name: "DeepSeek-R1", desc: "DeepSeek 深度推理模型，擅长数学、代码、逻辑推理，输出会展示思考过程。" },
+    { match: /deepseek-v4-pro|deepseek-v4-flash-0/, name: "DeepSeek-V4", desc: "DeepSeek 最新旗舰模型，兼顾推理能力与速度，支持超大上下文，中文表现优秀。" },
+    { match: /deepseek-r1/, name: "DeepSeek-R1", desc: "DeepSeek 深度推理模型，擅长数学、代码、逻辑推理，输出会展示思考过程。" },
     { match: /deepseek-coder/, name: "DeepSeek-Coder", desc: "代码专项模型，精通多种编程语言，适合代码生成、补全与解释。" },
     { match: /llama-3\.3-70b-instruct$/, name: "Llama 3.3 70B", desc: "Meta Llama 3.3 系列，70B 参数旗舰对话模型，继承 405B 能力但更经济。" },
     { match: /llama-3\.3/, name: "Llama 3.3", desc: "Meta Llama 3.3 系列，70B 参数旗舰对话模型，均衡的较强能力与效率。" },
@@ -2806,7 +2767,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     { match: /mistral-large/, name: "Mistral Large", desc: "Mistral 高端旗舰，多语言能力强，适合复杂推理任务。" },
     { match: /mixtral/, name: "Mixtral", desc: "Mistral 多专家稀疏模型（MoE），推理高效。" },
     { match: /qwen|qwen2\.5|qwq/, name: "通义千问 Qwen", desc: "阿里巴巴开源系列，中文能力出色的全能模型。" },
-    { match: /chatglm|glm-4|glm-z|thudm/, name: "智谱 GLM", desc: "智谱 AI 开源对话模型，中文优化，指令跟随稳定。" },
+    { match: /chatglm|glm-4|glm-z/, name: "智谱 GLM", desc: "智谱 AI 开源对话模型，中文优化，指令跟随稳定。" },
     { match: /spark-lite/, name: "讯飞星火 Spark", desc: "科大讯飞星火认知大模型 Lite 版，轻量快速，中文对话流畅，适合日常问答与轻量任务。" },
     { match: /acu\/deepseek-v4-flash/, name: "DeepSeek V4 Flash（官方自营）", desc: "AQUA 官方自营旗舰模型，极致响应速度与中文逻辑处理能力，专为实时交互与高频调用优化，长期服务、稳定可靠。" },
     { match: /bge-m3|bge-large|bge-/, name: "BGE 向量系列", desc: "BAAI 开源向量/重排模型，检索领域标杆，中文/多语检索表现优秀。" },
@@ -2829,10 +2790,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var params = base.params.slice();
     var limits = base.limits.slice();
     // 平台特定限制
-    if (meta.platform === "workers-ai") {
-      desc += "（由 Cloudflare Workers AI 提供）";
-      limits.unshift("Workers AI 有日额度限制，每日 00:00 UTC 重置", "额度用尽后该平台模型统一返回 429");
-    } else if (meta.platform === "zhipu") {
+    if (meta.platform === "zhipu") {
       limits.unshift("由智谱开放平台免费提供");
     } else if (meta.platform === "spark") {
       limits.unshift("由讯飞星火（Spark）免费提供");
@@ -2913,7 +2871,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     });
   }
   /* apiChat 失败自动回退：主模型失败后换备用健康模型重试一次（工具/游戏调用成功率保障） */
-  var APICHAT_FALLBACKS = ["acu/deepseek-v4-flash", "Qwen3-8B", "Qwen3-4B", "openai/gpt-oss-120b", "GLM-4-9B-0414", "openai/gpt-oss-20b"];
+  var APICHAT_FALLBACKS = ["deepseek-v4-flash", "qwen3-8b", "qwen3-4b", "gpt-oss-120b", "glm-4-9b-0414", "gpt-oss-20b"];
   function apiChatFallback(failed) {
     var pool = models.filter(pgModelOk);
     for (var i = 0; i < APICHAT_FALLBACKS.length; i++) {
@@ -3788,11 +3746,11 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   /* 工具/游戏默认对话模型：按优先级选第一个在线的（acu 自营优先，健康分兜底） */
   function toolChatModel() {
     var chatModels = models.filter(pgModelOk);
-    var prefer = ["acu/deepseek-v4-flash"];
+    var prefer = ["deepseek-v4-flash"];
     for (var i = 0; i < prefer.length; i++) {
       if (chatModels.indexOf(prefer[i]) !== -1) return prefer[i];
     }
-    return chatModels[0] || "acu/deepseek-v4-flash";
+    return chatModels[0] || "deepseek-v4-flash";
   }
   function renderToolTranslate(el) {
     var langOpts = TOOL_LANGS.map(function (l) { return '<option value="' + esc(l) + '">' + esc(l) + "</option>"; }).join("");
@@ -3828,11 +3786,11 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   }
 
   /* ---- 工具：文本内容审核 ---- */
-  var TOOL_MOD_MODEL = "Security-semantic-filtering";  // 上游实测唯一支持文本审核的模型
+  var TOOL_MOD_MODEL = "security-semantic-filtering";  // 上游实测唯一支持文本审核的模型
   function renderToolModeration(el) {
     el.innerHTML = toolShell("文本内容审核",
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',
-      "/v1/moderations · Security-semantic-filtering",
+      "/v1/moderations · security-semantic-filtering",
       '<p class="tool-intro">输入任意文本，检测是否包含涉政、色情、辱骂、暴力等风险内容；AI 会进一步解释风险点并给出改写建议。</p>' +
       '<div class="tool-io"><textarea id="mod-input" rows="5" placeholder="粘贴待检测的文本内容…"></textarea>' +
       '<div class="tool-btns"><button class="btn tool-run" id="mod-run">开始检测</button><button class="btn tool-ai" id="mod-ai" style="display:none;">AI 解读</button></div></div>' +
@@ -4042,7 +4000,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       var spec = modelSpec(m) || {};
       var c = capForType(meta.type);
       var st = modelStatus[m];
-      var stTag = m.toLowerCase() === "acu/auto-models" ? '<span class="cap-card-flag flag-acu">⚡ 智能路由</span>'
+      var stTag = m.toLowerCase() === "auto" ? '<span class="cap-card-flag flag-acu">⚡ 智能路由</span>'
         : dsMaintenance(m) ? '<span class="cap-card-flag flag-ex">维护中</span>'
         : st === "exhausted" ? '<span class="cap-card-flag flag-ex">耗尽</span>'
         : st === "unavailable" ? '<span class="cap-card-flag flag-un">不可用</span>' : "";
@@ -4138,11 +4096,11 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     sel.innerHTML = list.map(function (m) {
       return '<option value="' + esc(m) + '">' + esc(m) + (modelHealth[m] ? " · " + modelHealth[m].score + "分" : "") + "</option>";
     }).join("");
-    // 保持原选择；否则默认 acu/Auto-models（智能路由）> acu/deepseek-v4-flash（未到下线时刻）> 第一个健康分最高者 > 第一项
+    // 保持原选择；否则默认 auto（智能路由）> deepseek-v4-flash（未到下线时刻）> 第一个健康分最高者 > 第一项
     if (cur && list.indexOf(cur) !== -1) { sel.value = cur; return; }
-    var autoIdx = list.indexOf("acu/Auto-models");
+    var autoIdx = list.indexOf("auto");
     if (autoIdx !== -1) { sel.selectedIndex = autoIdx; return; }
-    var prefer = (!dsRetired()) ? list.indexOf("acu/deepseek-v4-flash") : -1;
+    var prefer = (!dsRetired()) ? list.indexOf("deepseek-v4-flash") : -1;
     if (prefer !== -1) { sel.selectedIndex = prefer; return; }
     var best = -1, bestScore = -1;
     list.forEach(function (m, i) {
@@ -4549,11 +4507,11 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   var pwState = { cat: "all", loaded: false, data: [] };
   /* 加载失败时的离线兜底（完整版以网关 GET /v1/tools/prompts 为准） */
   var PW_FALLBACK = [
-    { id: "fb-weekly", name: "周报炼金师", desc: "把零散的工作碎片炼成结构化、有亮点的周报", category: "work", official: false, model_hint: "Qwen3-8B",
+    { id: "fb-weekly", name: "周报炼金师", desc: "把零散的工作碎片炼成结构化、有亮点的周报", category: "work", official: false, model_hint: "qwen3-8b",
       prompt: "你是周报炼金师。我会给你本周做过的零散事项。请输出：1. 本周核心产出（3-5 条，动词开头，突出结果与数据）；2. 进行中事项（进度与下一步）；3. 风险与需要的支持；4. 下周计划。克制具体，不写空话，缺失信息用【待补充】标注。" },
-    { id: "fb-regex", name: "正则魔法师", desc: "描述就生成正则，正则就翻译成人话", category: "coding", official: false, model_hint: "Qwen3-8B",
+    { id: "fb-regex", name: "正则魔法师", desc: "描述就生成正则，正则就翻译成人话", category: "coding", official: false, model_hint: "qwen3-8b",
       prompt: "你是正则魔法师。我给「需求描述」时：生成正则，给 5 个匹配示例、3 个不匹配示例，并逐段解释结构；我给「正则表达式」时：逐段翻译成人话，列出易误匹配场景。标注 JS/Python/Java 方言差异。" },
-    { id: "fb-feynman", name: "费曼学习教练", desc: "用教别人的方式逼你真正学懂一个概念", category: "study", official: false, model_hint: "Qwen3-8B",
+    { id: "fb-feynman", name: "费曼学习教练", desc: "用教别人的方式逼你真正学懂一个概念", category: "study", official: false, model_hint: "qwen3-8b",
       prompt: "你是费曼学习教练。我说一个概念，你不直接讲解：1. 先让我用自己的话解释；2. 针对模糊与跳步处一次只追问一个问题；3. 我说懂了就出反例检验；4. 掌握后用 100 字大白话总结并指出易混淆的相邻概念。全程苏格拉底式追问。" }
   ];
   function pwCopy(text, btn) {
@@ -4814,7 +4772,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       }
       var st = modelStatus[m];
       var exhaustedCls = "";
-      if (m.toLowerCase() === "acu/auto-models") {
+      if (m.toLowerCase() === "auto") {
         tags += '<span class="mtag m-acu" title="每次请求实时选择当前最快最稳的模型，不保证命中同一个">⚡ 智能路由 · 快与稳优先</span>';
       } else if (dsMaintenance(m)) {
         tags += '<span class="mtag m-status-exhausted" title="官方自营通道维护中，已暂停服务">服务暂停 · 维护中</span>';
@@ -5008,7 +4966,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   } else {
     bootModels();
   }
-  // 每 60 秒自动刷新（模型列表与 Workers AI 额度状态自动更新）
+  // 每 60 秒自动刷新（模型列表与额度状态自动更新）
   setInterval(loadModels, 60000);
   route();
 })();
