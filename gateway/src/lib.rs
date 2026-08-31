@@ -835,10 +835,48 @@ async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
     ids.sort();
     ids.dedup();
 
+    // 轻量探测（max_tokens=1）：上游目录 ≠ 账号实际可调用（部分模型对旧密钥 404/403），
+    // 仅收录当前账号真实可调用的模型，避免用户调用时撞"上游已下线"错误
+    let nk = env_or(env, "NVIDIA_KEYS", "")
+        .split(',')
+        .next()
+        .unwrap_or("")
+        .trim()
+        .to_string();
+    let probe_url = format!("{}/v1/chat/completions", env_or(env, "NVIDIA_BASE", NVIDIA_BASE_DEFAULT));
+    let mut ok_ids: Vec<String> = Vec::new();
+    let mut probed = 0usize;
+    for id in &ids {
+        if nk.is_empty() {
+            ok_ids.push(id.clone()); // 无密钥时退化为不过滤
+            continue;
+        }
+        probed += 1;
+        let body = serde_json::json!({
+            "model": id,
+            "messages": [{"role": "user", "content": "hi"}],
+            "max_tokens": 1,
+        })
+        .to_string();
+        let mut blocked = false;
+        if let Ok(req) = build_upstream_req(&probe_url, Some(&format!("Bearer {}", nk)), None, body.as_bytes(), Method::Post) {
+            if let Ok(res) = Fetch::Request(req).send().await {
+                let st = res.status_code();
+                // 404 = NIM 函数不存在；403 = 账号无访问权限。其余（429/5xx/4xx 暂时性）保留
+                if st == 404 || st == 403 {
+                    blocked = true;
+                }
+            }
+        }
+        if !blocked {
+            ok_ids.push(id.clone());
+        }
+    }
+
     if let Ok(db) = env.d1("LOGS_DB") {
         d1_run(&db, "CREATE TABLE IF NOT EXISTS nvidia_models (id TEXT PRIMARY KEY, ts INTEGER NOT NULL)", &[]).await;
         d1_run(&db, "DELETE FROM nvidia_models", &[]).await;
-        for id in &ids {
+        for id in &ok_ids {
             let args = [id.clone(), ts.to_string()];
             d1_run(&db, "INSERT OR REPLACE INTO nvidia_models (id, ts) VALUES (?1, ?2)", &args).await;
         }
@@ -849,7 +887,7 @@ async fn sync_nvidia_models(env: &Env) -> serde_json::Value {
         let _ = kv.delete("models_list").await;
     }
 
-    serde_json::json!({"ok": true, "synced": ids.len(), "ts": ts})
+    serde_json::json!({"ok": true, "listed": ids.len(), "probed": probed, "synced": ok_ids.len(), "ts": ts})
 }
 
 // ---------------------------------------------------------------------------
