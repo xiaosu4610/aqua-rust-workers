@@ -4042,7 +4042,8 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       var spec = modelSpec(m) || {};
       var c = capForType(meta.type);
       var st = modelStatus[m];
-      var stTag = dsMaintenance(m) ? '<span class="cap-card-flag flag-ex">维护中</span>'
+      var stTag = m.toLowerCase() === "acu/auto-models" ? '<span class="cap-card-flag flag-acu">⚡ 智能路由</span>'
+        : dsMaintenance(m) ? '<span class="cap-card-flag flag-ex">维护中</span>'
         : st === "exhausted" ? '<span class="cap-card-flag flag-ex">耗尽</span>'
         : st === "unavailable" ? '<span class="cap-card-flag flag-un">不可用</span>' : "";
       var capIcons = CAPS.map(function (cp) {
@@ -4137,8 +4138,10 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     sel.innerHTML = list.map(function (m) {
       return '<option value="' + esc(m) + '">' + esc(m) + (modelHealth[m] ? " · " + modelHealth[m].score + "分" : "") + "</option>";
     }).join("");
-    // 保持原选择；否则默认 acu/deepseek-v4-flash（未到下线时刻）> 第一个健康分最高者 > 第一项
+    // 保持原选择；否则默认 acu/Auto-models（智能路由）> acu/deepseek-v4-flash（未到下线时刻）> 第一个健康分最高者 > 第一项
     if (cur && list.indexOf(cur) !== -1) { sel.value = cur; return; }
+    var autoIdx = list.indexOf("acu/Auto-models");
+    if (autoIdx !== -1) { sel.selectedIndex = autoIdx; return; }
     var prefer = (!dsRetired()) ? list.indexOf("acu/deepseek-v4-flash") : -1;
     if (prefer !== -1) { sel.selectedIndex = prefer; return; }
     var best = -1, bestScore = -1;
@@ -4240,7 +4243,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
             return;
           }
           // TextDecoder 缺失的极老内核：按 UTF-8 可打印字符近似解码（兼容兜底）
-          buf += dec ? dec.decode(chunk, { stream: true }) : String.fromCharCode.apply(null, new Uint8Array(chunk.value));
+          buf += dec ? dec.decode(chunk.value, { stream: true }) : String.fromCharCode.apply(null, new Uint8Array(chunk.value));
           var lines = buf.split("\n");
           buf = lines.pop();
           for (var i = 0; i < lines.length; i++) {
@@ -4469,7 +4472,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
             thState.busy = false;
             return;
           }
-          buf += dec ? dec.decode(chunk, { stream: true }) : String.fromCharCode.apply(null, new Uint8Array(chunk.value));
+          buf += dec ? dec.decode(chunk.value, { stream: true }) : String.fromCharCode.apply(null, new Uint8Array(chunk.value));
           var lines = buf.split("\n");
           buf = lines.pop();
           for (var i = 0; i < lines.length; i++) {
@@ -4811,7 +4814,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       }
       var st = modelStatus[m];
       var exhaustedCls = "";
-      if (dsMaintenance(m)) {
+      if (m.toLowerCase() === "acu/auto-models") {
+        tags += '<span class="mtag m-acu" title="每次请求实时选择当前最快最稳的模型，不保证命中同一个">⚡ 智能路由 · 快与稳优先</span>';
+      } else if (dsMaintenance(m)) {
         tags += '<span class="mtag m-status-exhausted" title="官方自营通道维护中，已暂停服务">服务暂停 · 维护中</span>';
         exhaustedCls = " exhausted";
       } else if (st === "exhausted") {
