@@ -1247,7 +1247,7 @@
       </div>
       <div class="qq-info">
         <b>AQUA 开源社区 · QQ 频道</b>
-        <p>大版本更新、密钥更换等重要公告同步于此，欢迎加入共建开源社区</p>
+        <p>大版本更新等重要公告同步于此，欢迎加入共建开源社区</p>
         <p>频道号：<span class="qq-num">pd57362562</span></p>
       </div>
       <div class="qq-actions">
@@ -1326,7 +1326,7 @@
           <code>任意密钥均可 · 填 sk-**** 即可</code>
           <a class="btn" href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener" style="text-decoration:none;">进频道交流</a>
         </div>
-        <p class="hint">本站为开放模式：<b>任意非空密钥均可使用</b>（如 <code>sk-****</code>，中英文均可）。大版本更新与公告在 <b>QQ 频道</b>（频道号 <b>pd57362562</b>）通知，欢迎进频道交流。</p>
+        <p class="hint">本站为开放模式：<b>密钥任意填，填什么都通过</b>（如 <code>sk-****</code>，中英文均可）——密钥<b>不固定、不变更</b>，<b>无需申请、不用来问</b>。大版本更新与公告在 <b>QQ 频道</b>（频道号 <b>pd57362562</b>）通知，欢迎进频道交流。</p>
       </div>
       </div>
 
@@ -1520,7 +1520,7 @@ resp = client.chat.completions.create(
   <section id="page-api" class="page">
     <div class="api-page">
       <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>API 文档</h1>
-      <p class="intro">AQUA 网关完整兼容 OpenAI 协议，所有端点均可直接用 OpenAI SDK 调用。统一入口见「首页」，以下为各端点的详细说明、调用示例与错误码。API Key 加 QQ 频道（频道号 pd57362562）获取，模型列表请以「模型中心 · 模型列表」为准（实时同步）。</p>
+      <p class="intro">AQUA 网关完整兼容 OpenAI 协议，所有端点均可直接用 OpenAI SDK 调用。统一入口见「首页」，以下为各端点的详细说明、调用示例与错误码。<b>API Key 无需申请：任意非空密钥均可使用（密钥不固定、不变更，填任何东西都会通过，不用来问）</b>，模型列表请以「模型中心 · 模型列表」为准（实时同步）。</p>
       <div class="repo-banner">
         <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.5 9.27l-4.75 4.63 1.12 6.53L12 17.77l-5.87 3.09 1.12-6.53L2.5 9.27l6.6-1.01L12 2z"/></svg>
         <span><b>AQUA · ACU 工程系列开源项目</b>——你正在看的这份页面源码全部开放，欢迎自部署与二开</span>
@@ -1645,7 +1645,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <li><b>官方自营</b>：模型 ID 为 <code>acu/&#123;model&#125;</code>（如 <code>acu/deepseek-v4-flash</code>），由 AQUA 官方自营旗舰通道提供，长期服务、稳定可靠。</li>
           <li><b>自营排队</b>：上游并发有限（全局 10 并发），高峰期会自动排队等待（先到先得，最长约 15 秒）；排队超时会返回 429 提示，请稍后重试，不要重复提交。</li>
           <li><b>非标准端点</b>：embedding / rerank / asr / tts 等特殊模型已适配为标准 OpenAI SDK 端点，可直接用官方 SDK 调用。</li>
-          <li><b>任意密钥可用</b>：本站为开放模式，任意非空密钥均可调用（如 <code>sk-****</code>，中英文均可）。大版本更新与公告在 QQ 频道（频道号 pd57362562）通知。</li>
+          <li><b>任意密钥可用</b>：本站为开放模式，任意非空密钥均可调用（如 <code>sk-****</code>，中英文均可）——密钥不固定、不变更，填任何东西都会通过，<b>无需申请、不用来问密钥</b>。大版本更新与公告在 QQ 频道（频道号 pd57362562）通知。</li>
         </ul>
       </div>
 
@@ -1660,7 +1660,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   <span class="str">"hint"</span>: <span class="str">"如需帮助：加入 QQ 频道 pd57362562（https://pd.qq.com/s/e4ktxw1b8）反馈，或访问官网 https://acu.ltzy.top"</span>,
   <span class="str">"help"</span>: { <span class="str">"site"</span>: <span class="str">"https://acu.ltzy.top"</span>, <span class="str">"docs"</span>: <span class="str">"https://acu.ltzy.top/#/api"</span>,
             <span class="str">"qq_guild"</span>: <span class="str">"pd57362562"</span>, <span class="str">"qq_guild_url"</span>: <span class="str">"https://pd.qq.com/s/e4ktxw1b8"</span>,
-            <span class="str">"qq_guild_invite"</span>: <span class="str">"加入 QQ 频道（频道号 pd57362562）获取密钥、公告与支持"</span>, <span class="str">"qq_group"</span>: <span class="tok">1103667832</span> }
+            <span class="str">"qq_guild_invite"</span>: <span class="str">"公告与支持见 QQ 频道（频道号 pd57362562）；密钥无需申请，任意填即可用"</span>, <span class="str">"qq_group"</span>: <span class="tok">1103667832</span> }
 }}</code></pre>
         <h3>业务错误码（<code>error.code</code>）</h3>
         <div class="md-table-wrap"><table class="md-table">
