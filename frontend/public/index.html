@@ -887,6 +887,73 @@
   .tool-bar input[type=radio] { accent-color: var(--accent); margin: 0; }
   .tool-bar .tool-status { color: var(--accent); font-weight: 600; }
   .tool-flex1 { flex: 1; min-width: 200px; }
+
+  /* ===== 状态大屏 / 竞技场 / 我的用量 ===== */
+  .dash-wrap { max-width: 1080px; margin: 0 auto; }
+  .dash-head { margin: 34px 0 6px; }
+  .dash-head h1 { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+  .dash-head h1 .ic { color: var(--accent); }
+  .dash-head h1 .ic svg { width: 24px; height: 24px; }
+  .dash-head p { color: var(--muted); font-size: 14px; margin: 8px 0 0; line-height: 1.8; }
+  .dash-sub { color: var(--muted); font-size: 12.5px; margin: 10px 0 22px; }
+  .dash-sub b { color: var(--accent); font-family: var(--mono); }
+  .dash-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  .dash-card { background: linear-gradient(160deg, var(--card), var(--card2)); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 16px; text-align: center; }
+  .dash-card b { display: block; font-size: 30px; font-weight: 800; font-family: var(--mono);
+    background: linear-gradient(120deg, var(--aqua), #818cf8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .dash-card span { display: block; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+  .dash-sec { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; }
+  .dash-sec > b { display: block; font-size: 15px; margin-bottom: 14px; }
+  .stat-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; }
+  .stat-row .nm { width: 200px; font-family: var(--mono); font-size: 12.5px; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stat-row .trk { flex: 1; height: 10px; border-radius: 5px; background: var(--card2); overflow: hidden; }
+  .stat-row .fil { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--aqua), #818cf8); transition: width .5s; }
+  .stat-row .fil.warn { background: linear-gradient(90deg, #f59e0b, #f97316); }
+  .stat-row .fil.bad { background: linear-gradient(90deg, #ef4444, #f97316); }
+  .stat-row .val { width: 150px; text-align: right; font-size: 12px; color: var(--muted); font-family: var(--mono); white-space: nowrap; }
+  .dash-empty { color: var(--muted); font-size: 13px; padding: 10px 0; }
+  .arena-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .arena-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; position: relative; }
+  .arena-box .ab-tag { position: absolute; top: -10px; left: 14px; background: linear-gradient(120deg, var(--aqua), #818cf8);
+    color: #06202b; font-weight: 800; font-size: 12px; border-radius: 999px; padding: 3px 12px; }
+  .arena-box .ab-text { font-size: 13.5px; line-height: 1.85; white-space: pre-wrap; color: var(--text); margin-top: 8px;
+    max-height: 320px; overflow-y: auto; }
+  .arena-box .ab-meta { margin-top: 10px; font-size: 11.5px; color: var(--muted); font-family: var(--mono); }
+  .arena-vs { text-align: center; color: var(--muted); font-size: 12px; margin: 4px 0 8px; letter-spacing: 2px; }
+  .arena-votes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .arena-votes .btn { flex: 1; min-width: 120px; }
+  .arena-reveal { border: 1px solid rgba(103,232,249,.3); background: rgba(103,232,249,.05); border-radius: 12px;
+    padding: 14px 16px; margin-top: 14px; font-size: 14px; }
+  .arena-reveal b { color: var(--accent); font-family: var(--mono); }
+  .lb-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--border); }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row .rk { width: 34px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; font-weight: 800; background: var(--card2); color: var(--muted); flex-shrink: 0; }
+  .lb-row:nth-child(1) .rk { background: linear-gradient(120deg, #f59e0b, #fbbf24); color: #422006; }
+  .lb-row:nth-child(2) .rk { background: linear-gradient(120deg, #94a3b8, #cbd5e1); color: #1e293b; }
+  .lb-row:nth-child(3) .rk { background: linear-gradient(120deg, #b45309, #d97706); color: #fff7ed; }
+  .lb-row .md { flex: 1; font-family: var(--mono); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-row .wr { font-weight: 800; color: var(--accent); font-family: var(--mono); font-size: 14px; }
+  .lb-row .rec { width: 150px; text-align: right; font-size: 11.5px; color: var(--muted); font-family: var(--mono); white-space: nowrap; }
+  .usage-keyrow { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .usage-keyrow input { flex: 1; min-width: 220px; background: var(--card2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: var(--mono); font-size: 13px; }
+  .usage-keyrow input:focus { outline: none; border-color: var(--accent); }
+  .usage-hint { font-size: 12.5px; color: var(--muted); line-height: 1.8; margin-bottom: 16px; }
+  .usage-hint code { font-family: var(--mono); color: var(--accent); font-size: 12px; }
+  /* 键值行基础样式（pg-health/tool-kv 之外的容器也能用） */
+  .pg-hrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .pg-hrow:last-child { border-bottom: none; }
+  .pg-hrow > b { font-weight: 600; }
+  @media (max-width: 860px) {
+    .dash-cards { grid-template-columns: repeat(2, 1fr); }
+    .arena-stage { grid-template-columns: 1fr; }
+    .stat-row .nm { width: 120px; }
+    .stat-row .val { width: 110px; }
+    .lb-row .rec { display: none; }
+  }
   /* 棋类游戏双栏：棋盘 + 信息面板 */
   .tt-layout { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
   .tt-side { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 12px; }
@@ -1102,6 +1169,18 @@
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
           <span class="nt">API 文档</span>
         </a>
+        <a href="#/arena" data-tab="arena">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6L8 2z"/><path d="M4 6h16"/><path d="M18 2l3 4v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6l3-4z"/></svg></span>
+          <span class="nt">模型竞技场</span>
+        </a>
+        <a href="#/status" data-tab="status">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+          <span class="nt">状态大屏</span>
+        </a>
+        <a href="#/usage" data-tab="usage">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>
+          <span class="nt">我的用量</span>
+        </a>
       </div>
       <div class="theme-switch" id="theme-switch">
         <button class="theme-btn" data-theme="light" title="白天亮色">
@@ -1175,6 +1254,24 @@
           <b>API 文档</b>
           <span class="qt-desc">端点、参数、错误码一览，OpenAI 协议全兼容</span>
           <span class="qt-go">查阅文档 →</span>
+        </a>
+        <a class="qtile" href="#/arena">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6L8 2z"/><path d="M4 6h16"/><path d="M18 2l3 4v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6l3-4z"/></svg></span>
+          <b>模型竞技场</b>
+          <span class="qt-desc">双模型盲测对比，投票揭晓身份，全站胜率排行</span>
+          <span class="qt-go">开始对决 →</span>
+        </a>
+        <a class="qtile" href="#/status">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+          <b>状态大屏</b>
+          <span class="qt-desc">全站调用量、成功率、模型健康度实时透明</span>
+          <span class="qt-go">查看大屏 →</span>
+        </a>
+        <a class="qtile" href="#/usage">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>
+          <b>我的用量</b>
+          <span class="qt-desc">凭你的密钥查调用统计，免注册、永久连续</span>
+          <span class="qt-go">查一查 →</span>
         </a>
       </div>
     </section>
@@ -1894,9 +1991,54 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
             <tr><td><code>/v1/tools/subnet</code></td><td>POST</td><td><code>{"cidr":"192.168.1.0/24"}</code></td><td>子网计算器：网络/广播地址、掩码、可用主机范围</td></tr>
             <tr><td><code>/v1/tools/treehole</code></td><td>POST</td><td><code>{"mode":"gentle","messages":[...]}</code></td><td>树洞情感陪伴（mode: gentle=小溪 / anime=星璃），OpenAI chat 格式，支持流式</td></tr>
             <tr><td><code>/v1/tools/prompts</code></td><td>GET</td><td>—</td><td>提示词工坊：官方收录的智能体人设与 Skill 提示词（分类/建议模型）</td></tr>
+            <tr><td><code>/v1/tools/translate</code></td><td>POST</td><td><code>{"text":"...","to":"en"}</code></td><td>AI 翻译：自动识别源语言，to 支持中/英/日/韩等（zh/en/ja/ko/fr/de/ru/es）</td></tr>
+            <tr><td><code>/v1/tools/url-summary</code></td><td>POST</td><td><code>{"url":"https://..."}</code></td><td>网页摘要：抓取网页正文并由 AI 提炼要点</td></tr>
+            <tr><td><code>/v1/tools/hash</code></td><td>POST</td><td><code>{"text":"...","algo":"sha256"}</code></td><td>哈希计算（algo: md5/sha1/sha256/sha512，默认 sha256）</td></tr>
+            <tr><td><code>/v1/tools/password</code></td><td>POST</td><td><code>{"length":16,"count":5}</code></td><td>批量强密码生成（length 8-64，count 1-20，可用 upper/lower/digits/symbols 开关）</td></tr>
+            <tr><td><code>/v1/tools/json</code></td><td>POST</td><td><code>{"text":"..."}</code></td><td>JSON 校验 + 美化/压缩（valid/pretty/minified）</td></tr>
+            <tr><td><code>/v1/tools/regex</code></td><td>POST</td><td><code>{"pattern":"...","text":"...","flags":"g"}</code></td><td>正则匹配测试（flags 支持 i/m/s），返回全部匹配与捕获组</td></tr>
+            <tr><td><code>/v1/tools/color</code></td><td>POST</td><td><code>{"input":"#3b82f6"}</code></td><td>颜色互转：HEX / RGB / HSL 三格式同时返回</td></tr>
+            <tr><td><code>/v1/tools/url-code</code></td><td>POST</td><td><code>{"text":"...","mode":"encode"}</code></td><td>URL 百分号编解码（mode: encode/decode）</td></tr>
+            <tr><td><code>/v1/tools/token-count</code></td><td>POST</td><td><code>{"text":"..."}</code></td><td>Token 近似估算（中文≈0.6字/token，英文≈4字符/token）</td></tr>
+            <tr><td><code>/v1/tools/uuid-bulk</code></td><td>POST</td><td><code>{"count":10}</code></td><td>批量 UUID v4 生成（count 1-100）</td></tr>
+            <tr><td><code>/v1/tools/shorten</code></td><td>POST</td><td><code>{"url":"https://..."}</code></td><td>短链生成：返回 <code>acu.ltzy.top/s/码</code>，90 天无访问自动清理</td></tr>
+            <tr><td><code>/v1/tools/webhook</code></td><td>POST</td><td><code>{"action":"create|list|clear","id":"..."}</code></td><td>Webhook 收集器：create 得到 /hook/{id} 地址，list 查看收到的请求，clear 清空</td></tr>
           </tbody>
         </table></div>
         <p class="desc" style="margin-top:8px;">示例：<code>curl https://你的网关/v1/tools/uuid -H "Authorization: Bearer sk-****"</code></p>
+      </div>
+
+      <!-- ===== 开放数据与社区玩法：状态大屏 / 竞技场 / 用量 ===== -->
+      <div class="api-card api-anchor">
+        <h2>开放数据与社区玩法 API</h2>
+        <p class="desc">全站数据透明化 + 社区玩法——这部分端点大多<b>无需密钥</b>，欢迎拿去做监控面板、二次开发或装进你自己的项目。</p>
+        <h3>数据大屏与用量</h3>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>端点</th><th>方法</th><th>鉴权</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>/v1/stats</code></td><td>GET</td><td>无需密钥</td><td>全站今日数据大屏：总调用 / 成功率 / 平均延迟 / 活跃密钥数 / 热门模型 TOP10</td></tr>
+            <tr><td><code>/status</code></td><td>GET</td><td>无需密钥</td><td>网关版本、连续运行时长、全部模型近 1 小时成功率与延迟（健康透明页）</td></tr>
+            <tr><td><code>/v1/usage</code></td><td>GET</td><td>Bearer 你的密钥</td><td>查这个密钥自己的用量：今日/近 7 天调用与成功率、模型分布、最近 10 条调用。开放模式下<b>填哪个密钥查哪个</b>，同一密钥统计永久连续（只存指纹不存明文）</td></tr>
+          </tbody>
+        </table></div>
+        <h3>模型竞技场（盲测 + 投票 + 排行）</h3>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>端点</th><th>方法</th><th>鉴权</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>/v1/arena</code></td><td>POST</td><td>Bearer 任意密钥</td><td>发起盲测对决：<code>{"prompt":"...","max_tokens":512}</code> → 两位匿名选手 A/B 的回答（含 battle_id 与耗时），身份隐藏防"看名投票"</td></tr>
+            <tr><td><code>/v1/arena/vote</code></td><td>POST</td><td>Bearer 任意密钥</td><td>投票：<code>{"battle_id":"...","winner":"a|b|tie"}</code> → 返回计数结果并<b>揭晓双模型真实身份</b>，一票一场不可改</td></tr>
+            <tr><td><code>/v1/arena/leaderboard</code></td><td>GET</td><td>无需密钥</td><td>全站胜率排行榜：胜 1 分 / 平 0.5 分 / 负 0 分，按积分排序</td></tr>
+          </tbody>
+        </table></div>
+        <h3>开发者小件</h3>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>端点</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /s/{code}</code></td><td>短链 302 跳转（挂在站点域名下）</td></tr>
+            <tr><td><code>ANY /hook/{id}</code></td><td>Webhook 收集地址：任意方法任意请求都会被完整记录（方法/路径/头/体），24 小时保留，配合 <code>/v1/tools/webhook</code> 的 list 动作查看</td></tr>
+          </tbody>
+        </table></div>
+        <p class="desc" style="margin-top:8px;">试一把：<code>curl https://你的网关/v1/stats</code>（不带密钥也能访问）。</p>
       </div>
 
       <!-- ===== 对接指南：把 AQUA 接进你的软件 ===== -->
@@ -2094,7 +2236,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <span class="tool-tag">LLM 驱动</span>
         </a>
       </div>
-      <div class="tools-sec"><span class="tools-sec-t">实用工具</span><span class="tools-sec-n">6 个 · 纯算法零额度</span></div>
+      <div class="tools-sec"><span class="tools-sec-t">实用工具</span><span class="tools-sec-n">12 个 · 纯算法零额度</span></div>
       <div class="tools-grid">
         <a class="tool-card" href="#/tools/ip">
           <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 4 5.6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-5.6-4-9s1.5-6.4 4-9z"/></svg></span>
@@ -2132,6 +2274,42 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
           <span class="tool-desc">UUID 生成、时间戳互转、Base64/URL 编解码、JSON 格式化</span>
           <span class="tool-tag">/v1/tools/*</span>
         </a>
+        <a class="tool-card" href="#/tools/hash">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg></span>
+          <b>哈希计算</b>
+          <span class="tool-desc">MD5 / SHA1 / SHA256 / SHA512 一键计算，校验文件指纹必备</span>
+          <span class="tool-tag">/v1/tools/hash</span>
+        </a>
+        <a class="tool-card" href="#/tools/password">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <b>密码生成器</b>
+          <span class="tool-desc">自定义长度与字符类型批量生成强密码，服务端随机熵</span>
+          <span class="tool-tag">/v1/tools/password</span>
+        </a>
+        <a class="tool-card" href="#/tools/color">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10" r="1.2" fill="currentColor"/><path d="M12 21a9 9 0 0 0 0-18"/></svg></span>
+          <b>颜色转换</b>
+          <span class="tool-desc">HEX / RGB / HSL 三格式互转，取色适配设计场景</span>
+          <span class="tool-tag">/v1/tools/color</span>
+        </a>
+        <a class="tool-card" href="#/tools/token-count">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg></span>
+          <b>Token 估算</b>
+          <span class="tool-desc">估算文本 token 消耗（中英文分别计价），控制上下文长度</span>
+          <span class="tool-tag">/v1/tools/token-count</span>
+        </a>
+        <a class="tool-card" href="#/tools/shorten">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+          <b>短链生成</b>
+          <span class="tool-desc">长网址一键变短链（acu.ltzy.top/s/xxx），90 天无访问自动清理</span>
+          <span class="tool-tag">/v1/tools/shorten</span>
+        </a>
+        <a class="tool-card" href="#/tools/webhook">
+          <span class="tool-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"/><path d="m6 17 3.13-5.78c.53-.97.1-2.18-.27-3.22A4 4 0 1 1 15.5 5.5"/><path d="m12 6 3.14 5.76c.5.96 1.67 1.11 2.75 1.24A4 4 0 1 1 18 21"/></svg></span>
+          <b>Webhook 调试</b>
+          <span class="tool-desc">一键生成收集地址，抓取任意请求的 Header/Body，调试回调利器</span>
+          <span class="tool-tag">/v1/tools/webhook</span>
+        </a>
       </div>
       <div class="tools-sec"><span class="tools-sec-t">创作工具</span><span class="tools-sec-n">3 个 · chat 端点驱动</span></div>
       <div class="tools-grid">
@@ -2156,7 +2334,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       </div>
       <div class="tools-sec"><span class="tools-sec-t">工具 API</span><span class="tools-sec-n">不只 AI，工具也能调</span></div>
       <div class="tools-api-note">
-        <p>上述所有工具的能力同时以 REST API 形式开放在网关上——例如 <code>POST /v1/tools/text-stats</code>、<code>GET /v1/tools/uuid</code>、<code>POST /v1/tools/base64</code>。鉴权方式与主 API 相同，详见 <a href="#/api" style="color:var(--accent);">API 文档</a>。我们不只提供 AI API，也提供工具 API。</p>
+        <p>上述所有工具的能力同时以 REST API 形式开放在网关上——例如 <code>POST /v1/tools/text-stats</code>、<code>POST /v1/tools/hash</code>、<code>POST /v1/tools/shorten</code>、<code>POST /v1/tools/webhook</code>。鉴权方式与主 API 相同，详见 <a href="#/api" style="color:var(--accent);">API 文档</a>。我们不只提供 AI API，也提供工具 API。</p>
       </div>
     </div>
   </div><!-- /hub-pane:tools -->
@@ -2166,6 +2344,101 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
   <section id="page-tool" class="page">
     <div class="tools-page">
       <div id="tool-body"></div>
+    </div>
+  </section>
+
+  <!-- ===== 页面九：模型竞技场（盲测对比 + 投票 + 排行榜） ===== -->
+  <section id="page-arena" class="page">
+    <div class="dash-wrap">
+      <div class="dash-head">
+        <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6L8 2z"/><path d="M4 6h16"/><path d="M18 2l3 4v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6l3-4z"/></svg></span>模型竞技场</h1>
+        <p>同一个问题，两位神秘选手同时作答——<b>盲测对比后投票，才能揭晓真实身份</b>。你的每一票都会计入全站胜率排行榜，帮后来者选出最好用的免费模型。</p>
+      </div>
+      <div class="dash-sec">
+        <b>出题</b>
+        <div class="tool-io">
+          <textarea id="ar-prompt" rows="3" placeholder="向两位选手提同一个问题，例如：用一句话解释什么是量子纠缠 / 帮我写一句春联 / 翻译这段英文…"></textarea>
+          <div class="tool-bar">
+            <span>回答长度</span>
+            <select id="ar-maxtok" style="background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
+              <option value="256">短（256 tokens）</option>
+              <option value="512" selected>中（512 tokens）</option>
+              <option value="1024">长（1024 tokens）</option>
+            </select>
+            <button class="btn tool-run" id="ar-run">开始对决</button>
+            <span class="tool-status" id="ar-hint">同一问题 · 双模型并行 · 盲测匿名</span>
+          </div>
+        </div>
+        <div id="ar-stage" class="arena-stage" style="display:none;">
+          <div class="arena-box"><span class="ab-tag">选手 A</span><div class="ab-text" id="ar-a"></div><div class="ab-meta" id="ar-ameta"></div></div>
+          <div class="arena-box"><span class="ab-tag">选手 B</span><div class="ab-text" id="ar-b"></div><div class="ab-meta" id="ar-bmeta"></div></div>
+        </div>
+        <div class="arena-vs" id="ar-vs" style="display:none;">— WHO WINS? —</div>
+        <div class="arena-votes" id="ar-votes" style="display:none;">
+          <button class="btn" id="ar-vote-a">A 更好 👈</button>
+          <button class="btn" id="ar-vote-tie">平局 🤝</button>
+          <button class="btn" id="ar-vote-b">B 更好 👉</button>
+        </div>
+        <div class="arena-reveal" id="ar-reveal" style="display:none;"></div>
+      </div>
+      <div class="dash-sec">
+        <b>🏆 全站胜率排行榜 <span style="font-size:11.5px;color:var(--muted);font-weight:400;">胜 1 分 / 平 0.5 分 / 负 0 分</span></b>
+        <div id="ar-lb"><div class="dash-empty">加载中…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 页面十：状态大屏（全站真实数据透明化） ===== -->
+  <section id="page-status" class="page">
+    <div class="dash-wrap">
+      <div class="dash-head">
+        <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>状态大屏</h1>
+        <p>全站运行数据实时透明化——所有数字直接来自网关数据库，不修饰、不筛选。数据每 60 秒自动刷新。</p>
+      </div>
+      <div class="dash-sub" id="st-meta">网关版本 <b>--</b> · 已运行 <b>--</b></div>
+      <div class="dash-cards">
+        <div class="dash-card"><b id="st2-calls">--</b><span>今日全站调用</span></div>
+        <div class="dash-card"><b id="st2-rate">--</b><span>今日成功率</span></div>
+        <div class="dash-card"><b id="st2-lat">--</b><span>今日平均延迟</span></div>
+        <div class="dash-card"><b id="st2-users">--</b><span>今日活跃密钥</span></div>
+      </div>
+      <div class="dash-sec">
+        <b>📈 今日热门模型 TOP 10 <span style="font-size:11.5px;color:var(--muted);font-weight:400;">（按调用量）</span></b>
+        <div id="st2-top"><div class="dash-empty">加载中…</div></div>
+      </div>
+      <div class="dash-sec">
+        <b>💓 全模型近 1 小时健康度 <span style="font-size:11.5px;color:var(--muted);font-weight:400;">（成功率条 · 悬停看延迟）</span></b>
+        <div id="st2-health"><div class="dash-empty">加载中…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 页面十一：我的用量（匿名密钥指纹统计） ===== -->
+  <section id="page-usage" class="page">
+    <div class="dash-wrap">
+      <div class="dash-head">
+        <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>我的用量</h1>
+        <p>输入你在用的密钥，查看这个密钥的调用统计——<b>无需注册，同一密钥字符串的统计永久连续</b>（密钥只显示指纹，明文不上屏、不入库）。</p>
+      </div>
+      <div class="usage-keyrow">
+        <input id="us-key" placeholder="输入你的密钥，如 sk-my-cat-123（用什么查什么）" />
+        <button class="btn tool-run" id="us-go">查询用量</button>
+      </div>
+      <p class="usage-hint">原理：网关只保存 <code>sha256(密钥)</code> 的前 12 位指纹用于聚合统计，<b>无法反推密钥本身</b>。同一个密钥字符串永远对应同一个指纹——今天填 <code>sk-aqua</code>、明天还填 <code>sk-aqua</code>，数据就连在一起。用量明细保留 <b>7 天</b>，到期自动清理。</p>
+      <div class="dash-cards">
+        <div class="dash-card"><b id="us-today">--</b><span>今日调用</span></div>
+        <div class="dash-card"><b id="us-today-rate">--</b><span>今日成功率</span></div>
+        <div class="dash-card"><b id="us-week">--</b><span>近 7 天调用</span></div>
+        <div class="dash-card"><b id="us-week-rate">--</b><span>近 7 天成功率</span></div>
+      </div>
+      <div class="dash-sec">
+        <b>🧩 你的模型分布 <span style="font-size:11.5px;color:var(--muted);font-weight:400;">（近 7 天 · Top 10）</span></b>
+        <div id="us-models"><div class="dash-empty">输入密钥后展示</div></div>
+      </div>
+      <div class="dash-sec">
+        <b>🕘 最近调用 <span style="font-size:11.5px;color:var(--muted);font-weight:400;">（最多 10 条）</span></b>
+        <div id="us-recent"><div class="dash-empty">输入密钥后展示</div></div>
+      </div>
     </div>
   </section>
 </div>
@@ -2938,6 +3211,12 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     weekly: renderToolWeekly,
     regex: renderToolRegex,
     polish: renderToolPolish,
+    hash: renderToolHash,
+    password: renderToolPassword,
+    color: renderToolColor,
+    "token-count": renderToolTokenCount,
+    shorten: renderToolShorten,
+    webhook: renderToolWebhook,
   };
   function renderTool(name) {
     var el = document.getElementById("tool-body");
@@ -2945,6 +3224,371 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var fn = TOOL_REGISTRY[name];
     if (fn) return fn(el);
     el.innerHTML = '<div class="model-empty">该工具正在建设中，敬请期待</div>';
+  }
+
+  /* ---- 新工具：哈希 / 密码生成 / 颜色转换 / Token 估算 / 短链 / Webhook（全部走网关工具 API） ---- */
+  function renderToolHash(el) {
+    el.innerHTML = toolShell("哈希计算",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg>',
+      "/v1/tools/hash",
+      '<p class="tool-intro">计算文本的 MD5 / SHA1 / SHA256 / SHA512 哈希值——常用于校验下载文件指纹、比对内容是否被篡改。</p>' +
+      '<div class="tool-io"><textarea id="hs-in" rows="6" placeholder="输入任意文本…"></textarea>' +
+      '<div class="tool-bar"><span>算法</span>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="hs-algo" value="md5">MD5</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="hs-algo" value="sha1">SHA1</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="hs-algo" value="sha256" checked>SHA256</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="radio" name="hs-algo" value="sha512">SHA512</label>' +
+      '<button class="btn tool-run" id="hs-run">计算</button></div>' +
+      '<div id="hs-out" class="tool-result"></div>');
+    document.getElementById("hs-run").addEventListener("click", function () {
+      var text = document.getElementById("hs-in").value;
+      var algo = (document.querySelector('input[name="hs-algo"]:checked') || {}).value || "sha256";
+      var box = document.getElementById("hs-out");
+      if (!text) { box.innerHTML = '<div class="tool-empty">请先输入要计算哈希的文本。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">计算中…</div>';
+      apiFetch("/tools/hash", { method: "POST", body: JSON.stringify({ text: text, algo: algo }) })
+        .then(function (j) {
+          box.innerHTML = '<div class="tool-ai-box"><b>' + j.algo.toUpperCase() + ' 摘要</b><div class="tool-ai-text" style="word-break:break-all;font-family:var(--mono);font-size:12.5px;">' + esc(j.digest) + '</div></div>';
+        })
+        .catch(function (err) { box.innerHTML = '<div class="tool-empty">计算失败：' + esc(err.message) + '</div>'; });
+    });
+  }
+
+  function renderToolPassword(el) {
+    el.innerHTML = toolShell("密码生成器",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      "/v1/tools/password",
+      '<p class="tool-intro">批量生成高强度随机密码——由网关服务端熵源生成，保证每类选中字符至少出现一次。</p>' +
+      '<div class="tool-bar"><span>长度</span><input id="pw-len" type="number" min="8" max="64" value="16" style="width:70px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:var(--mono);">' +
+      '<span>数量</span><input id="pw-cnt" type="number" min="1" max="20" value="5" style="width:70px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:var(--mono);"></div>' +
+      '<div class="tool-bar"><span>字符类型</span>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" id="pw-up" checked>大写</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" id="pw-low" checked>小写</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" id="pw-dig" checked>数字</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:4px;"><input type="checkbox" id="pw-sym">符号</label>' +
+      '<button class="btn tool-run" id="pw-run">生成</button></div>' +
+      '<div id="pw-out" class="tool-result"></div>');
+    document.getElementById("pw-run").addEventListener("click", function () {
+      var box = document.getElementById("pw-out");
+      box.innerHTML = '<div class="tool-loading">生成中…</div>';
+      apiFetch("/tools/password", {
+        method: "POST",
+        body: JSON.stringify({
+          length: parseInt(document.getElementById("pw-len").value, 10) || 16,
+          count: parseInt(document.getElementById("pw-cnt").value, 10) || 5,
+          upper: document.getElementById("pw-up").checked,
+          lower: document.getElementById("pw-low").checked,
+          digits: document.getElementById("pw-dig").checked,
+          symbols: document.getElementById("pw-sym").checked,
+        }),
+      }).then(function (j) {
+        box.innerHTML = j.passwords.map(function (p) {
+          return '<div class="pg-hrow" style="font-family:var(--mono);"><span style="user-select:all;">' + esc(p) + '</span><button class="btn" data-copy-text="' + esc(p) + '">复制</button></div>';
+        }).join("");
+      }).catch(function (err) { box.innerHTML = '<div class="tool-empty">生成失败：' + esc(err.message) + '</div>'; });
+    });
+  }
+
+  function renderToolColor(el) {
+    el.innerHTML = toolShell("颜色转换",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10" r="1.2" fill="currentColor"/><path d="M12 21a9 9 0 0 0 0-18"/></svg>',
+      "/v1/tools/color",
+      '<p class="tool-intro">HEX / RGB / HSL 三格式互转——输入 <code>#3b82f6</code> 或 <code>rgb(59,130,246)</code> 均可。</p>' +
+      '<div class="tool-io"><div class="tool-btns" style="width:100%;"><input id="cl-in" placeholder="如 #3b82f6 或 rgb(59,130,246)" style="flex:1;min-width:200px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:var(--mono);"><button class="btn tool-run" id="cl-run">转换</button></div></div>' +
+      '<div id="cl-out" class="tool-result"></div>');
+    document.getElementById("cl-run").addEventListener("click", function () {
+      var input = document.getElementById("cl-in").value.trim();
+      var box = document.getElementById("cl-out");
+      if (!input) { box.innerHTML = '<div class="tool-empty">请先输入颜色值。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">转换中…</div>';
+      apiFetch("/tools/color", { method: "POST", body: JSON.stringify({ input: input }) })
+        .then(function (j) {
+          var rgb = "rgb(" + j.rgb.r + ", " + j.rgb.g + ", " + j.rgb.b + ")";
+          var hsl = "hsl(" + j.hsl.h + ", " + j.hsl.s + "%, " + j.hsl.l + "%)";
+          box.innerHTML =
+            '<div style="width:100%;height:64px;border-radius:12px;border:1px solid var(--border);background:' + esc(j.hex) + ';margin-bottom:12px;"></div>' +
+            '<div class="pg-hrow" style="font-family:var(--mono);"><span style="user-select:all;">' + esc(j.hex) + '</span><button class="btn" data-copy-text="' + esc(j.hex) + '">复制</button></div>' +
+            '<div class="pg-hrow" style="font-family:var(--mono);"><span style="user-select:all;">' + esc(rgb) + '</span><button class="btn" data-copy-text="' + esc(rgb) + '">复制</button></div>' +
+            '<div class="pg-hrow" style="font-family:var(--mono);"><span style="user-select:all;">' + esc(hsl) + '</span><button class="btn" data-copy-text="' + esc(hsl) + '">复制</button></div>';
+        })
+        .catch(function (err) { box.innerHTML = '<div class="tool-empty">转换失败：' + esc(err.message) + '</div>'; });
+    });
+  }
+
+  function renderToolTokenCount(el) {
+    el.innerHTML = toolShell("Token 估算",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>',
+      "/v1/tools/token-count",
+      '<p class="tool-intro">估算一段文本会消耗多少 token（中文约 0.6 字/token，英文约 4 字符/token）——发送前心里有数，避免超长报错。为近似估算值，不同模型分词器有差异。</p>' +
+      '<div class="tool-io"><textarea id="tk-in" rows="8" placeholder="粘贴要估算的文本…"></textarea>' +
+      '<div class="tool-bar"><button class="btn tool-run" id="tk-run">估算</button><span class="tool-status" id="tk-status"></span></div>' +
+      '<div id="tk-out" class="tool-result"></div>');
+    document.getElementById("tk-run").addEventListener("click", function () {
+      var text = document.getElementById("tk-in").value;
+      var box = document.getElementById("tk-out");
+      if (!text.trim()) { box.innerHTML = '<div class="tool-empty">请先输入要估算的文本。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">估算中…</div>';
+      apiFetch("/tools/token-count", { method: "POST", body: JSON.stringify({ text: text }) })
+        .then(function (j) {
+          document.getElementById("tk-status").textContent = j.note || "";
+          box.innerHTML =
+            '<div class="pg-hrow"><span>估算 Tokens</span><b style="color:var(--accent);font-family:var(--mono);">' + j.tokens + '</b></div>' +
+            '<div class="pg-hrow"><span>总字符数</span><b>' + j.chars + '</b></div>' +
+            '<div class="pg-hrow"><span>其中中文字符</span><b>' + j.cjk_chars + '</b></div>';
+        })
+        .catch(function (err) { box.innerHTML = '<div class="tool-empty">估算失败：' + esc(err.message) + '</div>'; });
+    });
+  }
+
+  function renderToolShorten(el) {
+    el.innerHTML = toolShell("短链生成",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+      "/v1/tools/shorten",
+      '<p class="tool-intro">把冗长网址压缩成 <code>https://acu.ltzy.top/s/xxxxxx</code> 短链，302 跳转直达。<b>90 天无访问自动清理</b>，不做长期留存。</p>' +
+      '<div class="tool-io"><div class="tool-btns" style="width:100%;"><input id="sl-in" placeholder="https://example.com/very/long/url?with=params" style="flex:1;min-width:220px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:var(--mono);"><button class="btn tool-run" id="sl-run">缩短</button></div></div>' +
+      '<div id="sl-out" class="tool-result"></div>');
+    document.getElementById("sl-run").addEventListener("click", function () {
+      var url = document.getElementById("sl-in").value.trim();
+      var box = document.getElementById("sl-out");
+      if (!url) { box.innerHTML = '<div class="tool-empty">请先输入要缩短的网址。</div>'; return; }
+      box.innerHTML = '<div class="tool-loading">生成中…</div>';
+      apiFetch("/tools/shorten", { method: "POST", body: JSON.stringify({ url: url }) })
+        .then(function (j) {
+          box.innerHTML = '<div class="tool-ai-box"><b>短链已生成</b>' +
+            '<div class="pg-hrow" style="margin-top:8px;"><span style="user-select:all;color:var(--accent);font-family:var(--mono);">' + esc(j.short) + '</span><button class="btn" data-copy-text="' + esc(j.short) + '">复制</button></div>' +
+            '<div style="font-size:11.5px;color:var(--muted);margin-top:6px;">目标：' + esc(j.url) + ' · ' + esc(j.retention || "") + '</div></div>';
+        })
+        .catch(function (err) { box.innerHTML = '<div class="tool-empty">生成失败：' + esc(err.message) + '</div>'; });
+    });
+  }
+
+  function renderToolWebhook(el) {
+    el.innerHTML = toolShell("Webhook 调试",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-4px;color:var(--accent);"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"/><path d="m6 17 3.13-5.78c.53-.97.1-2.18-.27-3.22A4 4 0 1 1 15.5 5.5"/><path d="m12 6 3.14 5.76c.5.96 1.67 1.11 2.75 1.24A4 4 0 1 1 18 21"/></svg>',
+      "/v1/tools/webhook",
+      '<p class="tool-intro">调试第三方回调的利器：点「创建收集器」得到一个专属地址，把它填到任意需要回调的地方，随后用「查看请求」抓取收到的全部请求（方法 / 头 / 体）。记录保留 <b>24 小时</b>，自动清理。</p>' +
+      '<div class="tool-bar"><button class="btn tool-run" id="wh-create">① 创建收集器</button>' +
+      '<input id="wh-id" placeholder="Webhook ID（创建后自动填入）" style="flex:1;min-width:160px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:var(--mono);">' +
+      '<button class="btn tool-run" id="wh-list">② 查看请求</button>' +
+      '<button class="btn" id="wh-clear">清空记录</button></div>' +
+      '<div id="wh-out" class="tool-result"></div>');
+    var out = document.getElementById("wh-out");
+    document.getElementById("wh-create").addEventListener("click", function () {
+      out.innerHTML = '<div class="tool-loading">创建中…</div>';
+      apiFetch("/tools/webhook", { method: "POST", body: JSON.stringify({ action: "create" }) })
+        .then(function (j) {
+          document.getElementById("wh-id").value = j.id;
+          out.innerHTML = '<div class="tool-ai-box"><b>收集器已就绪</b>' +
+            '<div class="pg-hrow" style="margin-top:8px;"><span style="user-select:all;color:var(--accent);font-family:var(--mono);font-size:12px;">' + esc(j.url) + '</span><button class="btn" data-copy-text="' + esc(j.url) + '">复制地址</button></div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-top:6px;">' + esc(j.usage || "") + '</div></div>';
+          renderToolWebhookList(j.id);
+        })
+        .catch(function (err) { out.innerHTML = '<div class="tool-empty">创建失败：' + esc(err.message) + '</div>'; });
+    });
+    function renderToolWebhookList(id) {
+      apiFetch("/tools/webhook", { method: "POST", body: JSON.stringify({ action: "list", id: id }) })
+        .then(function (j) {
+          if (!j.items || !j.items.length) {
+            out.innerHTML = '<div class="tool-empty">还没有收到请求。地址：<code style="font-family:var(--mono);color:var(--accent);user-select:all;">' + esc(j.url) + '</code> —— 用 curl 或浏览器随便发一个请求试试。</div>';
+            return;
+          }
+          out.innerHTML = '<div class="tool-status" style="margin-bottom:8px;">共 ' + j.total + ' 条 · 展示最近 ' + j.items.length + ' 条</div>' + j.items.map(function (it) {
+            return '<div class="tool-ai-box" style="margin-bottom:10px;"><b>' + esc(it.method) + ' · ' + new Date(it.ts * 1000).toLocaleString() + '</b>' +
+              '<pre style="font-family:var(--mono);font-size:11.5px;white-space:pre-wrap;word-break:break-all;margin:6px 0 0;color:var(--muted);">' + esc(JSON.stringify({ path: it.path, headers: it.headers, body: it.body }, null, 2)) + '</pre></div>';
+          }).join("");
+        })
+        .catch(function (err) { out.innerHTML = '<div class="tool-empty">查询失败：' + esc(err.message) + '</div>'; });
+    }
+    document.getElementById("wh-list").addEventListener("click", function () {
+      var id = document.getElementById("wh-id").value.trim();
+      if (!id) { out.innerHTML = '<div class="tool-empty">先创建收集器，或粘贴已有 Webhook ID。</div>'; return; }
+      renderToolWebhookList(id);
+    });
+    document.getElementById("wh-clear").addEventListener("click", function () {
+      var id = document.getElementById("wh-id").value.trim();
+      if (!id) { out.innerHTML = '<div class="tool-empty">先创建收集器。</div>'; return; }
+      apiFetch("/tools/webhook", { method: "POST", body: JSON.stringify({ action: "clear", id: id }) })
+        .then(function (j) { out.innerHTML = '<div class="tool-empty">已清空 ' + (j.cleared || 0) + ' 条记录。</div>'; })
+        .catch(function (err) { out.innerHTML = '<div class="tool-empty">清空失败：' + esc(err.message) + '</div>'; });
+    });
+  }
+
+  /* ---- 页面：模型竞技场（盲测对比 + 投票 + 排行榜） ---- */
+  var arState = null; // 当前战场 {battleId, revealed:false}
+  function arenaInit() {
+    loadArenaLeaderboard();
+    var run = document.getElementById("ar-run");
+    if (run && !run.dataset.bound) {
+      run.dataset.bound = "1";
+      run.addEventListener("click", function () {
+        var prompt = document.getElementById("ar-prompt").value.trim();
+        var hint = document.getElementById("ar-hint");
+        var stage = document.getElementById("ar-stage");
+        var votes = document.getElementById("ar-votes");
+        var reveal = document.getElementById("ar-reveal");
+        if (!prompt) { hint.textContent = "请先输入问题"; return; }
+        arState = null;
+        hint.textContent = "两位选手思考中…（并行调用，最长约 1-2 分钟）";
+        stage.style.display = "none";
+        votes.style.display = "none";
+        reveal.style.display = "none";
+        apiFetch("/arena", {
+          method: "POST",
+          body: JSON.stringify({ prompt: prompt, max_tokens: parseInt(document.getElementById("ar-maxtok").value, 10) || 512 }),
+        }).then(function (j) {
+          arState = { battleId: j.battle_id };
+          hint.textContent = "对比左右两份回答，投出你的一票（盲测：身份投票后揭晓）";
+          stage.style.display = "";
+          votes.style.display = "";
+          var fa = j.a.ok ? (j.a.content || "（该选手没有返回内容）") : "（该选手掉线了：" + (j.a.status || "?") + "）";
+          var fb = j.b.ok ? (j.b.content || "（该选手没有返回内容）") : "（该选手掉线了：" + (j.b.status || "?") + "）";
+          document.getElementById("ar-a").textContent = fa;
+          document.getElementById("ar-b").textContent = fb;
+          document.getElementById("ar-ameta").textContent = "耗时 " + (j.a.latency_ms / 1000).toFixed(1) + "s";
+          document.getElementById("ar-bmeta").textContent = "耗时 " + (j.b.latency_ms / 1000).toFixed(1) + "s";
+        }).catch(function (err) {
+          hint.textContent = "对决失败：" + err.message;
+        });
+      });
+      ["a", "tie", "b"].forEach(function (w) {
+        var btn = document.getElementById("ar-vote-" + w);
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", function () {
+          if (!arState || !arState.battleId) return;
+          var reveal = document.getElementById("ar-reveal");
+          apiFetch("/arena/vote", { method: "POST", body: JSON.stringify({ battle_id: arState.battleId, winner: w }) })
+            .then(function (j) {
+              reveal.style.display = "";
+              reveal.innerHTML = (j.counted ? "🗳️ 一票已计入！" : "🗳️ " + esc(j.msg || "该战场已投过票")) +
+                ' 身份揭晓：选手 A = <b>' + esc(j.revealed.a) + '</b> · 选手 B = <b>' + esc(j.revealed.b) + '</b>' +
+                '<div style="margin-top:8px;"><button class="btn" id="ar-again">再来一场 →</button></div>';
+              document.getElementById("ar-votes").style.display = "none";
+              var again = document.getElementById("ar-again");
+              if (again) again.addEventListener("click", function () { document.getElementById("ar-run").click(); });
+              loadArenaLeaderboard();
+            })
+            .catch(function (err) {
+              reveal.style.display = "";
+              reveal.textContent = "投票失败：" + err.message;
+            });
+        });
+      });
+    }
+  }
+  function loadArenaLeaderboard() {
+    var el = document.getElementById("ar-lb");
+    if (!el) return;
+    fetch(GATEWAY + "/arena/leaderboard").then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.ranking || !j.ranking.length) { el.innerHTML = '<div class="dash-empty">还没有投票数据——来 Arena 打第一场，写下历史第一票！</div>'; return; }
+      el.innerHTML = j.ranking.map(function (r, i) {
+        return '<div class="lb-row"><span class="rk">' + (i + 1) + '</span><span class="md">' + esc(r.model) + '</span>' +
+          '<span class="wr">' + r.win_rate + '%</span><span class="rec">' + r.wins + '胜 ' + r.losses + '负 ' + r.ties + '平 · ' + r.battles + '场</span></div>';
+      }).join('');
+    }).catch(function () { el.innerHTML = '<div class="dash-empty">排行榜加载失败，稍后自动重试</div>'; });
+  }
+
+  /* ---- 页面：状态大屏（/v1/stats + /status，60s 自动刷新） ---- */
+  var stTimer = null;
+  function statusInit() {
+    loadStatusDashboard();
+    if (!stTimer) stTimer = setInterval(function () {
+      if (document.getElementById("page-status").classList.contains("active")) loadStatusDashboard();
+    }, 60000);
+  }
+  function loadStatusDashboard() {
+    fetch(GATEWAY + "/stats").then(function (r) { return r.json(); }).then(function (j) {
+      document.getElementById("st2-calls").textContent = j.today ? j.today.total_calls.toLocaleString() : "--";
+      document.getElementById("st2-rate").textContent = j.today ? j.today.ok_rate + "%" : "--";
+      document.getElementById("st2-lat").textContent = j.today ? (j.today.avg_latency_ms / 1000).toFixed(2) + "s" : "--";
+      document.getElementById("st2-users").textContent = j.today ? j.today.active_keys.toLocaleString() : "--";
+      var top = document.getElementById("st2-top");
+      if (!j.top_models || !j.top_models.length) { top.innerHTML = '<div class="dash-empty">今天还没有调用记录</div>'; }
+      else {
+        var maxc = j.top_models[0].calls || 1;
+        top.innerHTML = j.top_models.map(function (m) {
+          return '<div class="stat-row"><span class="nm" title="' + esc(m.model) + '">' + esc(m.model) + '</span>' +
+            '<span class="trk"><span class="fil" style="width:' + Math.max(4, Math.round(m.calls * 100 / maxc)) + '%;"></span></span>' +
+            '<span class="val">' + m.calls.toLocaleString() + ' 次</span></div>';
+        }).join('');
+      }
+    }).catch(function () {
+      ["st2-calls", "st2-rate", "st2-lat", "st2-users"].forEach(function (id) { document.getElementById(id).textContent = "--"; });
+    });
+    fetch(GATEWAY + "/status").then(function (r) { return r.json(); }).then(function (j) {
+      var up = j.uptime_sec || 0;
+      var d = Math.floor(up / 86400), h = Math.floor(up % 86400 / 3600), mnt = Math.floor(up % 3600 / 60);
+      document.getElementById("st-meta").innerHTML = "网关版本 <b>" + esc(j.version || "--") + "</b> · 已连续运行 <b>" + d + " 天 " + h + " 时 " + mnt + " 分</b> · 健康窗口 " + esc(j.window || "1h");
+      var box = document.getElementById("st2-health");
+      if (!j.models || !j.models.length) { box.innerHTML = '<div class="dash-empty">近 1 小时还没有调用数据——去 Playground 或竞技场产生第一条记录</div>'; return; }
+      box.innerHTML = j.models.map(function (m) {
+        var cls = m.success_rate >= 90 ? "" : (m.success_rate >= 50 ? "warn" : "bad");
+        return '<div class="stat-row"><span class="nm" title="' + esc(m.model) + '">' + esc(m.model) + '</span>' +
+          '<span class="trk"><span class="fil ' + cls + '" style="width:' + Math.max(3, Math.round(m.success_rate)) + '%;"></span></span>' +
+          '<span class="val" title="平均延迟 ' + (m.avg_latency_ms / 1000).toFixed(2) + 's">' + m.success_rate + '% · ' + m.calls_1h + '次 · ' + (m.avg_latency_ms / 1000).toFixed(1) + 's</span></div>';
+      }).join('');
+    }).catch(function () {
+      document.getElementById("st2-health").innerHTML = '<div class="dash-empty">健康数据加载失败，稍后自动重试</div>';
+    });
+  }
+
+  /* ---- 页面：我的用量（/v1/usage，按密钥指纹查询） ---- */
+  function usageInit() {
+    var btn = document.getElementById("us-go");
+    if (btn && !btn.dataset.bound) {
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", loadUsage);
+      document.getElementById("us-key").addEventListener("keydown", function (e) { if (e.key === "Enter") loadUsage(); });
+    }
+  }
+  function loadUsage() {
+    var key = document.getElementById("us-key").value.trim();
+    var boxModels = document.getElementById("us-models");
+    var boxRecent = document.getElementById("us-recent");
+    if (!key) {
+      document.getElementById("us-today").textContent = "--";
+      document.getElementById("us-today-rate").textContent = "--";
+      document.getElementById("us-week").textContent = "--";
+      document.getElementById("us-week-rate").textContent = "--";
+      boxModels.innerHTML = '<div class="dash-empty">输入密钥后展示</div>';
+      boxRecent.innerHTML = '<div class="dash-empty">输入密钥后展示</div>';
+      return;
+    }
+    fetch(GATEWAY + "/usage", { headers: { "Authorization": "Bearer " + key } })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error((res.j && res.j.error && res.j.error.message) || "查询失败");
+        var j = res.j;
+        document.getElementById("us-today").textContent = j.today.calls.toLocaleString();
+        document.getElementById("us-today-rate").textContent = j.today.ok_rate + "%";
+        document.getElementById("us-week").textContent = j.week.calls.toLocaleString();
+        document.getElementById("us-week-rate").textContent = j.week.ok_rate + "%";
+        if (!j.by_model || !j.by_model.length) { boxModels.innerHTML = '<div class="dash-empty">近 7 天这个密钥还没有调用记录——拿它去 Playground 聊一句再来刷新</div>'; }
+        else {
+          var maxc = j.by_model[0].calls || 1;
+          boxModels.innerHTML = j.by_model.map(function (m) {
+            return '<div class="stat-row"><span class="nm" title="' + esc(m.model) + '">' + esc(m.model) + '</span>' +
+              '<span class="trk"><span class="fil" style="width:' + Math.max(4, Math.round(m.calls * 100 / maxc)) + '%;"></span></span>' +
+              '<span class="val">' + m.calls.toLocaleString() + ' 次</span></div>';
+          }).join('');
+        }
+        if (!j.recent || !j.recent.length) { boxRecent.innerHTML = '<div class="dash-empty">暂无最近调用</div>'; }
+        else {
+          boxRecent.innerHTML = j.recent.map(function (r) {
+            return '<div class="lb-row"><span class="rk" style="background:' + (r.ok ? "rgba(52,211,153,.15);color:#34d399;" : "rgba(248,113,113,.15);color:#f87171;") + '">' + (r.ok ? "OK" : "ERR") + '</span>' +
+              '<span class="md">' + esc(r.endpoint) + (r.model ? ' · ' + esc(r.model) : '') + '</span>' +
+              '<span class="rec">' + new Date(r.ts * 1000).toLocaleString() + ' · ' + r.latency_ms + 'ms</span></div>';
+          }).join('');
+        }
+      })
+      .catch(function (err) {
+        document.getElementById("us-today").textContent = "--";
+        document.getElementById("us-today-rate").textContent = "--";
+        document.getElementById("us-week").textContent = "--";
+        document.getElementById("us-week-rate").textContent = "--";
+        boxModels.innerHTML = '<div class="dash-empty">查询失败：' + esc(err.message) + '</div>';
+        boxRecent.innerHTML = '<div class="dash-empty"></div>';
+      });
   }
 
   /* ---- 工具：周报生成器 / 正则解释器 / 文本润色（chat 端点驱动） ---- */
@@ -4606,10 +5250,13 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var tm = hash.match(/^tools\/([a-z-]+)$/);
     if (tm) { renderTool(decodeURIComponent(tm[1])); return; }
     var tab = hash.split("?")[0] || "home";
-    if (["home", "models", "capabilities", "api", "playground", "tools"].indexOf(tab) === -1) tab = "home";
+    if (["home", "models", "capabilities", "api", "playground", "tools", "status", "arena", "usage"].indexOf(tab) === -1) tab = "home";
     if (tab === "models") applyFilter();
     else if (tab === "capabilities") renderCapabilities();
     if (tab === "home") updateHomeStats();
+    if (tab === "status") statusInit();
+    if (tab === "arena") arenaInit();
+    if (tab === "usage") usageInit();
   }
   function route() {
     var hash = (location.hash || "#/home").replace(/^#\//, "");
@@ -4631,7 +5278,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       return;
     }
     var tab = hash.split("?")[0] || "home";
-    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole", "prompts"].indexOf(tab) === -1) tab = "home";
+    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole", "prompts", "status", "arena", "usage"].indexOf(tab) === -1) tab = "home";
     // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/树洞/工具箱/提示词工坊）
     // 旧 hash（#/capabilities、#/tools 等）全部兼容，直接映射到对应子板块
     var pageId = "page-" + tab;
@@ -4648,6 +5295,9 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     if (tab === "playground") pgInit();
     if (tab === "treehole") thInit();
     if (tab === "prompts") pwInit();
+    if (tab === "status") statusInit();
+    if (tab === "arena") arenaInit();
+    if (tab === "usage") usageInit();
     renderCurrentPage();
   }
   // 大板块子目录：高亮当前子 tab 并切换可见面板
