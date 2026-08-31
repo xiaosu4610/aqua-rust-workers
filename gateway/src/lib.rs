@@ -514,29 +514,14 @@ async fn normalize_upstream(mut res: Response, channel: &str) -> Result<Response
 }
 
 // ---------------------------------------------------------------------------
-// D1 日志与健康记录
+// D1 健康记录（仅滚动保留近 8 小时，不存任何长期日志）
 // ---------------------------------------------------------------------------
-async fn log_request(env: &Env, method: &str, path: &str, model: &str, upstream: &str, code: u16, dur_ms: i64) {
-    if let Ok(db) = env.d1("LOGS_DB") {
-        let args = [
-            now_ts().to_string(),
-            method.to_string(),
-            path.to_string(),
-            model.to_string(),
-            upstream.to_string(),
-            code.to_string(),
-            dur_ms.to_string(),
-        ];
-        d1_run(
-            &db,
-            "INSERT INTO request_logs (timestamp, method, path, model, upstream, status_code, duration_ms) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-            &args,
-        )
-        .await;
-    }
-}
+/// 健康数据保留窗口：Auto 路由用近 6 小时数据，留 2 小时余量；到期即删
+const HEALTH_RETENTION_SECS: i64 = 8 * 3600;
 
 /// 记录单次模型调用健康：ok 布尔 + err_type（rate_limited/client_error/upstream_error/network_error/timeout/success）
+/// 随身清理：每次写入顺手并行删掉 8 小时前的过期行（走 ts 索引，无匹配时几乎零行读）；
+/// 不设定期任务，数据随写随滚，绝不长期滞留
 async fn record_health(env: &Env, model: &str, ok: bool, err_type: &str, code: u16, latency_ms: i64) {
     if let Ok(db) = env.d1("LOGS_DB") {
         // 列序与 SQL 完全一致：model 在前、ts 在后，杜绝字段错位
@@ -548,33 +533,16 @@ async fn record_health(env: &Env, model: &str, ok: bool, err_type: &str, code: u
             code.to_string(),
             latency_ms.to_string(),
         ];
-        d1_run(
-            &db,
-            "INSERT INTO model_health (model, ts, ok, err_type, status_code, latency_ms) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-            &args,
+        let cutoff = (now_ts() - HEALTH_RETENTION_SECS).to_string();
+        futures_util::future::join(
+            d1_run(
+                &db,
+                "INSERT INTO model_health (model, ts, ok, err_type, status_code, latency_ms) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                &args,
+            ),
+            d1_run(&db, "DELETE FROM model_health WHERE ts < ?1", &[cutoff]),
         )
         .await;
-    }
-}
-
-/// 每 6 小时顺手清理一次 7 天前的健康记录（用 KV 标记避免并发重复清理）
-async fn maybe_cleanup_health(env: &Env, db: &D1Database) {
-    if let Ok(kv) = env.kv("MODEL_CACHE") {
-        let key = "health_cleanup_ts";
-        let last = kv.get(key).text().await.unwrap_or(None);
-        let now = now_ts();
-        let do_clean = match last {
-            Some(s) => s.parse::<i64>().map(|t| now - t > 6 * 3600).unwrap_or(true),
-            None => true,
-        };
-        if do_clean {
-            let cutoff = (now - 7 * 86400).to_string();
-            d1_run(db, "DELETE FROM model_health WHERE ts < ?1", &[cutoff.clone()]).await;
-            d1_run(db, "DELETE FROM request_logs WHERE timestamp < ?1", &[cutoff]).await;
-            if let Ok(p) = kv.put(key, now.to_string()) {
-                let _ = p.expiration_ttl(8 * 3600).execute().await;
-            }
-        }
     }
 }
 
@@ -587,7 +555,6 @@ async fn compute_all_health(env: &Env) -> serde_json::Value {
         Ok(d) => d,
         Err(_) => return serde_json::json!({}),
     };
-    maybe_cleanup_health(env, &db).await;
 
     let sql = "SELECT model, COUNT(*) AS total, SUM(ok) AS ok_cnt, AVG(latency_ms) AS avg_lat, \
                SUM(CASE WHEN err_type='rate_limited' THEN 1 ELSE 0 END) AS rate_cnt, \
@@ -598,7 +565,8 @@ async fn compute_all_health(env: &Env) -> serde_json::Value {
                      ROW_NUMBER() OVER (PARTITION BY model ORDER BY ts DESC) AS rn \
                      FROM model_health WHERE ts >= ?1) \
                WHERE rn <= 100 GROUP BY model";
-    let cutoff = (now_ts() - 14 * 86400).to_string();
+    // 统计窗口 = 保留窗口（近 8 小时）：表内只有滚动数据，扫描行数恒定有界
+    let cutoff = (now_ts() - HEALTH_RETENTION_SECS).to_string();
     let mut out = serde_json::Map::new();
     if let Ok(stmt) = db.prepare(sql).bind(&js_args(&[cutoff])) {
         if let Ok(res) = stmt.all().await {
@@ -686,10 +654,10 @@ async fn fetch_wai_exhausted(env: &Env) -> bool {
     false
 }
 
-const MODEL_CACHE_TTL: u64 = 30; // 秒
+const MODEL_CACHE_TTL: u64 = 300; // 模型列表 KV 缓存 5 分钟：健康分变化缓慢，大幅降低各地区健康计算频率
 
 async fn handle_models(req: Request, env: Env) -> Result<Response> {
-    // 命中 KV 缓存直接返回（30s TTL，与前端 60s 轮询错峰）
+    // 命中 KV 缓存直接返回（300s TTL，与前端 60s 轮询错峰）
     if let Ok(kv) = env.kv("MODEL_CACHE") {
         if let Ok(Some(cached)) = kv.get("models_list").text().await {
             let mut res = Response::from_body(ResponseBody::Body(cached.into_bytes()))?;
@@ -1292,6 +1260,16 @@ fn is_auto_model(model: &str) -> bool {
 /// 成功率 ≥90% 且调用量 ≥3 的候选中按（成功率 desc、延迟 asc）排序，
 /// 调用方逐个尝试直到成功（绝对可用性），从而分散负载避免压垮单一模型。
 async fn auto_candidates(env: &Env) -> Vec<String> {
+    // KV 缓存 60 秒：候选一分钟内复用，聊天请求不再逐个扫 D1（数据仍是准实时健康）
+    if let Ok(kv) = env.kv("MODEL_CACHE") {
+        if let Ok(Some(cached)) = kv.get("auto_candidates").text().await {
+            if let Ok(v) = serde_json::from_str::<Vec<String>>(&cached) {
+                if !v.is_empty() {
+                    return v;
+                }
+            }
+        }
+    }
     let now = now_ts();
     let since = now - 6 * 3600;
     let mut cands: Vec<(String, f64, f64)> = Vec::new();
@@ -1325,6 +1303,14 @@ async fn auto_candidates(env: &Env) -> Vec<String> {
     let fallback = if now >= DEEPSEEK_SUNSET_TS { "Qwen3-8B" } else { "acu/deepseek-v4-flash" };
     if !out.iter().any(|m| m == fallback) {
         out.push(fallback.to_string());
+    }
+    // 写回 KV 缓存（60 秒）
+    if let Ok(kv) = env.kv("MODEL_CACHE") {
+        if let Ok(json) = serde_json::to_string(&out) {
+            if let Ok(p) = kv.put("auto_candidates", json) {
+                let _ = p.expiration_ttl(60).execute().await;
+            }
+        }
     }
     out
 }
@@ -1438,7 +1424,6 @@ async fn handle_chat(mut req: Request, env: Env) -> Result<Response> {
     } else {
         "client_error"
     };
-    log_request(&env, "POST", "/v1/chat/completions", &model, provider, code, dur_ms).await;
     if !auto_used {
         // auto 路径的健康记录已在候选循环内逐个完成（含失败候选）
         record_health(&env, &model, ok, err_type, code, dur_ms * 1000).await;
