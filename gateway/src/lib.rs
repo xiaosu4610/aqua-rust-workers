@@ -836,8 +836,10 @@ async fn sync_fetch_list(env: &Env) -> Vec<String> {
 }
 
 /// 探测每个候选模型的账号可用性（10 并发分批）→ 入库 D1 → 清 KV 缓存。
-/// 可独立跑在 wait_until 后台（探测慢模型可能拖到数分钟，不能阻塞 HTTP 响应）。
-async fn sync_probe_and_store(env: &Env, ids: Vec<String>) -> serde_json::Value {
+/// budget_secs = 单批探测总预算（秒）：HTTP 同步传 25 保证响应及时返回；
+/// Cron 传 0 表示无预算限制（15 分钟 wall time 足够完整探测）。
+/// 超预算后剩余模型直接保留入库（宁多勿漏），由运行时密钥池封禁机制兜底。
+async fn sync_probe_and_store(env: &Env, ids: Vec<String>, budget_secs: u64) -> serde_json::Value {
     let ts = now_ts();
     // 轻量探测（max_tokens=1）：上游目录 ≠ 账号实际可调用（部分模型对旧密钥 404/403），
     // 仅收录当前账号真实可调用的模型，避免用户调用时撞"上游已下线"错误
@@ -848,9 +850,19 @@ async fn sync_probe_and_store(env: &Env, ids: Vec<String>) -> serde_json::Value 
         .trim()
         .to_string();
     let probe_url = format!("{}/v1/chat/completions", env_or(env, "NVIDIA_BASE", NVIDIA_BASE_DEFAULT));
+    let start = now_ts();
     let mut ok_ids: Vec<String> = Vec::new();
     let mut probed = 0usize;
+    let mut budget_skipped = 0usize;
+    let mut budget_exhausted = false;
     for chunk in ids.chunks(10) {
+        if budget_exhausted || (!nk.is_empty() && budget_secs > 0 && (now_ts() - start) as u64 >= budget_secs) {
+            // 预算耗尽：剩余候选全部保留（运行时 404 自动归一化为中文错误 + 密钥池封禁兜底）
+            budget_exhausted = true;
+            budget_skipped += chunk.len();
+            ok_ids.extend(chunk.iter().cloned());
+            continue;
+        }
         if nk.is_empty() {
             ok_ids.extend(chunk.iter().cloned()); // 无密钥时退化为不过滤
             continue;
@@ -898,7 +910,7 @@ async fn sync_probe_and_store(env: &Env, ids: Vec<String>) -> serde_json::Value 
         let _ = kv.delete("models_list").await;
     }
 
-    serde_json::json!({"ok": true, "listed": ids.len(), "probed": probed, "synced": ok_ids.len(), "ts": ts})
+    serde_json::json!({"ok": true, "listed": ids.len(), "probed": probed, "budget_skipped": budget_skipped, "synced": ok_ids.len(), "ts": ts})
 }
 
 // ---------------------------------------------------------------------------
@@ -2202,7 +2214,7 @@ fn auth_mode(env: &Env) -> &'static str {
 }
 
 #[event(fetch)]
-pub async fn main(req: Request, env: Env, ctx: Context) -> Result<Response> {
+pub async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     console_error_panic_hook::set_once();
 
     // ===== 防扫保底（zone 级 WAF 之外的第二道防线，Workers 层零成本拦截） =====
@@ -2272,7 +2284,7 @@ pub async fn main(req: Request, env: Env, ctx: Context) -> Result<Response> {
         return Ok(res);
     }
 
-    // ===== 管理端点：NVIDIA 模型目录同步（快速返回，探测在 wait_until 后台完成） =====
+    // ===== 管理端点：NVIDIA 模型目录同步（请求内完成，25s 预算，超时部分运行时兜底） =====
     // 独立于通用鉴权（强制 GATEWAY_KEYS 管理密钥，open 模式下公开 demo key 不放行）
     if p == "/v1/_internal/sync-models" {
         if req.method() != Method::Post {
@@ -2289,22 +2301,8 @@ pub async fn main(req: Request, env: Env, ctx: Context) -> Result<Response> {
         if ids.is_empty() {
             return err_ecode(502, "UPSTREAM_UNREACHABLE", "NVIDIA 上游模型列表拉取失败，请稍后重试");
         }
-        let listed = ids.len();
-        let env2 = env.clone();
-        ctx.wait_until(async move {
-            let out = sync_probe_and_store(&env2, ids).await;
-            if let Some(code) = out.get("error").and_then(|v| v.as_str()) {
-                console_log!("[sync] nvidia probe failed: {}", code);
-            } else if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
-                console_log!("[sync] nvidia probe done: {} models stored", n);
-            }
-        });
-        return json_res(&serde_json::json!({
-            "ok": true,
-            "listed": listed,
-            "probe": "background",
-            "note": "列表已拉取；账号可用性探测在后台进行，约 1-2 分钟后 /v1/models 反映最终目录"
-        }));
+        let out = sync_probe_and_store(&env, ids, 25).await;
+        return json_res(&out);
     }
 
     // 鉴权白名单：健康检查根路径 + 公开模型列表（营销入口）。
@@ -2403,9 +2401,9 @@ pub async fn main(req: Request, env: Env, ctx: Context) -> Result<Response> {
 }
 
 /// 每日定时任务：北京时间 00:00（UTC 16:00）从 NVIDIA 上游同步最新模型列表。
-/// 列表拉取快速完成；探测在 wait_until 后台继续（慢模型不占用 Cron 主流程）。
+/// Cron 无预算限制（15 分钟 wall time），完整探测所有候选模型。
 #[event(scheduled)]
-pub async fn main(_event: ScheduledEvent, env: Env, ctx: ScheduleContext) -> Result<()> {
+pub async fn main(_event: ScheduledEvent, env: Env, _ctx: ScheduleContext) -> Result<()> {
     console_error_panic_hook::set_once();
     let ids = sync_fetch_list(&env).await;
     if ids.is_empty() {
@@ -2413,14 +2411,9 @@ pub async fn main(_event: ScheduledEvent, env: Env, ctx: ScheduleContext) -> Res
         return Ok(());
     }
     let listed = ids.len();
-    let env2 = env.clone();
-    ctx.wait_until(async move {
-        let out = sync_probe_and_store(&env2, ids).await;
-        if let Some(code) = out.get("error").and_then(|v| v.as_str()) {
-            console_log!("[cron] nvidia probe failed: {}", code);
-        } else if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
-            console_log!("[cron] nvidia sync done: {}/{} models stored", n, listed);
-        }
-    });
+    let out = sync_probe_and_store(&env, ids, 0).await;
+    if let Some(n) = out.get("synced").and_then(|v| v.as_u64()) {
+        console_log!("[cron] nvidia sync done: {}/{} models stored", n, listed);
+    }
     Ok(())
 }
