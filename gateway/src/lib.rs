@@ -386,7 +386,7 @@ fn err_json(status: u16, code: &str, msg: &str) -> serde_json::Value {
                 "docs": DOCS_URL,
                 "qq_guild": QQ_GUILD_ID,
                 "qq_guild_url": QQ_GUILD_URL,
-                "qq_guild_invite": format!("加入 QQ 频道（频道号 {}）获取密钥、公告与支持", QQ_GUILD_ID),
+                "qq_guild_invite": format!("公告与支持见 QQ 频道（频道号 {}）；密钥无需申请，任意填即可用", QQ_GUILD_ID),
                 "qq_group": QQ_GROUP_NUM,
             }
         }
@@ -1999,7 +1999,7 @@ async fn handle_assets(req: Request, env: Env) -> Result<Response> {
 fn err_invalid_key() -> Result<Response> {
     let v = serde_json::json!({
         "error": {
-            "message": "API 密钥无效或已过期（仅指定密钥模式下会出现）。请访问官网 acu.ltzy.top，或加入 AQUA 开源社区 QQ 频道（频道号 pd57362562）获取最新密钥；日常交流可加 QQ 群 1103667832。",
+            "message": "API 密钥无效或已过期（仅指定密钥模式下会出现）。本站默认开放模式：任意非空密钥均可使用，密钥不固定、不变更，无需申请或索要。请访问官网 acu.ltzy.top；公告与支持见 QQ 频道（频道号 pd57362562），日常交流可加 QQ 群 1103667832。",
             "type": "invalid_api_key",
             "code": 401,
             "help": {
