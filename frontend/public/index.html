@@ -205,9 +205,9 @@
     background: linear-gradient(120deg, var(--grad-1) 0%, var(--grad-2) 45%, var(--grad-3) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 0 10px rgba(56,189,248,.18)); }
-  .nav-tabs { display: flex; gap: 4px; background: var(--tab-bg);
+  .nav-tabs { display: flex; flex-wrap: wrap; gap: 4px; background: var(--tab-bg);
     border: 1px solid var(--border); border-radius: 10px; padding: 4px;
-    min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    min-width: 0; justify-content: center; }
   .nav-tabs::-webkit-scrollbar { display: none; }
   .nav-tabs a { text-decoration: none; color: var(--muted); font-size: 14px;
     padding: 7px 14px; border-radius: 7px; transition: all .15s; white-space: nowrap; flex: none;
@@ -216,12 +216,40 @@
   .nav-tabs a.active { background: var(--tab-active-bg); color: var(--accent); font-weight: 600; }
   .nav-tabs a .nt-short { display: none; }  /* 中屏切短文案用，桌面默认隐藏 */
 
+  /* ===== 下拉大板块：聚合同类入口，点开见多级子版块 ===== */
+  .nav-drop { position: relative; display: inline-flex; }
+  .drop-toggle { font-family: inherit; display: inline-flex; align-items: center; gap: 7px;
+    background: none; border: none; cursor: pointer; color: var(--muted); font-size: 14px;
+    padding: 7px 14px; border-radius: 7px; transition: all .15s; white-space: nowrap; }
+  .drop-toggle:hover { color: var(--accent-soft); }
+  .drop-toggle .caret { width: 11px; height: 11px; opacity: .65; transition: transform .15s; }
+  .nav-drop.open .caret { transform: rotate(180deg); }
+  .nav-drop.open .drop-toggle, .nav-drop.active .drop-toggle {
+    background: var(--tab-active-bg); color: var(--accent); font-weight: 600; }
+  .drop-panel { position: absolute; top: calc(100% + 8px); left: 0; min-width: 224px;
+    background: var(--nav-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border); border-radius: 12px; padding: 6px;
+    display: none; flex-direction: column; gap: 2px; z-index: 80;
+    box-shadow: 0 14px 36px rgba(0,0,0,.35); }
+  [data-theme="light"] .drop-panel { box-shadow: 0 14px 36px rgba(15,60,100,.16); }
+  .nav-drop.open .drop-panel { display: flex; }
+  .nav-drop:last-child .drop-panel { left: auto; right: 0; }
+  .drop-panel a { text-decoration: none; color: var(--muted); padding: 9px 11px;
+    border-radius: 8px; display: flex; flex-direction: column; gap: 2px; transition: background .15s; }
+  .drop-panel a:hover { background: var(--tab-active-bg); color: var(--accent); }
+  .drop-panel a.active { background: var(--tab-active-bg); color: var(--accent); }
+  .drop-panel a .drow { display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+  .drop-panel a .drow .ic svg { width: 15px; height: 15px; }
+  .drop-panel a .ddesc { font-size: 11.5px; color: var(--muted); padding-left: 23px; opacity: .85; }
+  .drop-panel a:hover .ddesc, .drop-panel a.active .ddesc { color: var(--accent-soft); }
+
   /* ===== 窄桌面 (≤1280px)：收紧导航，防止标签文字被挤成竖排 ===== */
   @media (max-width: 1280px) {
     .nav-brand span { font-size: 18px; letter-spacing: 2px; }
     .qq-nav span { display: none; }   /* 外链按钮收成纯图标（悬停有提示） */
     .qq-nav { padding: 7px 9px; }
-    .nav-tabs a { padding: 7px 11px; font-size: 13px; gap: 5px; }
+    .nav-tabs a, .drop-toggle { padding: 7px 11px; font-size: 13px; gap: 5px; }
     .nav-tabs a .ic svg { width: 15px; height: 15px; }
   }
 
@@ -230,9 +258,10 @@
     .nav-inner { gap: 8px; }
     .nav-brand span { font-size: 17px; letter-spacing: 1px; }
     .nav-tabs { gap: 2px; padding: 3px; }
-    .nav-tabs a { padding: 7px 9px; font-size: 12.5px; gap: 4px; }
+    .nav-tabs a, .drop-toggle { padding: 7px 9px; font-size: 12.5px; gap: 4px; }
     .nav-tabs a .nt-long { display: none; }
     .nav-tabs a .nt-short { display: inline; }
+    .drop-panel { min-width: 208px; }
   }
 
   /* ===== 中屏 (≤1080px)：首页磁贴自动聚拢、状态条 2×2，避免挤压 ===== */
@@ -1141,7 +1170,10 @@
   /* ===== 超小屏 (≤380px) ===== */
   @media (max-width: 380px) {
     .nav-tabs a { padding: 5px 8px; font-size: 12px; }
-    .nav-tabs a span:not(.ic) { display: none; }
+    /* 纯图标模式只收顶层元素：下拉面板内保留文字与说明，保证手机可用 */
+    .nav-tabs > a .nt, .drop-toggle .dt-label { display: none; }
+    .drop-toggle { padding: 5px 8px; }
+    .drop-panel a .nt, .drop-panel a .nt-long { display: inline; }
     .nav-tabs a .ic svg { width: 16px; height: 16px; }
     .brand { font-size: 28px; }
     .copy-row code { font-size: 11px; }
@@ -1179,30 +1211,73 @@
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>
           <span class="nt nt-long">首页</span><span class="nt nt-short">首页</span>
         </a>
-        <a href="#/models" data-tab="models">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-          <span class="nt nt-long">模型中心</span><span class="nt nt-short">模型</span>
-        </a>
-        <a href="#/playground" data-tab="playground">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
-          <span class="nt nt-long">体验中心</span><span class="nt nt-short">体验</span>
-        </a>
+        <div class="nav-drop" data-drop>
+          <button type="button" class="drop-toggle">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+            <span class="dt-label">体验中心</span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="drop-panel">
+            <a href="#/playground" data-tab="playground">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>AI 对话</span>
+              <span class="ddesc">在线对话 · 流式体验 · 模型即点即用</span>
+            </a>
+            <a href="#/tools" data-tab="tools">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>工具箱</span>
+              <span class="ddesc">15 款实用小工具 · 翻译 / 哈希 / 短链等</span>
+            </a>
+            <a href="#/treehole" data-tab="treehole">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>树洞</span>
+              <span class="ddesc">匿名倾诉 · 推理模型深度陪伴</span>
+            </a>
+            <a href="#/prompts" data-tab="prompts">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>提示词工坊</span>
+              <span class="ddesc">精选提示词模板 · 一键填入对话</span>
+            </a>
+          </div>
+        </div>
+        <div class="nav-drop" data-drop>
+          <button type="button" class="drop-toggle">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span>
+            <span class="dt-label">模型中心</span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="drop-panel">
+            <a href="#/models" data-tab="models">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>模型列表</span>
+              <span class="ddesc">全部模型 · 实时健康度 · 一键复制</span>
+            </a>
+            <a href="#/capabilities" data-tab="capabilities">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>能力矩阵</span>
+              <span class="ddesc">模型能力与上下文长度对照</span>
+            </a>
+          </div>
+        </div>
         <a href="#/api" data-tab="api">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
           <span class="nt nt-long">API 文档</span><span class="nt nt-short">API</span>
         </a>
-        <a href="#/arena" data-tab="arena">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6L8 2z"/><path d="M4 6h16"/><path d="M18 2l3 4v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6l3-4z"/></svg></span>
-          <span class="nt nt-long">模型竞技场</span><span class="nt nt-short">竞技场</span>
-        </a>
-        <a href="#/status" data-tab="status">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
-          <span class="nt nt-long">状态大屏</span><span class="nt nt-short">状态</span>
-        </a>
-        <a href="#/usage" data-tab="usage">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>
-          <span class="nt nt-long">我的用量</span><span class="nt nt-short">用量</span>
-        </a>
+        <div class="nav-drop" data-drop>
+          <button type="button" class="drop-toggle">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+            <span class="dt-label">数据中心</span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="drop-panel">
+            <a href="#/arena" data-tab="arena">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6L8 2z"/><path d="M4 6h16"/><path d="M18 2l3 4v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6l3-4z"/></svg></span>模型竞技场</span>
+              <span class="ddesc">双模型盲测对比 · 投票看胜率榜</span>
+            </a>
+            <a href="#/status" data-tab="status">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>状态大屏</span>
+              <span class="ddesc">全站调用量 · 成功率 · 实时监控</span>
+            </a>
+            <a href="#/usage" data-tab="usage">
+              <span class="drow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>我的用量</span>
+              <span class="ddesc">按密钥查统计 · 匿名指纹不存明文</span>
+            </a>
+          </div>
+        </div>
       </div>
       <div class="theme-switch" id="theme-switch">
         <button class="theme-btn" data-theme="light" title="白天亮色">
@@ -5309,7 +5384,11 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     else if (tab === "playground" || tab === "tools" || tab === "treehole" || tab === "prompts") { pageId = "page-experience"; navKey = "playground"; }
     document.getElementById(pageId).classList.add("active");
     document.querySelectorAll(".nav-tabs a").forEach(function (a) {
-      a.classList.toggle("active", a.getAttribute("data-tab") === navKey);
+      a.classList.toggle("active", a.getAttribute("data-tab") === navKey || a.getAttribute("data-tab") === tab);
+    });
+    // 下拉大板块联动高亮：任一子版块激活则父板块点亮
+    document.querySelectorAll(".nav-drop").forEach(function (d) {
+      d.classList.toggle("active", !!d.querySelector("a.active"));
     });
     // 子目录高亮 + 内容面板切换
     if (pageId === "page-modelhub") setHubSub("page-modelhub", tab === "capabilities" ? "capabilities" : "models");
@@ -5333,6 +5412,26 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       p.style.display = p.getAttribute("data-pane") === sub ? "" : "none";
     });
   }
+  // ===== 下拉大板块交互：点开/收起、点外部关闭、点击子项后收起 =====
+  document.querySelectorAll(".nav-drop .drop-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var drop = btn.closest(".nav-drop");
+      var wasOpen = drop.classList.contains("open");
+      document.querySelectorAll(".nav-drop.open").forEach(function (d) { d.classList.remove("open"); });
+      if (!wasOpen) drop.classList.add("open");
+    });
+  });
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".nav-drop")) {
+      document.querySelectorAll(".nav-drop.open").forEach(function (d) { d.classList.remove("open"); });
+    }
+  });
+  document.querySelectorAll(".drop-panel a").forEach(function (a) {
+    a.addEventListener("click", function () {
+      document.querySelectorAll(".nav-drop.open").forEach(function (d) { d.classList.remove("open"); });
+    });
+  });
   window.addEventListener("hashchange", route);
 
   /* ---- 首页改版：子导航平滑滚动 / 代码示例 Tab / 实时状态填充 ---- */
