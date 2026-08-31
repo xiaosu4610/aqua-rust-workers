@@ -1612,6 +1612,102 @@ console.log(r.choices[<span class="tok">0</span>].message.content);</code></pre>
         <p class="desc">跑通了？恭喜，你已经会用 80% 的功能了——剩下的端点全是「换个地址、换个参数」的重复动作。继续往下看概念词典和端点详解。</p>
       </div>
 
+      <!-- ===== 说人话 · 核心概念词典 ===== -->
+      <div class="api-card api-anchor">
+        <h2>说人话 · 核心概念词典</h2>
+        <p class="desc">对接时常见的专业术语，每个都用大白话+比喻讲一遍。看不懂某段文档时回来查这张表。</p>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>术语</th><th>大白话解释（人话版）</th><th>什么时候关心它</th></tr></thead>
+          <tbody>
+            <tr><td><code>messages</code></td><td><b>聊天记录本</b>。AI 本身没有记忆——你把之前的对话从头复制进这个数组，它才「记得」聊过什么。</td><td>每次调用都要传；多轮对话的灵魂</td></tr>
+            <tr><td><code>role</code> 三种角色</td><td><b>system=导演</b>（幕后定人设和规矩，观众看不见）；<b>user=观众</b>（你的提问）；<b>assistant=演员</b>（AI 的回答）。多轮对话=把整本聊天记录按顺序再念一遍。</td><td>构造 messages 时</td></tr>
+            <tr><td><code>temperature</code></td><td><b>创造力旋钮</b>（0~2）。0=严谨复读机，问什么答什么（适合数学/代码/信息提取）；0.7=日常聊天刚刚好；1.5 以上=天马行空（适合创意写作），太高会开始胡说。</td><td>想要稳定答案调低，想要创意调高</td></tr>
+            <tr><td><code>max_tokens</code></td><td><b>回答的字数上限</b>。相当于给 AI 的工作台大小设了限——防止它写三千字小作文。若返回里 <code>finish_reason=length</code> 就是说到一半被掐断了。</td><td>控制回复长度 / 省流量</td></tr>
+            <tr><td><code>top_p</code></td><td>另一个创造力旋钮（0~1），和 temperature 干的是同一类活。两个都调容易打架，<b>调一个就行</b>。</td><td>一般不用动</td></tr>
+            <tr><td><code>stream</code></td><td><b>打字机模式</b>开关。<code>false</code>=AI 憋个大招一次性整段返回；<code>true</code>=像打字一样一个字一个字往外蹦（SSE 流式），等待体验好得多。</td><td>做聊天界面强烈建议开</td></tr>
+            <tr><td>token</td><td><b>AI 的积木块</b>。AI 不是按「字」读文本的，而是按 token：1 个汉字≈1~2 个 token，1 个英文单词≈1 个。各种长度限制都数它。</td><td>看懂 max_tokens / 上下文窗口</td></tr>
+            <tr><td>上下文窗口</td><td><b>模型的工作记忆（桌面大小）</b>。桌面就那么大，聊天记录堆太多 earliest 的会被挤出去——长对话记得自己裁剪 messages（比如只带最近 20 条）。</td><td>长对话 / 长文档处理</td></tr>
+            <tr><td>system prompt<br>（提示词）</td><td><b>AI 的人设说明书</b>。放在 messages 第一条（role=system），告诉它「你是谁、说话什么风格、什么能做什么不能做」。本站提示词工坊收录了大量现成的人设，可直接抄。</td><td>想给 AI 定人设 / 定规矩</td></tr>
+            <tr><td>幻觉</td><td><b>AI 一本正经地编造事实</b>。它天生是个「想象力过剩的优等生」，不知道也硬答。数字、引用、法条、日期这类硬信息，务必自己核实。</td><td>任何时候都要留个心眼</td></tr>
+            <tr><td>RAG</td><td><b>先翻资料再回答</b>。把检索到的资料塞进 prompt 里让 AI「照着资料答」，能大幅减少幻觉——开卷考试总比闭卷靠谱。</td><td>知识库问答 / 客服机器人</td></tr>
+            <tr><td>embeddings<br>（向量/嵌入）</td><td><b>给文字发 GPS 坐标</b>。把一段文字变成一串数字（向量），意思越接近的文字坐标越靠近——「找相似」就变成了「算距离」。语义搜索、推荐、聚类全靠它。</td><td>语义搜索 / 去重 / 分类</td></tr>
+            <tr><td>rerank<br>（重排）</td><td><b>给检索结果排座位的裁判</b>。先粗筛出 100 条候选，再让裁判按「和问题的相关度」重新排座次，取前几名。</td><td>RAG 流程的第二道工序</td></tr>
+            <tr><td>ASR / TTS</td><td>AI 的<b>耳朵</b>和<b>嘴巴</b>。ASR（语音识别）=听录音转文字；TTS（语音合成）=把文字读出声来。</td><td>语音助手 / 有声内容</td></tr>
+            <tr><td>SSE</td><td><b>服务器到你程序之间的一根小水管</b>。数据一段一段主动流过来，不用你反复问「好了没」。stream=true 时用的就是它。</td><td>处理流式回复时</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- ===== 对话接口进阶：多轮对话 / 流式 / 参数速查 ===== -->
+      <div class="api-card api-anchor">
+        <h2>对话接口进阶：多轮对话、流式输出、参数速查</h2>
+        <p class="desc">把 <code>/v1/chat/completions</code> 玩明白，等于会用了全部 AI 接口——其他端点都只是「换个地址、换个参数」。</p>
+        <h3>参数速查表</h3>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>参数</th><th>必填</th><th>默认</th><th>大白话</th></tr></thead>
+          <tbody>
+            <tr><td><code>model</code></td><td>必填</td><td>—</td><td>点哪个「厨师」做菜，如 <code>acu/deepseek-v4-flash</code></td></tr>
+            <tr><td><code>messages</code></td><td>必填</td><td>—</td><td>聊天记录本（见上方词典），至少一条</td></tr>
+            <tr><td><code>temperature</code></td><td>可选</td><td>1</td><td>创造力旋钮 0~2，代码/数学用 0，聊天用 0.7</td></tr>
+            <tr><td><code>max_tokens</code></td><td>可选</td><td>模型上限</td><td>回答字数上限，防止小作文</td></tr>
+            <tr><td><code>stream</code></td><td>可选</td><td>false</td><td>打字机模式开关</td></tr>
+            <tr><td><code>top_p</code></td><td>可选</td><td>1</td><td>另一个创造力旋钮，与 temperature 二选一调</td></tr>
+            <tr><td><code>stop</code></td><td>可选</td><td>—</td><td>「到这里就停」的哨兵词，AI 说到它立刻收工</td></tr>
+          </tbody>
+        </table></div>
+        <h3>多轮对话：为什么 AI 会「失忆」，怎么治</h3>
+        <p class="desc">AI 没有记忆。每次调用都是一场<b>全新的、没有前世记忆</b>的对话——所谓多轮对话，就是<b>你每次都把之前的完整聊天记录一起递回去</b>，像复读整本笔记本：</p>
+        <pre><button class="btn" data-copy-from="code-multi-turn">复制</button><code id="code-multi-turn"><span class="tok"># 第二轮提问时，messages 里要带上第一轮的全部内容：</span>
+messages = [
+  {<span class="str">"role"</span>: <span class="str">"system"</span>,   <span class="str">"content"</span>: <span class="str">"你是一个耐心的编程老师"</span>},   <span class="tok"># 人设说明书</span>
+  {<span class="str">"role"</span>: <span class="str">"user"</span>,     <span class="str">"content"</span>: <span class="str">"Python 的列表是什么？"</span>},       <span class="tok"># 第 1 问</span>
+  {<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="str">"列表像一个能装任何东西的收纳盒…"</span>}, <span class="tok"># 第 1 答（也要带上！）</span>
+  {<span class="str">"role"</span>: <span class="str">"user"</span>,     <span class="str">"content"</span>: <span class="str">"那字典呢？"</span>}                    <span class="tok"># 第 2 问</span>
+]
+r = client.chat.completions.create(model=<span class="str">"zhipu/glm-4-flash"</span>, messages=messages)</code></pre>
+        <ul class="tips">
+          <li><b>AI 回答「失忆」了？</b>九成是没把历史 messages 带回去。</li>
+          <li>记录太长会超出上下文窗口——常规做法：只带<b>最近 10~20 条</b>，或把更早的内容总结成一条。</li>
+          <li>「我不是、我没有」式人格漂移：在 system 里重申人设，或在每轮开头追加一条 system 提醒。</li>
+        </ul>
+        <h3>流式输出：做出「打字机」效果</h3>
+        <p class="desc">请求里加 <code>"stream": true</code>，服务器就会通过 SSE 小水管一段段推送。每一段都是一个标准 JSON（<code>data: {...}</code>），你把 <code>choices[0].delta.content</code> 拼接到界面上即可：</p>
+        <pre><button class="btn" data-copy-from="code-stream-py">复制</button><code id="code-stream-py"><span class="tok"># Python：一行开启流式</span>
+stream = client.chat.completions.create(
+    model=<span class="str">"zhipu/glm-4-flash"</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"讲个冷笑话"</span>}],
+    stream=<span class="kwd">True</span>,                          <span class="tok"># ← 打字机开关</span>
+)
+<span class="kwd">for</span> chunk <span class="kwd">in</span> stream:                      <span class="tok"># 每次循环 = 一小段</span>
+    piece = chunk.choices[<span class="tok">0</span>].delta.content <span class="kwd">or</span> <span class="str">""</span>
+    <span class="kwd">print</span>(piece, end=<span class="str">""</span>, flush=<span class="kwd">True</span>)     <span class="tok"># 逐段打印，肉眼可见的打字机</span></code></pre>
+        <pre><button class="btn" data-copy-from="code-stream-js">复制</button><code id="code-stream-js"><span class="tok">// JS（浏览器原生 SSE，无需任何库）</span>
+<span class="kwd">const</span> res = <span class="kwd">await</span> fetch(<span class="str">"https://api.ltzy.top/v1/chat/completions"</span>, {
+  method: <span class="str">"POST"</span>,
+  headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>, <span class="str">"Authorization"</span>: <span class="str">"Bearer sk-anything"</span> },
+  body: JSON.stringify({ model: <span class="str">"zhipu/glm-4-flash"</span>, stream: <span class="kwd">true</span>,
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"讲个冷笑话"</span> }] }),
+});
+<span class="kwd">const</span> reader = res.body.getReader(), dec = <span class="kwd">new</span> TextDecoder();
+<span class="kwd">let</span> buf = <span class="str">""</span>, full = <span class="str">""</span>;
+<span class="kwd">while</span> (<span class="kwd">true</span>) {
+  <span class="kwd">const</span> { done, value } = <span class="kwd">await</span> reader.read();
+  <span class="kwd">if</span> (done) <span class="kwd">break</span>;
+  buf += dec.decode(value, { stream: <span class="kwd">true</span> });
+  <span class="kwd">const</span> lines = buf.split(<span class="str">"\n"</span>); buf = lines.pop();
+  <span class="kwd">for</span> (<span class="kwd">const</span> line <span class="kwd">of</span> lines) {
+    <span class="kwd">if</span> (!line.startsWith(<span class="str">"data: "</span>)) <span class="kwd">continue</span>;
+    <span class="kwd">const</span> data = line.slice(<span class="tok">6</span>);
+    <span class="kwd">if</span> (data === <span class="str">"[DONE]"</span>) <span class="kwd">break</span>;        <span class="tok">// 水管关闭信号</span>
+    <span class="kwd">const</span> j = JSON.parse(data);
+    full += j.choices[<span class="tok">0</span>].delta.content || <span class="str">""</span>;
+    <span class="tok">// 每收到一段就把 full 更新到界面（如 box.textContent = full）→ 打字机效果</span>
+  }
+}
+console.log(full);</code></pre>
+        <p class="desc">💡 本站「体验中心 · AI 对话」就是按这套逻辑实现的流式前端，可对照源码学习（仓库开源）。</p>
+      </div>
+
       <div class="api-card api-anchor">
         <h2><span class="api-method">GET</span><span class="api-endpoint">/v1/models</span></h2>
         <p class="desc">获取可用模型列表。返回 Nvidia NIM、Gitee AI、SiliconFlow、智谱 GLM、讯飞星火、官方自营与 Workers AI 的全部模型。</p>
