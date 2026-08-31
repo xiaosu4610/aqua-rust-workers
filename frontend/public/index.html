@@ -244,6 +244,36 @@
   .drop-panel a .ddesc { font-size: 11.5px; color: var(--muted); padding-left: 23px; opacity: .85; }
   .drop-panel a:hover .ddesc, .drop-panel a.active .ddesc { color: var(--accent-soft); }
 
+  /* ===== 赞助页 ===== */
+  .nav-tabs a.nav-sponsor { color: #f43f5e; }
+  .nav-tabs a.nav-sponsor:hover { color: #fb7185; }
+  [data-theme="light"] .nav-tabs a.nav-sponsor { color: #e11d48; }
+  .sponsor-head { text-align: center; padding: 46px 0 4px; }
+  .sponsor-head h1 { font-size: 26px; display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
+  .sponsor-head h1 .ic svg { width: 26px; height: 26px; }
+  .sponsor-head p { color: var(--muted); font-size: 14.5px; max-width: 640px; margin: 14px auto 0; line-height: 1.85; }
+  .sponsor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 660px; margin: 26px auto 0; }
+  .sponsor-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; text-align: center; transition: transform .15s, border-color .15s; }
+  .sponsor-card:hover { transform: translateY(-3px); border-color: var(--border-hover); }
+  .sponsor-card a { display: block; }
+  .sponsor-card img { width: 100%; max-width: 250px; border-radius: 12px; display: block; margin: 0 auto; background: #fff; padding: 10px; border: 1px solid var(--border); }
+  .sponsor-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 999px; margin-bottom: 14px; }
+  .sponsor-tag svg { width: 14px; height: 14px; }
+  .sponsor-tag.wx { color: #07c160; background: rgba(7,193,96,.13); }
+  .sponsor-tag.ali { color: #1677ff; background: rgba(22,119,255,.13); }
+  .sponsor-hint { font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+  .sponsor-why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+  .why-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .why-card .ic svg { width: 20px; height: 20px; color: var(--accent); }
+  .why-card b { display: block; margin: 10px 0 6px; font-size: 14.5px; }
+  .why-card span { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .sponsor-alt { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+  .sponsor-note { text-align: center; font-size: 12.5px; color: var(--muted); max-width: 580px; margin: 26px auto 0; line-height: 1.85; }
+  @media (max-width: 860px) {
+    .sponsor-grid { grid-template-columns: 1fr; max-width: 380px; }
+    .sponsor-why { grid-template-columns: 1fr; }
+  }
+
   /* ===== 窄桌面 (≤1280px)：收紧导航，防止标签文字被挤成竖排 ===== */
   @media (max-width: 1280px) {
     .nav-brand span { font-size: 18px; letter-spacing: 2px; }
@@ -1257,6 +1287,10 @@
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
           <span class="nt nt-long">API 文档</span><span class="nt nt-short">API</span>
         </a>
+        <a href="#/sponsor" data-tab="sponsor" class="nav-sponsor" title="赞助 AQUA · 请作者喝杯咖啡">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+          <span class="nt nt-long">赞助</span><span class="nt nt-short">赞助</span>
+        </a>
         <div class="nav-drop" data-drop>
           <button type="button" class="drop-toggle">
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
@@ -1369,6 +1403,12 @@
           <b>我的用量</b>
           <span class="qt-desc">凭你的密钥查调用统计，免注册、永久连续</span>
           <span class="qt-go">查一查 →</span>
+        </a>
+        <a class="qtile" href="#/sponsor">
+          <span class="qt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+          <b>赞助支持</b>
+          <span class="qt-desc">请作者喝杯咖啡，助服务器与算力走得更远</span>
+          <span class="qt-go">去支持 →</span>
         </a>
       </div>
     </section>
@@ -2442,6 +2482,59 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     <div class="tools-page">
       <div id="tool-body"></div>
     </div>
+  </section>
+
+  <!-- ===== 页面：赞助（主要收入来源） ===== -->
+  <section id="page-sponsor" class="page">
+    <div class="sponsor-head">
+      <h1><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>赞助 AQUA</h1>
+      <p>AQUA 是 ACU 工程系列的开源旗舰项目——接口永久免费、免注册、开放模式长期不变。但服务器、带宽与上游算力都是每月真实支出的成本。如果 AQUA 帮你的项目省了钱、省了心，欢迎请作者喝杯咖啡，这是对我们最直接的支持。</p>
+    </div>
+
+    <div class="sponsor-grid">
+      <div class="sponsor-card">
+        <span class="sponsor-tag wx"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.69 3.5C4.98 3.5 2 6.05 2 9.2c0 1.77.94 3.35 2.4 4.39l-.6 1.8 2.1-1.05c.6.17 1.24.28 1.91.3-.12-.42-.18-.86-.18-1.31 0-2.98 2.98-5.4 6.65-5.4.23 0 .45.01.67.03C14.32 5.35 11.75 3.5 8.69 3.5zM6.6 7.3a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zm4.2 0a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7zM15.4 9.2c-3.22 0-5.8 2.06-5.8 4.6 0 2.54 2.58 4.6 5.8 4.6.55 0 1.08-.06 1.58-.18l1.85.92-.53-1.58c1.28-.86 2.1-2.17 2.1-3.76 0-2.54-2.58-4.6-5.8-4.6zm-2.1 2.2a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5zm4 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"/></svg>微信收款码</span>
+        <a href="/sponsor-wechat.jpg" target="_blank" rel="noopener" title="点击查看大图"><img src="/sponsor-wechat.jpg" alt="微信收款码" loading="lazy"></a>
+        <div class="sponsor-hint">打开微信「扫一扫」→ 识别二维码 → 金额随意</div>
+      </div>
+      <div class="sponsor-card">
+        <span class="sponsor-tag ali"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.42 13.35c-.32.86-1.24 1.42-2.44 1.42-1.9 0-4.05-.9-5.98-2.1a29.16 29.16 0 0 1-4.36 2.06l-.4-.96a27.6 27.6 0 0 0 3.98-1.94 21.5 21.5 0 0 1-2.5-2.1l.75-.7s1.1 1.06 2.68 2.14c.9-1.72 1.5-3.6 1.72-5.17H8.1V7.2h3.16V5.6h1.9v1.6h3.2v.8h-3.2v1.05s2.62-.05 3.9.28c-.2 1.9-.86 4.06-1.8 5.98 1.34-.62 2.6-1.3 3.56-1.96-.9 1.28-1.98 2.52-3.16 3.6 1.66.83 3.34 1.38 4.76 1.38z"/></svg>支付宝收款码</span>
+        <a href="/sponsor-alipay.jpg" target="_blank" rel="noopener" title="点击查看大图"><img src="/sponsor-alipay.jpg" alt="支付宝收款码" loading="lazy"></a>
+        <div class="sponsor-hint">打开支付宝「扫一扫」→ 识别二维码 → 金额随意</div>
+      </div>
+    </div>
+
+    <section class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>你的赞助会用在哪里</h2>
+      <div class="sponsor-why">
+        <div class="why-card">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg></span>
+          <b>服务器与带宽</b>
+          <span>国内服务器 + 隧道链路的租用与维护，让每个接口都快且稳。</span>
+        </div>
+        <div class="why-card">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></span>
+          <b>上游算力成本</b>
+          <span>官方自营通道与密钥池的持续供给，兜底 Auto 智能路由的可用性。</span>
+        </div>
+        <div class="why-card">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span>
+          <b>持续开发</b>
+          <span>新功能、新工具与更多 ACU 生态项目，都靠你的支持推进。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2 class="sec-title"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>不花钱也一样支持</h2>
+      <div class="sponsor-alt">
+        <a class="badge" href="https://gitee.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" style="text-decoration:none;">⭐ Gitee 点个 Star</a>
+        <a class="badge" href="https://github.com/xiaosu4610/aqua-rust-workers" target="_blank" rel="noopener" style="text-decoration:none;">⭐ GitHub 点个 Star</a>
+        <a class="badge" href="https://pd.qq.com/s/e4ktxw1b8" target="_blank" rel="noopener" style="text-decoration:none;">加入 QQ 频道</a>
+        <a class="badge" href="https://qm.qq.com/q/qoe6XbsVge" target="_blank" rel="noopener" style="text-decoration:none;">加入 QQ 群 1103667832</a>
+      </div>
+      <p class="sponsor-note">赞助完全自愿、金额随意，<b>不与任何功能挂钩</b>——AQUA 所有功能永久免费，开放模式长期不变，密钥任意填即可使用、无需申请。感谢每一位支持者，你们让免费 AI 网关走得更远 ❤</p>
+    </section>
   </section>
 
   <!-- ===== 页面九：模型竞技场（盲测对比 + 投票 + 排行榜） ===== -->
@@ -5347,7 +5440,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
     var tm = hash.match(/^tools\/([a-z-]+)$/);
     if (tm) { renderTool(decodeURIComponent(tm[1])); return; }
     var tab = hash.split("?")[0] || "home";
-    if (["home", "models", "capabilities", "api", "playground", "tools", "status", "arena", "usage"].indexOf(tab) === -1) tab = "home";
+    if (["home", "models", "capabilities", "api", "playground", "tools", "status", "arena", "usage", "sponsor"].indexOf(tab) === -1) tab = "home";
     if (tab === "models") applyFilter();
     else if (tab === "capabilities") renderCapabilities();
     if (tab === "home") updateHomeStats();
@@ -5375,7 +5468,7 @@ print(r.choices[<span class="tok">0</span>].message.content)</code></pre>
       return;
     }
     var tab = hash.split("?")[0] || "home";
-    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole", "prompts", "status", "arena", "usage"].indexOf(tab) === -1) tab = "home";
+    if (["home", "models", "capabilities", "api", "playground", "tools", "treehole", "prompts", "status", "arena", "usage", "sponsor"].indexOf(tab) === -1) tab = "home";
     // 大板块归并：模型中心（模型列表/模型能力）、体验中心（AI 对话/树洞/工具箱/提示词工坊）
     // 旧 hash（#/capabilities、#/tools 等）全部兼容，直接映射到对应子板块
     var pageId = "page-" + tab;
