@@ -2287,7 +2287,23 @@ async fn extract_key(req: &Request) -> Option<String> {
     None
 }
 
-/// 固定密钥校验：key 与 GATEWAY_KEYS（逗号分隔）任意一把完全相等即放行
+/// 恒定时间字符串比较：避免通过响应耗时差异侧信道逐字节猜测密钥。
+/// 长度差异也只混入最终结果而不提前返回；逐字节遍历固定上界，比较耗时不依赖匹配前缀长度。
+fn ct_eq(a: &str, b: &str) -> bool {
+    let (ab, bb) = (a.as_bytes(), b.as_bytes());
+    let mut diff: usize = ab.len() ^ bb.len();
+    let n = ab.len().max(bb.len());
+    for i in 0..n {
+        // 越界侧补 0：任一方提前结束也不短路，避免泄露长度/前缀信息
+        let x = ab.get(i).copied().unwrap_or(0);
+        let y = bb.get(i).copied().unwrap_or(0);
+        diff |= (x ^ y) as usize;
+    }
+    diff == 0
+}
+/// 固定密钥校验：key 与 GATEWAY_KEYS（逗号分隔）任意一把完全相等即放行。
+/// 占位符 REPLACE_WITH_REAL_KEY 视为未配置——防止照抄 wrangler.toml 模板、
+/// 忘记替换时，这个公开仓库里人人皆知的字符串变成有效密钥；比较走恒定时间。
 fn key_valid(env: &Env, key: &str) -> bool {
     let Ok(cfg) = env.var("GATEWAY_KEYS") else {
         return false;
@@ -2295,8 +2311,8 @@ fn key_valid(env: &Env, key: &str) -> bool {
     let raw = cfg.to_string();
     raw.split(',')
         .map(|s| s.trim())
-        .filter(|s| !s.is_empty())
-        .any(|k| k == key)
+        .filter(|s| !s.is_empty() && *s != "REPLACE_WITH_REAL_KEY")
+        .any(|k| ct_eq(k, key))
 }
 
 /// 鉴权模式（环境变量 AUTH_MODE）：
